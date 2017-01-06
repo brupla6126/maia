@@ -1,0 +1,21 @@
+AllCops:
+  # Include:
+  Exclude:
+    - '**/*~'
+    - '*.gemspec'
+    - 'Gemfile'
+    - 'Guardfile'
+    - 'spec/spec_helper.rb'
+    - 'test/**/*'
+    - 'tmp/**/*'
+
+Metrics/AbcSize:
+  # The ABC size is a calculated magnitude, so this number can be a Fixnum or
+  # a Float.
+  Max: 30
+Metrics/LineLength:
+  Enabled: false
+
+Style/EndOfLine:
+  Enabled: false
+
