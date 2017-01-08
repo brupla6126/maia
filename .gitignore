@@ -6,10 +6,8 @@
 /doc/
 /pkg/
 /spec/reports/
-/tmp/
 /spec/data/
 /test/data/
-/test/temp/
 *.bundle
 *.so
 *.o
