@@ -1,27 +1,30 @@
 require 'araignee/architecture/creator'
 
-include Araignee, Araignee::Architecture
+include Araignee::Architecture
+
+class CreatorImpl < Creator
+  def create
+    Result.new(@attributes)
+  end
+end
 
 RSpec.describe Creator do
   describe '#execute' do
-    it 'should raise NotImplementedError' do
-      expect { Creator.execute(name: 'joe') }.to raise_error(NotImplementedError)
-    end
-  end
-
-  describe '#initialize' do
-    let(:user) { Creator.new(name: 'joe') }
-
-    context 'when creating with attributes' do
-      it 'should raise ArgumentError name must be set' do
-        expect(user.attributes[:name]).to eq('joe')
+    context 'when abstract class' do
+      it 'should raise NotImplementedError' do
+        expect { Creator.instance.execute(name: 'joe') }.to raise_error(NotImplementedError)
       end
     end
-  end
+    context 'when implemented class' do
+      let(:result) { CreatorImpl.instance.execute(name: 'joe') }
 
-  describe '#create' do
-    it 'should raise NotImplementedError' do
-      expect { Creator.new({}).create }.to raise_error(NotImplementedError)
+      it 'should return a Creator::Result' do
+        expect(result).to be_a(Creator::Result)
+      end
+
+      it 'should be successful' do
+        expect(result.successful?).to eq(true)
+      end
     end
   end
 end
@@ -51,13 +54,13 @@ RSpec.describe Creator::Result do
       it 'should default to []' do
         expect(result.messages).to eq([])
       end
-      it 'successful? should return true' do
+      it 'should return true' do
         expect(result.successful?).to eq(true)
       end
     end
 
     context 'when messages is set' do
-      it 'successful? should return false' do
+      it 'should return false' do
         expect(result_error.successful?).to eq(false)
       end
     end

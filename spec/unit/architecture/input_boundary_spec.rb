@@ -2,7 +2,7 @@ require 'araignee/architecture/input_boundary'
 
 include Araignee::Architecture
 
-RSpec.describe Araignee::Architecture::InputBoundary do
+RSpec.describe InputBoundary do
   describe '#process' do
     let(:input) { InputBoundary.new }
 

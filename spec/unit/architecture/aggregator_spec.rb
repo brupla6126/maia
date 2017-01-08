@@ -1,6 +1,6 @@
 require 'araignee/architecture/aggregator'
 
-include Araignee, Araignee::Architecture
+include Araignee::Architecture
 
 RSpec.describe Aggregator do
   describe '#execute' do

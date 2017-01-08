@@ -1,16 +1,21 @@
+require 'singleton'
+
 module Araignee
   module Architecture
-    # Creator creates an entity
+    # Creator service part of Clean Architecture.
+    # Base class to create an entity and report a result object.
     class Creator
+      include Singleton
+
       attr_reader :attributes
 
-      def self.execute(attributes)
-        new(attributes).create
+      def execute(attributes)
+        @attributes = attributes
+
+        create
       end
 
-      def initialize(attributes)
-        @attributes = attributes
-      end
+      protected
 
       def create
         raise NotImplementedError

@@ -2,7 +2,7 @@ require 'araignee/architecture/presenter'
 
 include Araignee::Architecture
 
-RSpec.describe Araignee::Architecture::Presenter do
+RSpec.describe Presenter do
   describe '#process' do
     let(:presenter) { Presenter.new }
 

@@ -1,63 +1,79 @@
 require 'araignee/architecture/finder'
 
-include Araignee, Araignee::Architecture
+include Araignee::Architecture
 
 RSpec.describe Finder do
   describe '#execute' do
-    it 'should raise NotImplementedError' do
-      expect { Finder.execute(name: 'joe') }.to raise_error(NotImplementedError)
-    end
-  end
-
-  describe '#initialize' do
-    let(:user) { Finder.new(name: 'joe') }
-
-    context 'when creating with filters' do
-      it 'should raise ArgumentError name must be set' do
-        expect(user.filters[:name]).to eq('joe')
+    context 'when with filters' do
+      it 'should raise NotImplementedError' do
+        expect { Finder.instance.execute(name: 'joe') }.to raise_error(NotImplementedError)
       end
     end
-  end
 
-  describe '#find' do
-    it 'should raise NotImplementedError' do
-      expect { Finder.new({}).find }.to raise_error(NotImplementedError)
+    context 'when without filters' do
+      it 'should raise ArgumentError, filters empty' do
+        expect { Finder.instance.execute({}) }.to raise_error(ArgumentError, 'filters empty')
+      end
     end
   end
 end
 
 RSpec.describe Finder::Result do
   describe '#initialize' do
-    let(:result) { Finder::Result.new({}, []) }
+    context 'when filters empty' do
+      it 'should raise ArgumentError filters must be set' do
+        expect { Finder::Result.new({}, [], []) }.to raise_error(ArgumentError, 'filters must be set')
+      end
+    end
 
-    context 'when name not set' do
-      it 'should raise ArgumentError name must be set' do
-        expect(result.entity).to eq({})
+    context 'when filters not empty' do
+      let(:result) { Finder::Result.new({ a: 1 }, [], []) }
+      it 'result filters should be set' do
+        expect(result.filters).to eq(a: 1)
+      end
+    end
+
+    context 'when entities set empty' do
+      let(:result) { Finder::Result.new({ a: 1 }, [], []) }
+      it 'result entities should be empty' do
+        expect(result.entities).to eq([])
+      end
+    end
+
+    context 'when entities not empty' do
+      let(:result) { Finder::Result.new({ a: 1 }, [1], []) }
+      it 'result entities should be set' do
+        expect(result.entities).to eq([1])
+      end
+    end
+
+    context 'when messages set empty' do
+      let(:result) { Finder::Result.new({ a: 1 }, [1], []) }
+      it 'result messages should equal []' do
         expect(result.messages).to eq([])
       end
     end
-    context 'when messages not set' do
-      it 'should default to []' do
-        expect(result.messages).to eq([])
+
+    context 'when messages not empty' do
+      let(:result) { Finder::Result.new({ a: 1 }, [1], ['abc']) }
+      it 'result messages should be set' do
+        expect(result.messages).to eq(['abc'])
       end
     end
   end
 
   describe '#successful?' do
-    let(:result) { Finder::Result.new({}, []) }
-    let(:result_error) { Finder::Result.new({}, ['error 1']) }
+    let(:result) { Finder::Result.new({ a: 1 }, [], []) }
+    let(:result_error) { Finder::Result.new({ a: 1 }, [], ['error 1']) }
 
-    context 'when messages not set' do
-      it 'should default to []' do
-        expect(result.messages).to eq([])
-      end
-      it 'successful? should return true' do
+    context 'when messages empty' do
+      it 'should return true' do
         expect(result.successful?).to eq(true)
       end
     end
 
     context 'when messages is set' do
-      it 'successful? should return false' do
+      it 'should return false' do
         expect(result_error.successful?).to eq(false)
       end
     end

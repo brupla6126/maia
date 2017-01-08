@@ -26,7 +26,7 @@ module Araignee
           end
         end
 
-        Log[Log].info { "Controllers: #{@controllers.keys}" }
+        Log[@name].info { "Controllers: #{@controllers.keys}" }
       end
 
       # called per request

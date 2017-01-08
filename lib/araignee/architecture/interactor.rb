@@ -18,7 +18,8 @@ module Araignee
 
       protected
 
-      # process request model and store the data from entities into the response model
+      # Derived class can process request model and store
+      # the data from entities into the response model
       def interact
         raise NotImplementedError
       end

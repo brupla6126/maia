@@ -9,7 +9,7 @@ module Repositories
   end
 end
 
-RSpec.describe Araignee::Architecture::Repository do
+RSpec.describe Repository do
   let(:objects_memory) { Repositories::Objects::Memory.new }
   after do
     Repository.clean

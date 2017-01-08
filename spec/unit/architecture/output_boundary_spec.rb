@@ -2,7 +2,7 @@ require 'araignee/architecture/output_boundary'
 
 include Araignee::Architecture
 
-RSpec.describe Araignee::Architecture::OutputBoundary do
+RSpec.describe OutputBoundary do
   describe '#process' do
     let(:output) { OutputBoundary.new }
 

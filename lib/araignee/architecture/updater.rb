@@ -1,16 +1,19 @@
+require 'singleton'
+
 module Araignee
   module Architecture
-    # Updater updates an entity
+    # Updater service part of Clean Architecture.
+    #  Base class to update an entity and report a result object.
     class Updater
+      include Singleton
+
       attr_reader :attributes
 
-      def self.execute(id, attributes)
-        new(id, attributes).update
-      end
-
-      def initialize(id, attributes)
+      def execute(id, attributes)
         @id = id
         @attributes = attributes
+
+        update
       end
 
       def update

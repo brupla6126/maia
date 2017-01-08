@@ -1,27 +1,47 @@
 require 'araignee/architecture/updater'
 
-include Araignee, Araignee::Architecture
+include Araignee::Architecture
+
+class UpdaterImpl < Updater
+  def update
+    Result.new(@id, @entity)
+  end
+end
+
+class UpdaterImplError < Updater
+  def update
+    Result.new(@id, @entity, %w(a))
+  end
+end
 
 RSpec.describe Updater do
   describe '#execute' do
-    it 'should raise NotImplementedError' do
-      expect { Updater.execute(1, name: 'joe') }.to raise_error(NotImplementedError)
-    end
-  end
-
-  describe '#initialize' do
-    let(:user) { Updater.new(1, name: 'joe') }
-
-    context 'when creating with attributes' do
-      it 'should raise ArgumentError name must be set' do
-        expect(user.attributes[:name]).to eq('joe')
+    context 'when abstract class' do
+      it 'should raise NotImplementedError' do
+        expect { Updater.instance.execute(1, name: 'joe') }.to raise_error(NotImplementedError)
       end
     end
-  end
+    context 'when implemented class' do
+      let(:result) { UpdaterImpl.instance.execute(1, name: 'joe') }
 
-  describe '#update' do
-    it 'should raise NotImplementedError' do
-      expect { Updater.new(1, {}).update }.to raise_error(NotImplementedError)
+      it 'should return a Updater::Result' do
+        expect(result).to be_a(Updater::Result)
+      end
+
+      it 'should be successful' do
+        expect(result.successful?).to eq(true)
+      end
+    end
+    context 'when implemented class with errors' do
+      let(:result) { UpdaterImplError.instance.execute(1, name: 'joe') }
+
+      it 'should return a Updater::Result' do
+        expect(result).to be_a(Updater::Result)
+      end
+
+      it 'should not be successful' do
+        expect(result.successful?).to eq(false)
+      end
     end
   end
 end
@@ -51,13 +71,13 @@ RSpec.describe Updater::Result do
       it 'should default to []' do
         expect(result.messages).to eq([])
       end
-      it 'successful? should return true' do
+      it 'should return true' do
         expect(result.successful?).to eq(true)
       end
     end
 
     context 'when messages is set' do
-      it 'successful? should return false' do
+      it 'should return false' do
         expect(result_error.successful?).to eq(false)
       end
     end

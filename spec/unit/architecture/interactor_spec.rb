@@ -1,6 +1,6 @@
 require 'araignee/architecture/interactor'
 
-include Araignee, Araignee::Architecture
+include Araignee::Architecture
 
 RSpec.describe Interactor do
   describe '#execute' do

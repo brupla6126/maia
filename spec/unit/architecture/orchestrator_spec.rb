@@ -1,6 +1,6 @@
 require 'araignee/architecture/orchestrator'
 
-include Araignee, Araignee::Architecture
+include Araignee::Architecture
 
 RSpec.describe Orchestrator do
   describe '#initialize' do
@@ -29,12 +29,14 @@ RSpec.describe Orchestrator do
       it 'interactor.process should be called once' do
         expect(interactor).to receive(:process).with(request_model, {}, {}).once
         expect(presenter).to receive(:process).with({}, {}, {}).once
+
         orchestrator.process(request_model)
       end
 
       it 'presenter.process should be called once' do
         expect(interactor).to receive(:process).with(request_model, {}, {}).once
         expect(presenter).to receive(:process).with({}, {}, {}).once
+
         orchestrator.process(request_model)
       end
 
