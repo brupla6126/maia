@@ -1,4 +1,4 @@
-require 'araignee/architecture/validator'
+require 'araignee/architecture/services/validator'
 
 include Araignee::Architecture
 
@@ -15,12 +15,6 @@ end
 
 RSpec.describe Validator do
   describe '#execute' do
-    context 'when abstract class' do
-      it 'should raise NotImplementedError' do
-        expect { Validator.instance.execute(name: 'joe') }.to raise_error(NotImplementedError)
-      end
-    end
-
     context 'when implemented class' do
       let(:result) { ValidatorImpl.instance.execute(name: 'joe') }
 

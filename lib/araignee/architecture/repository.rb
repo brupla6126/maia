@@ -1,13 +1,13 @@
 module Araignee
   module Architecture
-    # Class for global access to repositories
+    # Class for global access to objects
     class Repository
       def self.register(type, repository)
         repositories[type] = repository
       end
 
       def self.for(type)
-        repositories[type] || raise(ArgumentError, "repository :#{type} not registered")
+        repositories[type]
       end
 
       def self.repositories

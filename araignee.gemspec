@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["bplamondon66@gmail.com"]
 
   spec.summary       = %q{ Araignee Library }
-  spec.description   = %q{ Araignee Library: Core classes for creating great apps.}
+  spec.description   = %q{ Araignee Library: Core classes for creating great Ruby apps.}
   spec.homepage      = "https://github.com/brupla6126/araignee"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }

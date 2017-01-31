@@ -3,12 +3,8 @@ require 'araignee/architecture/entity'
 include Araignee::Architecture
 
 class User < Entity
-  attribute :name, String, default: ''
+  attribute :name, String, default: 'black'
   attribute :age, Integer, default: 0
-
-  def validate_attributes
-    raise ArgumentError, 'name must be set' if name.empty?
-  end
 end
 
 RSpec.describe Araignee::Architecture::Entity do
@@ -16,8 +12,14 @@ RSpec.describe Araignee::Architecture::Entity do
     let(:user) { User.new(name: 'joe') }
 
     context 'when name not set' do
-      it 'should raise ArgumentError name must be set' do
-        expect { User.new }.to raise_error(ArgumentError, 'name must be set')
+      let(:user_empty) { User.new }
+      it 'should default to black' do
+        expect(user_empty.name).to eq('black')
+      end
+    end
+    context 'when name set' do
+      it 'should equal joe' do
+        expect(user.name).to eq('joe')
       end
     end
     context 'when age not set' do

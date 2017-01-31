@@ -1,14 +1,21 @@
-require 'araignee/architecture/updater'
+require 'araignee/architecture/entity'
+require 'araignee/architecture/services/updater'
 
 include Araignee::Architecture
 
-class UpdaterImpl < Updater
-  def update
-    Result.new(@id, @entity)
+module Impl
+  class Entity < Araignee::Architecture::Entity
+    attribute :name, String
+  end
+  class Finder < Araignee::Architecture::Finder
+  end
+  class Updater < Araignee::Architecture::Updater
+  end
+  class Validator < Araignee::Architecture::Validator
   end
 end
 
-class UpdaterImplError < Updater
+class UpdaterImplError < Araignee::Architecture::Updater
   def update
     Result.new(@id, @entity, %w(a))
   end
@@ -21,17 +28,26 @@ RSpec.describe Updater do
         expect { Updater.instance.execute(1, name: 'joe') }.to raise_error(NotImplementedError)
       end
     end
-    context 'when implemented class' do
-      let(:result) { UpdaterImpl.instance.execute(1, name: 'joe') }
 
-      it 'should return a Updater::Result' do
-        expect(result).to be_a(Updater::Result)
+    context 'when implemented class' do
+      let(:result) { Impl::Updater.instance.execute(1, name: 'blow') }
+
+      after do
+        Repository.clean
       end
 
-      it 'should be successful' do
+      it 'should update the entity successfully' do
+        storage = double('storage')
+        Repository.register(Impl::Entity, storage)
+
+        expect(storage).to receive(:one).once.and_return(id: 1, name: 'joe')
+        expect(storage).to receive(:save).once
+        expect(result).to be_a(Updater::Result)
         expect(result.successful?).to eq(true)
+        expect(result.entity.name).to eq('blow')
       end
     end
+
     context 'when implemented class with errors' do
       let(:result) { UpdaterImplError.instance.execute(1, name: 'joe') }
 

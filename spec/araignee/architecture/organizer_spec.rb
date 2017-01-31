@@ -1,33 +1,33 @@
-require 'araignee/architecture/presenter'
+require 'araignee/architecture/organizer'
 
 include Araignee::Architecture
 
-RSpec.describe Presenter do
+RSpec.describe Organizer do
   describe '#process' do
-    let(:presenter) { Presenter.new }
+    let(:organizer) { Organizer.new }
 
     context 'when not derived' do
       let(:response_model) { { books_count: 3 } }
       let(:view_model) { {} }
 
       it 'should raise NotImplementedError' do
-        expect { presenter.process(response_model, view_model) }.to raise_error(NotImplementedError)
+        expect { organizer.process(response_model, view_model) }.to raise_error(NotImplementedError)
       end
     end
 
     context 'when derived' do
-      class PresenterImpl < Presenter
-        def present
+      class OrganizerImpl < Organizer
+        def organize
           @view_model[:books_count] = @response_model[:books_count].to_s
         end
       end
 
-      let(:presenter_impl) { PresenterImpl.new }
+      let(:organizer_impl) { OrganizerImpl.new }
       let(:response_model) { { books_count: 3 } }
       let(:view_model) { {} }
 
-      it 'view model returned should be Hash' do
-        presenter_impl.process(response_model, view_model)
+      it 'model data should be organized into view model' do
+        organizer_impl.process(response_model, view_model)
         expect(view_model[:books_count]).to eq('3')
       end
     end

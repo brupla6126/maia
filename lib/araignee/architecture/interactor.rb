@@ -1,9 +1,8 @@
-require 'araignee/architecture/input_boundary'
-
 module Araignee
   module Architecture
-    # Interactor receives requests from controllers, gets data from entities, sends responses to presenters and returns the view model.
-    class Interactor < InputBoundary
+    # Interactor component part of Clean Architecture.
+    # It receives requests from controllers, gets/sets data from/to entities and modifies the response model.
+    class Interactor
       def process(request_model, response_model, context = {})
         raise ArgumentError, 'request_model not set' unless request_model
         raise ArgumentError, 'response_model not set' unless response_model

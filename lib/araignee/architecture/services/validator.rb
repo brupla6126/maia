@@ -3,14 +3,15 @@ require 'singleton'
 module Araignee
   module Architecture
     # Validator service part of Clean Architecture.
-    # It validates an entity and report a result object.
+    # It validates an entity and returns a result object.
     class Validator
       include Singleton
 
       attr_reader :entity
 
-      def execute(entity)
+      def execute(entity, context = {})
         @entity = entity
+        @context = context || {}
 
         validate_entity
       end
@@ -24,7 +25,6 @@ module Araignee
       end
 
       def validate
-        raise NotImplementedError
       end
 
       # Result class for Validator

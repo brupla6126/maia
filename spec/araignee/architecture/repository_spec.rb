@@ -44,7 +44,7 @@ RSpec.describe Repository do
 
     context 'when asking inexisting repository' do
       it 'should raise ArgumentError repository :actions not registered' do
-        expect { Repository.for(:actions) }.to raise_error(ArgumentError, 'repository :actions not registered')
+        expect(Repository.for(:actions)).to eq(nil)
       end
     end
   end
