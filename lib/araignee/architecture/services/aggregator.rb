@@ -2,7 +2,7 @@ require 'singleton'
 
 module Araignee
   module Architecture
-    # Finder service part of Clean Architecture.
+    # Aggregator service.
     # Base class to aggregate data from entities and return a result object.
     class Aggregator
       include Singleton

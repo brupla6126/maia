@@ -1,22 +1,28 @@
+require 'araignee/architecture/entity'
 require 'araignee/architecture/services/validator'
 
 include Araignee::Architecture
 
-class ValidatorImpl < Validator
-  def validate
+module Impl
+  class Entity < Araignee::Architecture::Entity
+    attribute :id, Integer
+    attribute :name, String
   end
 end
 
 class ValidatorImplError < Validator
-  def validate
+  def validate_entity(_klass, _entity)
     %w(a b)
   end
 end
 
 RSpec.describe Validator do
-  describe '#execute' do
+  let(:validator) { Validator.instance }
+
+  describe '#validate' do
     context 'when implemented class' do
-      let(:result) { ValidatorImpl.instance.execute(name: 'joe') }
+      let(:params) { { klass: Impl::Entity, entity: { name: 'joe' } } }
+      let(:result) { validator.validate(params) }
 
       it 'should return a Validator::Result' do
         expect(result).to be_a(Validator::Result)
@@ -28,7 +34,8 @@ RSpec.describe Validator do
     end
 
     context 'when implemented class with errors' do
-      let(:result) { ValidatorImplError.instance.execute(name: 'joe') }
+      let(:params) { { klass: Impl::Entity, entity: { name: 'joe' } } }
+      let(:result) { ValidatorImplError.instance.validate(params) }
 
       it 'should return a Validator::Result' do
         expect(result).to be_a(Validator::Result)
@@ -85,9 +92,6 @@ RSpec.describe Validator::Result do
     context 'when messages are not set' do
       before { result_error << nil }
 
-      it 'successful? should return true' do
-        expect(result_error.successful?).to eq(true)
-      end
       it 'should have 0 messages' do
         expect(result_error.messages).to eq([])
       end
@@ -96,9 +100,6 @@ RSpec.describe Validator::Result do
     context 'when messages are empty' do
       before { result_error << [] }
 
-      it 'successful? should return true' do
-        expect(result_error.successful?).to eq(true)
-      end
       it 'should have 0 messages' do
         expect(result_error.messages).to eq([])
       end
@@ -107,9 +108,6 @@ RSpec.describe Validator::Result do
     context 'when messages are set' do
       before { result_error << %w(a b) }
 
-      it 'successful? should return false' do
-        expect(result_error.successful?).to eq(false)
-      end
       it 'should have 2 messages' do
         expect(result_error.messages).to eq(%w(a b))
       end

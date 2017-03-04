@@ -26,7 +26,13 @@ module Araignee
         end
 
         def create(entity)
-          @entities[entity[:id]] = entity
+          @entities[entity.id] = entity
+
+          true
+        end
+
+        def update(entity)
+          @entities[entity.id] = entity
 
           true
         end

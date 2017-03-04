@@ -6,6 +6,10 @@ require 'araignee/architecture/services/validator'
 
 module Araignee
   module Architecture
+    # Forward declaration to solve circular dependencies
+    module Service
+    end
+
     # Updater service part of Clean Architecture.
     # Base class to update an entity and return a result object.
     class Updater
@@ -14,55 +18,48 @@ module Araignee
 
       attr_reader :attributes
 
-      def execute(id, attributes)
-        raise NotImplementedError, 'must derive this class' if self.class == Araignee::Architecture::Updater
+      def update(klass: nil, id: nil, attributes: {})
+        raise ArgumentError, 'klass invalid' unless klass
+        raise ArgumentError, 'id invalid' unless id
+        raise ArgumentError, 'attributes empty' if attributes.empty?
 
-        @id = id
-        @attributes = attributes
+        entity = find_entity(klass, id)
 
-        update
+        entity = update_entity(entity, attributes) if entity
+
+        validation = validate_entity(klass, entity)
+
+        save_entity(klass, entity) if validation.successful?
+
+        Result.new(klass, id, entity, validation.messages)
       end
 
       protected
 
-      def update
-        find_entity
-
-        update_entity if @entity
-
-        save_entity if validation.successful?
-
-        result
+      def find_entity(klass, id)
+        result_one = finder(klass).one(klass: klass, filters: { id: id })
+        result_one.entity if result_one.successful?
       end
 
-      def find_entity
-        result_one = sibling_class(:finder).instance.one(id: @id)
-        @entity = result_one.entity if result_one.successful?
+      def update_entity(entity, attributes)
+        entity.attributes = attributes
+        entity
       end
 
-      def update_entity
-        @entity.attributes = @attributes
+      def save_entity(klass, entity)
+        storage(klass).update(entity)
       end
 
-      def save_entity
-        repository.save(@entity)
-      end
-
-      private
-
-      def validation
-        @validation ||= validator.execute(@entity, @context)
-      end
-
-      def result
-        Result.new(@id, @entity, validation.messages)
+      def validate_entity(klass, entity)
+        validator(klass).validate(klass: klass, entity: entity)
       end
 
       # Result class for Updater
       class Result
         attr_reader :id, :entity, :messages
 
-        def initialize(id, entity, messages = [])
+        def initialize(klass, id, entity, messages = [])
+          @klass = klass
           @id = id
           @entity = entity
           @messages = messages

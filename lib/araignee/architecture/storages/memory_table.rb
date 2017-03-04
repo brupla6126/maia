@@ -30,6 +30,16 @@ module Araignee
           true
         end
 
+        def update(entity)
+          if @entities.select { |e| e.id == entity.id }.any?
+            @entities.map! { |e| e.id == entity.id ? entity : e }
+          else
+            @entities << entity
+          end
+
+          true
+        end
+
         def delete(filters)
           index = @entities.index { |entity| entity.id == filters[:id] }
           entity = @entities.delete_at(index) if index

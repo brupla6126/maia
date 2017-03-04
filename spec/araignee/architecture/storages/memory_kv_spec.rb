@@ -7,6 +7,7 @@ class MyEntity
   include Virtus.model
 
   attribute :id, String
+  attribute :name, String
 end
 
 RSpec.describe Storages::MemoryKV do
@@ -85,6 +86,21 @@ RSpec.describe Storages::MemoryKV do
     it 'should have stored entity correctly' do
       expect(storage.entities.key?('abc')).to eq(true)
       expect(storage.entities['abc'].id).to eq('abc')
+    end
+  end
+
+  describe '#update' do
+    let(:filter) { { id: 'abc' } }
+    let(:entity) { MyEntity.new(id: 'abc', name: 'joe') }
+
+    before do
+      storage.update(entity)
+    end
+
+    it 'should have stored entity correctly' do
+      expect(storage.entities.key?('abc')).to eq(true)
+      expect(storage.entities['abc'].id).to eq('abc')
+      expect(storage.entities['abc'].name).to eq('joe')
     end
   end
 

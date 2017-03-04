@@ -89,6 +89,18 @@ RSpec.describe Storages::MemoryTable do
     end
   end
 
+  describe '#update' do
+    let(:entity) { MyEntity.new(id: 'abc') }
+
+    before do
+      storage.update(entity)
+    end
+
+    it 'should have stored entity correctly' do
+      expect(storage.entities.select { |entity| entity.id == 'abc' }.any?).to eq(true)
+    end
+  end
+
   describe '#delete' do
     let(:filter) { { id: 'abc' } }
     let(:entity) { MyEntity.new(id: 'abc') }

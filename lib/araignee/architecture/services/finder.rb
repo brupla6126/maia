@@ -1,78 +1,69 @@
 require 'singleton'
 require 'araignee/architecture/repository'
 require 'araignee/architecture/services/service'
-require 'araignee/architecture/services/validator'
 
 module Araignee
   module Architecture
+    # Forward declaration to solve circular dependencies
+    module Service
+    end
+
     # Finder service part of Clean Architecture.
     # Base class to find entity(ies) and return a result object.
     class Finder
       include Singleton
       include Service
 
-      def one(filters)
+      def one(klass: nil, filters: {})
+        raise ArgumentError, 'klass invalid' unless klass
         raise ArgumentError, 'filters empty' if filters.empty?
-        raise NotImplementedError, 'must derive this class' if self.class == Araignee::Architecture::Finder
 
-        @filters = filters
-
-        find_one
-
-        result
+        find_one(klass, filters)
       end
 
-      def many(filters, sort = nil, limit = nil)
+      def many(klass: nil, filters: {}, sort: nil, limit: nil)
+        raise ArgumentError, 'klass invalid' unless klass
         raise ArgumentError, 'filters empty' if filters.empty?
-        raise NotImplementedError, 'must derive this class' if self.class == Araignee::Architecture::Finder
 
-        @filters = filters
-        @sort = sort
-        @limit = limit
-
-        find_many
-
-        result
+        find_many(klass, filters, sort, limit)
       end
 
       protected
 
-      def find_one
-        @entity = nil
+      def find_one(klass, filters)
+        data = storage(klass).one(filters)
 
-        data = repository.one(@filters)
+        entity = data ? klass.new(data) : nil
 
-        @entity = entity_class.new(data) if data
+        Result.new(klass, filters, entity)
       end
 
-      def find_many
-        data = repository.many(@filters, @sort, @limit)
+      def find_many(klass, filters, sort, limit)
+        data = storage(klass).many(filters, sort, limit)
 
-        @entities = []
+        entities = []
 
-        data.each do |d|
-          @entities << entity_class.new(d) if data
+        if data
+          data.each do |d|
+            entities << klass.new(d) if data
+          end
         end
-      end
 
-      def validation
-        @validation ||= validator.execute(@entity, @context)
-      end
-
-      def result
-        Result.new(@filters, @entity, @entities, validation.messages)
+        Result.new(klass, filters, nil, entities)
       end
 
       # Result class for Finder
       class Result
         attr_reader :filters, :entity, :entities, :messages
 
-        def initialize(filters, entity, entities, messages = [])
+        def initialize(klass, filters, entity = nil, entities = nil, messages = [])
+          raise ArgumentError, 'klass must be set' unless klass
           raise ArgumentError, 'filters must be set' if filters.empty?
 
+          @klass = klass
           @filters = filters
-          @entity = entity
-          @entities = entities
+          @entity = entity if entity
+          @entities = entities if entities
           @messages = messages
         end
 
