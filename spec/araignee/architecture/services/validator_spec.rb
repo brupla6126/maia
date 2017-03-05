@@ -11,7 +11,7 @@ module Impl
 end
 
 class ValidatorImplError < Validator
-  def validate_entity(_klass, _entity)
+  def validate_entity(klass: nil, entity: nil, context: nil)
     %w(a b)
   end
 end

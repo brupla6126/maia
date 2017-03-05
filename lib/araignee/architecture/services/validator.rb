@@ -11,16 +11,16 @@ module Araignee
     class Validator
       include Singleton
 
-      def validate(klass: nil, entity: nil)
+      def validate(klass: nil, entity: nil, context: nil)
         result = Result.new
-        result << validate_entity(klass, entity)
+        result << validate_entity(klass: klass, entity: entity, context: context)
         result
       end
 
       protected
 
       # to be implemented in derived classes
-      def validate_entity(klass, entity)
+      def validate_entity(klass: nil, entity: nil, context: nil)
       end
 
       # Result class for Validator
