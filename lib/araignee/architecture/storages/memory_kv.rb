@@ -17,12 +17,13 @@ module Araignee
         end
 
         def one(filters)
+          raise ArgumentError, 'id is not set' unless filters[:id]
+
           @entities[filters[:id]]
         end
 
         def many(_filters)
-          # just returns everything
-          @entities.map { |k, v| { k => v } }
+          raise NotImplementedError
         end
 
         def create(entity)

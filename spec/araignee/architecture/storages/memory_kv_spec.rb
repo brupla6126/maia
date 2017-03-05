@@ -64,14 +64,9 @@ RSpec.describe Storages::MemoryKV do
 
   describe '#many' do
     let(:filter) { { id: 'abc' } }
-    let(:entity) { MyEntity.new(id: 'abc') }
 
-    before do
-      storage.entities['abc'] = entity
-    end
-
-    it 'should return entities' do
-      expect(storage.many(filter).any?).to eq(true)
+    it 'should raise NotImplementedError' do
+      expect { storage.many(filter) }.to raise_error(NotImplementedError)
     end
   end
 
