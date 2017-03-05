@@ -2,41 +2,43 @@ require 'singleton'
 
 module Araignee
   module Architecture
-    # Forward declaration to solve circular dependencies
-    module Service
-    end
-
-    # Validator service part of Clean Architecture.
-    # It validates an entity and returns a result object.
-    class Validator
-      include Singleton
-
-      def validate(klass: nil, entity: nil, context: nil)
-        result = Result.new
-        result << validate_entity(klass: klass, entity: entity, context: context)
-        result
+    module Services
+      # Forward declaration to solve circular dependencies
+      module Service
       end
 
-      protected
+      # Validator service part of Clean Architecture.
+      # It validates an entity and returns a result object.
+      class Validator
+        include Singleton
 
-      # to be implemented in derived classes
-      def validate_entity(klass: nil, entity: nil, context: nil)
-      end
-
-      # Result class for Validator
-      class Result
-        attr_reader :messages
-
-        def initialize
-          @messages = []
+        def validate(klass: nil, entity: nil, context: nil)
+          result = Result.new
+          result << validate_entity(klass: klass, entity: entity, context: context)
+          result
         end
 
-        def successful?
-          @messages.empty?
+        protected
+
+        # to be implemented in derived classes
+        def validate_entity(klass: nil, entity: nil, context: nil)
         end
 
-        def <<(messages)
-          @messages += messages if messages
+        # Result class for Validator
+        class Result
+          attr_reader :messages
+
+          def initialize
+            @messages = []
+          end
+
+          def successful?
+            @messages.empty?
+          end
+
+          def <<(messages)
+            @messages += messages if messages
+          end
         end
       end
     end
