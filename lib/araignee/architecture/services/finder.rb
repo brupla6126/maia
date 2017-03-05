@@ -23,7 +23,6 @@ module Araignee
 
       def many(klass: nil, filters: {}, sort: nil, limit: nil)
         raise ArgumentError, 'klass invalid' unless klass
-        raise ArgumentError, 'filters empty' if filters.empty?
 
         find_many(klass, filters, sort, limit)
       end

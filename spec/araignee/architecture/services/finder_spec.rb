@@ -85,14 +85,6 @@ RSpec.describe Finder do
       Repository.clean
     end
 
-    context 'without filters' do
-      let(:params) { { klass: Impl::Entity, filters: {} } }
-
-      it 'should raise ArgumentError, filters empty' do
-        expect { finder.many(params) }.to raise_error(ArgumentError, 'filters empty')
-      end
-    end
-
     context 'with unmatched filters' do
       let(:params) { { klass: Impl::Entity, filters: { name: 'joe' } } }
       let(:result) { finder.many(params) }
