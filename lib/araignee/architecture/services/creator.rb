@@ -15,8 +15,6 @@ module Araignee
       include Singleton
       include Service
 
-      attr_reader :attributes
-
       def create(klass: nil, attributes: {})
         raise ArgumentError, 'klass invalid' unless klass
         raise ArgumentError, 'attributes empty' if attributes.empty?

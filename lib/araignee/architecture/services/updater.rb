@@ -16,8 +16,6 @@ module Araignee
       include Singleton
       include Service
 
-      attr_reader :attributes
-
       def update(klass: nil, id: nil, attributes: {})
         raise ArgumentError, 'klass invalid' unless klass
         raise ArgumentError, 'id invalid' unless id
