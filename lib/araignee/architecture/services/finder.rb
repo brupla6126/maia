@@ -56,9 +56,8 @@ module Araignee
         class Result
           attr_reader :filters, :entity, :entities, :messages
 
-          def initialize(klass, filters, entity = nil, entities = nil, messages = [])
+          def initialize(klass, filters = {}, entity = nil, entities = nil, messages = [])
             raise ArgumentError, 'klass must be set' unless klass
-            raise ArgumentError, 'filters must be set' if filters.empty?
 
             @klass = klass
             @filters = filters

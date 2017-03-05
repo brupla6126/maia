@@ -144,8 +144,10 @@ RSpec.describe Finder::Result do
     end
 
     context 'when filters empty' do
-      it 'should raise ArgumentError filters must be set' do
-        expect { Finder::Result.new(Impl::Entity, {}, [], []) }.to raise_error(ArgumentError, 'filters must be set')
+      let(:result) { Finder::Result.new(Impl::Entity) }
+
+      it 'result filters should be empty' do
+        expect(result.filters).to eq({})
       end
     end
 
