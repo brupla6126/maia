@@ -17,11 +17,13 @@ RSpec.describe Araignee::Architecture::Entity do
         expect(user_empty.name).to eq('black')
       end
     end
+
     context 'when name set' do
       it 'should equal joe' do
         expect(user.name).to eq('joe')
       end
     end
+
     context 'when age not set' do
       it 'should default to 0' do
         expect(user.age).to eq(0)

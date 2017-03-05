@@ -3,6 +3,7 @@ require 'araignee/architecture/services/creator'
 require 'araignee/architecture/storages/memory_kv'
 
 include Araignee::Architecture
+include Araignee::Architecture::Services
 
 module Impl
   class Entity < Araignee::Architecture::Entity

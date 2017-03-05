@@ -2,13 +2,14 @@ require 'araignee/architecture/entity'
 require 'araignee/architecture/services/service'
 
 include Araignee::Architecture
+include Araignee::Architecture::Services
 
 module Impl
   class Entity < Araignee::Architecture::Entity
   end
 
   class Service
-    include Araignee::Architecture::Service
+    include Araignee::Architecture::Services::Service
   end
 end
 

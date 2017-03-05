@@ -2,6 +2,7 @@ require 'araignee/architecture/entity'
 require 'araignee/architecture/services/deleter'
 
 include Araignee::Architecture
+include Araignee::Architecture::Services
 
 module Impl
   class Entity < Araignee::Architecture::Entity

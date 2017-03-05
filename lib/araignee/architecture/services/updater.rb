@@ -6,65 +6,67 @@ require 'araignee/architecture/services/validator'
 
 module Araignee
   module Architecture
-    # Forward declaration to solve circular dependencies
-    module Service
-    end
-
-    # Updater service part of Clean Architecture.
-    # Base class to update an entity and return a result object.
-    class Updater
-      include Singleton
-      include Service
-
-      def update(klass: nil, id: nil, attributes: {})
-        raise ArgumentError, 'klass invalid' unless klass
-        raise ArgumentError, 'id invalid' unless id
-        raise ArgumentError, 'attributes empty' if attributes.empty?
-
-        entity = find_entity(klass, id)
-
-        entity = update_entity(entity, attributes) if entity
-
-        validation = validate_entity(klass, entity)
-
-        save_entity(klass, entity) if validation.successful?
-
-        Result.new(klass, id, entity, validation.messages)
+    module Services
+      # Forward declaration to solve circular dependencies
+      module Service
       end
 
-      protected
+      # Updater service part of Clean Architecture.
+      # Base class to update an entity and return a result object.
+      class Updater
+        include Singleton
+        include Service
 
-      def find_entity(klass, id)
-        result_one = finder(klass).one(klass: klass, filters: { id: id })
-        result_one.entity if result_one.successful?
-      end
+        def update(klass: nil, id: nil, attributes: {})
+          raise ArgumentError, 'klass invalid' unless klass
+          raise ArgumentError, 'id invalid' unless id
+          raise ArgumentError, 'attributes empty' if attributes.empty?
 
-      def update_entity(entity, attributes)
-        entity.attributes = attributes
-        entity
-      end
+          entity = find_entity(klass, id)
 
-      def save_entity(klass, entity)
-        storage(klass).update(entity)
-      end
+          entity = update_entity(entity, attributes) if entity
 
-      def validate_entity(klass, entity)
-        validator(klass).validate(klass: klass, entity: entity)
-      end
+          validation = validate_entity(klass, entity)
 
-      # Result class for Updater
-      class Result
-        attr_reader :id, :entity, :messages
+          save_entity(klass, entity) if validation.successful?
 
-        def initialize(klass, id, entity, messages = [])
-          @klass = klass
-          @id = id
-          @entity = entity
-          @messages = messages
+          Result.new(klass, id, entity, validation.messages)
         end
 
-        def successful?
-          @messages.empty?
+        protected
+
+        def find_entity(klass, id)
+          result_one = finder(klass).one(klass: klass, filters: { id: id })
+          result_one.entity if result_one.successful?
+        end
+
+        def update_entity(entity, attributes)
+          entity.attributes = attributes
+          entity
+        end
+
+        def save_entity(klass, entity)
+          storage(klass).update(entity)
+        end
+
+        def validate_entity(klass, entity)
+          validator(klass).validate(klass: klass, entity: entity)
+        end
+
+        # Result class for Updater
+        class Result
+          attr_reader :id, :entity, :messages
+
+          def initialize(klass, id, entity, messages = [])
+            @klass = klass
+            @id = id
+            @entity = entity
+            @messages = messages
+          end
+
+          def successful?
+            @messages.empty?
+          end
         end
       end
     end

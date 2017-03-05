@@ -3,6 +3,7 @@ require 'araignee/architecture/services/updater'
 require 'araignee/architecture/storages/memory_kv'
 
 include Araignee::Architecture
+include Araignee::Architecture::Services
 
 module Impl
   class Entity < Araignee::Architecture::Entity
@@ -11,7 +12,7 @@ module Impl
   end
 end
 
-class UpdaterImplError < Araignee::Architecture::Updater
+class UpdaterImplError < Updater
   def update
     Result.new(Impl::Entity, @id, @entity, %w(a))
   end

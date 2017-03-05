@@ -4,70 +4,72 @@ require 'araignee/architecture/services/service'
 
 module Araignee
   module Architecture
-    # Forward declaration to solve circular dependencies
-    module Service
-    end
-
-    # Finder service part of Clean Architecture.
-    # Base class to find entity(ies) and return a result object.
-    class Finder
-      include Singleton
-      include Service
-
-      def one(klass: nil, filters: {})
-        raise ArgumentError, 'klass invalid' unless klass
-        raise ArgumentError, 'filters empty' if filters.empty?
-
-        find_one(klass, filters)
+    module Services
+      # Forward declaration to solve circular dependencies
+      module Service
       end
 
-      def many(klass: nil, filters: {}, sort: nil, limit: nil)
-        raise ArgumentError, 'klass invalid' unless klass
+      # Finder service part of Clean Architecture.
+      # Base class to find entity(ies) and return a result object.
+      class Finder
+        include Singleton
+        include Service
 
-        find_many(klass, filters, sort, limit)
-      end
+        def one(klass: nil, filters: {})
+          raise ArgumentError, 'klass invalid' unless klass
+          raise ArgumentError, 'filters empty' if filters.empty?
 
-      protected
+          find_one(klass, filters)
+        end
 
-      def find_one(klass, filters)
-        data = storage(klass).one(filters)
+        def many(klass: nil, filters: {}, sort: nil, limit: nil)
+          raise ArgumentError, 'klass invalid' unless klass
 
-        entity = data ? klass.new(data) : nil
+          find_many(klass, filters, sort, limit)
+        end
 
-        Result.new(klass, filters, entity)
-      end
+        protected
 
-      def find_many(klass, filters, sort, limit)
-        data = storage(klass).many(filters, sort, limit)
+        def find_one(klass, filters)
+          data = storage(klass).one(filters)
 
-        entities = []
+          entity = data ? klass.new(data) : nil
 
-        if data
-          data.each do |d|
-            entities << klass.new(d) if data
+          Result.new(klass, filters, entity)
+        end
+
+        def find_many(klass, filters, sort, limit)
+          data = storage(klass).many(filters, sort, limit)
+
+          entities = []
+
+          if data
+            data.each do |d|
+              entities << klass.new(d) if data
+            end
           end
+
+          Result.new(klass, filters, nil, entities)
         end
 
-        Result.new(klass, filters, nil, entities)
-      end
+        # Result class for Finder
+        class Result
+          attr_reader :filters, :entity, :entities, :messages
 
-      # Result class for Finder
-      class Result
-        attr_reader :filters, :entity, :entities, :messages
+          def initialize(klass, filters, entity = nil, entities = nil, messages = [])
+            raise ArgumentError, 'klass must be set' unless klass
+            raise ArgumentError, 'filters must be set' if filters.empty?
 
-        def initialize(klass, filters, entity = nil, entities = nil, messages = [])
-          raise ArgumentError, 'klass must be set' unless klass
-          raise ArgumentError, 'filters must be set' if filters.empty?
+            @klass = klass
+            @filters = filters
+            @entity = entity if entity
+            @entities = entities if entities
+            @messages = messages
+          end
 
-          @klass = klass
-          @filters = filters
-          @entity = entity if entity
-          @entities = entities if entities
-          @messages = messages
-        end
-
-        def successful?
-          @messages.empty?
+          def successful?
+            @messages.empty?
+          end
         end
       end
     end

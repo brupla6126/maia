@@ -3,6 +3,7 @@ require 'araignee/architecture/services/finder'
 require 'araignee/architecture/storages/memory_kv'
 
 include Araignee::Architecture
+include Araignee::Architecture::Services
 
 RSpec.describe Finder do
   module Impl
