@@ -20,7 +20,7 @@ module Araignee
           @entities.select { |entity| entity.id == filters[:id] }[0]
         end
 
-        def many(_filters)
+        def many(_filters = {}, _sort = nil, _limit = nil)
           @entities
         end
 

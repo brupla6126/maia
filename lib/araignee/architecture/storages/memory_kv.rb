@@ -22,7 +22,7 @@ module Araignee
           @entities[filters[:id]]
         end
 
-        def many(_filters)
+        def many(_filters = {}, _sort = nil, _limit = nil)
           raise NotImplementedError
         end
 
