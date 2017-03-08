@@ -13,15 +13,29 @@ module Araignee
         end
 
         def exists?(filters)
-          @entities.select { |entity| entity.id == filters[:id] }.any?
+          !one(filters).nil?
         end
 
         def one(filters)
-          @entities.select { |entity| entity.id == filters[:id] }[0]
+          selected = []
+
+          filters.each_key do |key|
+            selected += @entities.select { |entity| entity.send(:"#{key}") == filters[key] }
+          end
+
+          selected.uniq.any? ? selected[0] : nil
         end
 
-        def many(_filters = {}, _sort = nil, _limit = nil)
-          @entities
+        def many(filters = {}, _sort = nil, _limit = nil)
+          return @entities if filters.empty?
+
+          selected = []
+
+          filters.each_key do |key|
+            selected += @entities.select { |entity| entity.send(:"#{key}") == filters[key] }
+          end
+
+          selected.uniq
         end
 
         def create(entity)

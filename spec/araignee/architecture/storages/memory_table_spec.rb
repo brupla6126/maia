@@ -41,17 +41,22 @@ RSpec.describe Storages::MemoryTable do
   end
 
   describe '#one' do
-    let(:entity) { MyEntity.new(id: 'abc') }
+    let(:entity) { MyEntity.new(id: 'abc', name: 'ABC') }
 
     before do
       storage.entities << entity
     end
 
     context 'when using matching filter' do
-      let(:filter_match) { { id: 'abc' } }
+      let(:filter_match_id) { { id: 'abc' } }
+      let(:filter_match_name) { { name: 'ABC' } }
 
-      it 'should return the entity' do
-        expect(storage.one(filter_match)).to eq(entity)
+      it 'should find the entity by id' do
+        expect(storage.one(filter_match_id)).to eq(entity)
+      end
+
+      it 'should find the entity by name' do
+        expect(storage.one(filter_match_name)).to eq(entity)
       end
     end
 
@@ -65,15 +70,30 @@ RSpec.describe Storages::MemoryTable do
   end
 
   describe '#many' do
-    let(:filter) { { id: 'abc' } }
-    let(:entity) { MyEntity.new(id: 'abc') }
+    let(:filter_id) { { id: 'abc' } }
+    let(:filter_name) { { name: 'ABC' } }
+    let(:entity1) { MyEntity.new(id: 'abc', name: 'ABC') }
+    let(:entity2) { MyEntity.new(id: 'xyz', name: 'XYZ') }
 
     before do
-      storage.entities << entity
+      storage.entities << entity1
+      storage.entities << entity2
     end
 
-    it 'should return entities' do
-      expect(storage.many(filter).any?).to eq(true)
+    context 'when using matching filter' do
+      it 'should find the entity by id' do
+        expect(storage.many(filter_id)).to eq([entity1])
+      end
+
+      it 'should find the entity by name' do
+        expect(storage.many(filter_name)).to eq([entity1])
+      end
+    end
+
+    context 'when using empty filter' do
+      it 'should return all entities' do
+        expect(storage.many({})).to eq([entity1, entity2])
+      end
     end
   end
 
