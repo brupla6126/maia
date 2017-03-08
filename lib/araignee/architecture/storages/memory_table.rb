@@ -11,9 +11,6 @@ module Araignee
           @entities = []
         end
 
-        def configure(_config)
-        end
-
         def exists?(filters)
           !one(filters).nil?
         end
@@ -65,6 +62,10 @@ module Araignee
 
           return 1 if entity
           0
+        end
+
+        def clear
+          @entities.clear
         end
       end
     end

@@ -107,7 +107,7 @@ RSpec.describe Storages::MemoryTable do
     end
 
     it 'should have stored entity correctly' do
-      entity = storage.entities.select { |entity| entity.name == name }[0]
+      entity = storage.entities.select { |e| e.name == name }[0]
 
       expect(entity.id).to eq(Digest::MD5.hexdigest(name))
     end
@@ -156,6 +156,19 @@ RSpec.describe Storages::MemoryTable do
       it 'should return 0' do
         expect(result).to eq(0)
       end
+    end
+  end
+
+  describe '#clear' do
+    let(:entity) { MyEntity.new(id: 'abc') }
+
+    before do
+      storage.entities << entity
+      storage.clear
+    end
+
+    it 'should be empty' do
+      expect(storage.entities.count).to eq(0)
     end
   end
 end

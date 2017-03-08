@@ -132,4 +132,17 @@ RSpec.describe Storages::MemoryKV do
       end
     end
   end
+
+  describe '#clear' do
+    let(:entity) { MyEntity.new(id: 'abc') }
+
+    before do
+      storage.entities['abc'] = entity
+      storage.clear
+    end
+
+    it 'should be empty' do
+      expect(storage.entities.count).to eq(0)
+    end
+  end
 end
