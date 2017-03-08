@@ -7,6 +7,7 @@ class MyEntity
   include Virtus.model
 
   attribute :id, String
+  attribute :name, String, default: ''
 end
 
 RSpec.describe Storages::MemoryTable do
@@ -98,14 +99,17 @@ RSpec.describe Storages::MemoryTable do
   end
 
   describe '#create' do
-    let(:entity) { MyEntity.new(id: 'abc') }
+    let(:name) { 'abc' }
+    let(:entity) { MyEntity.new(name: name) }
 
     before do
       storage.create(entity)
     end
 
     it 'should have stored entity correctly' do
-      expect(storage.entities.select { |entity| entity.id == 'abc' }.any?).to eq(true)
+      entity = storage.entities.select { |entity| entity.name == name }[0]
+
+      expect(entity.id).to eq(Digest::MD5.hexdigest(name))
     end
   end
 

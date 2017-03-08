@@ -1,3 +1,5 @@
+require 'digest/sha2'
+
 module Araignee
   module Architecture
     module Storages
@@ -39,6 +41,9 @@ module Araignee
         end
 
         def create(entity)
+          # generate id
+          entity.id = Digest::MD5.hexdigest(entity.name)
+
           @entities << entity
 
           true
