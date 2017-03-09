@@ -22,9 +22,9 @@ module Araignee
           raise ArgumentError, 'id invalid' unless id
           raise ArgumentError, 'attributes empty' if attributes.empty?
 
-          entity = find_entity(klass, id)
+          entity = find_entity(klass, id) || klass.new
 
-          entity = update_entity(entity, attributes) if entity
+          entity = update_entity(entity, attributes)
 
           validation = validate_entity(klass, entity)
 
