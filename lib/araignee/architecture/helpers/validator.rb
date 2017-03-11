@@ -2,12 +2,12 @@ require 'singleton'
 
 module Araignee
   module Architecture
-    module Services
+    module Helpers
       # Forward declaration to solve circular dependencies
-      module Service
+      module Helper
       end
 
-      # Validator service part of Clean Architecture.
+      # Validator helper part of Clean Architecture.
       # It validates an entity and returns a result object.
       class Validator
         include Singleton

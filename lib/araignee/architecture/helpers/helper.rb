@@ -1,15 +1,15 @@
 require 'araignee/architecture/repository'
-require 'araignee/architecture/services/creator'
-require 'araignee/architecture/services/deleter'
-require 'araignee/architecture/services/finder'
-require 'araignee/architecture/services/updater'
-require 'araignee/architecture/services/validator'
+require 'araignee/architecture/helpers/creator'
+require 'araignee/architecture/helpers/deleter'
+require 'araignee/architecture/helpers/finder'
+require 'araignee/architecture/helpers/updater'
+require 'araignee/architecture/helpers/validator'
 
 module Araignee
   module Architecture
-    module Services
-      # Base methods for services
-      module Service
+    module Helpers
+      # Base methods for helpers
+      module Helper
         protected
 
         def creator(klass)

@@ -1,21 +1,21 @@
 require 'singleton'
 require 'araignee/architecture/repository'
-require 'araignee/architecture/services/finder'
-require 'araignee/architecture/services/service'
-require 'araignee/architecture/services/validator'
+require 'araignee/architecture/helpers/finder'
+require 'araignee/architecture/helpers/helper'
+require 'araignee/architecture/helpers/validator'
 
 module Araignee
   module Architecture
-    module Services
+    module Helpers
       # Forward declaration to solve circular dependencies
-      module Service
+      module Helper
       end
 
-      # Updater service part of Clean Architecture.
+      # Updater helper part of Clean Architecture.
       # Base class to update an entity and return a result object.
       class Updater
         include Singleton
-        include Service
+        include Helper
 
         def update(klass: nil, id: nil, attributes: {})
           raise ArgumentError, 'klass invalid' unless klass

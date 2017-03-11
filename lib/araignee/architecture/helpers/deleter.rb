@@ -1,19 +1,19 @@
 require 'singleton'
 require 'araignee/architecture/repository'
-require 'araignee/architecture/services/service'
+require 'araignee/architecture/helpers/helper'
 
 module Araignee
   module Architecture
-    module Services
+    module Helpers
       # Forward declaration to solve circular dependencies
-      module Service
+      module Helper
       end
 
-      # Deleter service part of Clean Architecture.
+      # Deleter helper part of Clean Architecture.
       # Base class to delete an entity and return a result object.
       class Deleter
         include Singleton
-        include Service
+        include Helper
 
         def delete(klass: nil, filters: {})
           raise ArgumentError, 'klass invalid' unless klass

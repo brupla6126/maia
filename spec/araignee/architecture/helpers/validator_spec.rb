@@ -1,8 +1,8 @@
 require 'araignee/architecture/entity'
-require 'araignee/architecture/services/validator'
+require 'araignee/architecture/helpers/validator'
 
 include Araignee::Architecture
-include Araignee::Architecture::Services
+include Araignee::Architecture::Helpers
 
 module Impl
   class Entity < Araignee::Architecture::Entity

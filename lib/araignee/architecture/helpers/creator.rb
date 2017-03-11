@@ -1,20 +1,20 @@
 require 'singleton'
 require 'araignee/architecture/repository'
-require 'araignee/architecture/services/service'
-require 'araignee/architecture/services/validator'
+require 'araignee/architecture/helpers/helper'
+require 'araignee/architecture/helpers/validator'
 
 module Araignee
   module Architecture
-    module Services
+    module Helpers
       # Forward declaration to solve circular dependencies
-      module Service
+      module Helper
       end
 
-      # Creator service part of Clean Architecture.
+      # Creator helper part of Clean Architecture.
       # Base class to create an entity and return a result object.
       class Creator
         include Singleton
-        include Service
+        include Helper
 
         def create(klass: nil, attributes: {})
           raise ArgumentError, 'klass invalid' unless klass

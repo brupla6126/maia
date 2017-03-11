@@ -1,19 +1,19 @@
 require 'singleton'
 require 'araignee/architecture/repository'
-require 'araignee/architecture/services/service'
+require 'araignee/architecture/helpers/helper'
 
 module Araignee
   module Architecture
-    module Services
+    module Helpers
       # Forward declaration to solve circular dependencies
-      module Service
+      module Helper
       end
 
-      # Finder service part of Clean Architecture.
+      # Finder helper part of Clean Architecture.
       # Base class to find entity(ies) and return a result object.
       class Finder
         include Singleton
-        include Service
+        include Helper
 
         def one(klass: nil, filters: {})
           raise ArgumentError, 'klass invalid' unless klass

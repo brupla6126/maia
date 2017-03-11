@@ -1,20 +1,20 @@
 require 'araignee/architecture/entity'
-require 'araignee/architecture/services/service'
+require 'araignee/architecture/helpers/helper'
 
 include Araignee::Architecture
-include Araignee::Architecture::Services
+include Araignee::Architecture::Helpers
 
 module Impl
   class Entity < Araignee::Architecture::Entity
   end
 
-  class Service
-    include Araignee::Architecture::Services::Service
+  class Helper
+    include Araignee::Architecture::Helpers::Helper
   end
 end
 
-RSpec.describe Service do
-  let(:service) { Impl::Service.new }
+RSpec.describe Helper do
+  let(:helper) { Impl::Helper.new }
 
   before do
     Repository.register(Impl::Entity) do |helpers|
@@ -29,7 +29,7 @@ RSpec.describe Service do
   describe '#creator' do
     context 'when Creator instance NOT set in repository' do
       it 'should return Creator.instance' do
-        expect(service.send(:creator, Impl::Entity)).to eq(Creator.instance)
+        expect(helper.send(:creator, Impl::Entity)).to eq(Creator.instance)
       end
     end
 
@@ -39,7 +39,7 @@ RSpec.describe Service do
       before { Repository.register(Impl::Entity, :creator, creator) }
 
       it 'should return Creator instance registered in Repository' do
-        expect(service.send(:creator, Impl::Entity)).to eq(creator)
+        expect(helper.send(:creator, Impl::Entity)).to eq(creator)
       end
     end
   end
@@ -47,7 +47,7 @@ RSpec.describe Service do
   describe '#finder' do
     context 'when Finder instance NOT set in repository' do
       it 'should return Finder.instance' do
-        expect(service.send(:finder, Impl::Entity)).to eq(Finder.instance)
+        expect(helper.send(:finder, Impl::Entity)).to eq(Finder.instance)
       end
     end
 
@@ -57,7 +57,7 @@ RSpec.describe Service do
       before { Repository.register(Impl::Entity, :finder, finder) }
 
       it 'should return Finder instance registered in Repository' do
-        expect(service.send(:finder, Impl::Entity)).to eq(finder)
+        expect(helper.send(:finder, Impl::Entity)).to eq(finder)
       end
     end
   end
@@ -65,7 +65,7 @@ RSpec.describe Service do
   describe '#deleter' do
     context 'when Deleter instance NOT set in repository' do
       it 'should return Deleter.instance' do
-        expect(service.send(:deleter, Impl::Entity)).to eq(Deleter.instance)
+        expect(helper.send(:deleter, Impl::Entity)).to eq(Deleter.instance)
       end
     end
 
@@ -75,7 +75,7 @@ RSpec.describe Service do
       before { Repository.register(Impl::Entity, :deleter, deleter) }
 
       it 'should return Deleter instance registered in Repository' do
-        expect(service.send(:deleter, Impl::Entity)).to eq(deleter)
+        expect(helper.send(:deleter, Impl::Entity)).to eq(deleter)
       end
     end
   end
@@ -83,7 +83,7 @@ RSpec.describe Service do
   describe '#storage' do
     context 'when Storage instance NOT set in repository' do
       it 'should return nil' do
-        expect(service.send(:storage, Impl::Entity)).to eq(nil)
+        expect(helper.send(:storage, Impl::Entity)).to eq(nil)
       end
     end
 
@@ -93,7 +93,7 @@ RSpec.describe Service do
       before { Repository.register(Impl::Entity, :storage, storage) }
 
       it 'should return Storage instance registered in Repository' do
-        expect(service.send(:storage, Impl::Entity)).to eq(storage)
+        expect(helper.send(:storage, Impl::Entity)).to eq(storage)
       end
     end
   end
@@ -101,7 +101,7 @@ RSpec.describe Service do
   describe '#updater' do
     context 'when Updater instance NOT set in repository' do
       it 'should return Updater.instance' do
-        expect(service.send(:updater, Impl::Entity)).to eq(Updater.instance)
+        expect(helper.send(:updater, Impl::Entity)).to eq(Updater.instance)
       end
     end
 
@@ -111,7 +111,7 @@ RSpec.describe Service do
       before { Repository.register(Impl::Entity, :updater, updater) }
 
       it 'should return Updater instance registered in Repository' do
-        expect(service.send(:updater, Impl::Entity)).to eq(updater)
+        expect(helper.send(:updater, Impl::Entity)).to eq(updater)
       end
     end
   end
@@ -119,7 +119,7 @@ RSpec.describe Service do
   describe '#validator' do
     context 'when Validator instance NOT set in repository' do
       it 'should return Validator.instance' do
-        expect(service.send(:validator, Impl::Entity)).to eq(Validator.instance)
+        expect(helper.send(:validator, Impl::Entity)).to eq(Validator.instance)
       end
     end
 
@@ -129,7 +129,7 @@ RSpec.describe Service do
       before { Repository.register(Impl::Entity, :validator, validator) }
 
       it 'should return Validator instance registered in Repository' do
-        expect(service.send(:validator, Impl::Entity)).to eq(validator)
+        expect(helper.send(:validator, Impl::Entity)).to eq(validator)
       end
     end
   end

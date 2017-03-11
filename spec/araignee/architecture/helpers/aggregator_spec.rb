@@ -1,24 +1,18 @@
 require 'araignee/architecture/entity'
-require 'araignee/architecture/services/aggregator'
+require 'araignee/architecture/helpers/aggregator'
 
-include Araignee::Architecture
+include Araignee::Architecture, Araignee::Architecture::Helpers
 
 module Impl
   class Entity < Araignee::Architecture::Entity
     attribute :name, String
   end
-  class Aggregator < Araignee::Architecture::Aggregator
+  class Aggregator < Araignee::Architecture::Helpers::Aggregator
   end
 end
 
 RSpec.describe Aggregator do
   describe '#execute' do
-    context 'when base class' do
-      it 'should raise NotImplementedError' do
-        expect { Aggregator.instance.execute(name: 'joe') }.to raise_error(NotImplementedError)
-      end
-    end
-
     context 'when implemented class' do
       let(:result) { Impl::Aggregator.instance.execute(name: 'joe') }
 
