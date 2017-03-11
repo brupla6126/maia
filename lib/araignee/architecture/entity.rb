@@ -8,11 +8,7 @@ module Araignee
 
       def initialize(attributes = {})
         super
-
-        validate_attributes
       end
-
-      def validate_attributes; end
     end
   end
 end

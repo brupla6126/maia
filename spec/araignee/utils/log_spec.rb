@@ -70,60 +70,6 @@ RSpec.describe Utils::Log do
     end
   end
 
-  describe '#configure' do
-    let(:config) do
-      {
-        logging: {
-          loggers: {
-            console: Logger.new(STDOUT)
-          },
-          formatters: {
-          },
-          logs: {}
-        }
-      }
-    end
-
-    context 'when logger is of class Logger' do
-      before(:example) do
-        Log.close
-      end
-      after(:example) do
-        Log.close
-      end
-      it 'uses specified logger' do
-        config[:logging][:logs][:default] = {
-          logger: Logger.new(STDOUT),
-          level: Logger::DEBUG,
-          # formatter: :simple
-        }
-        Log.configure config
-        expect(Log[:default]).to eq(config[:logging][:logs][:default][:logger])
-        expect(Log[:default].level).to eq(Logger::DEBUG)
-        # expect( Log[:default].formatter).not_to eq(nil)
-      end
-    end
-
-    context 'when logger is of class Symbol' do
-      before(:example) do
-        Log.close
-      end
-      after(:example) do
-        Log.close
-      end
-      it 'gets logger from predefined logger' do
-        config[:logging][:loggers][:console] = Logger.new(STDOUT)
-        config[:logging][:logs][:default] = {
-          logger: :console,
-          # level: Logger::DEBUG,
-        }
-
-        Log.configure config
-        expect(Log[:default] == config[:logging][:loggers][:console])
-      end
-    end
-  end
-
   describe '#debug' do
     before(:example) do
       Log.close
