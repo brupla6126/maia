@@ -139,8 +139,8 @@ RSpec.describe Storages::MemoryTable do
         result = storage.delete(id: 'abc')
       end
 
-      it 'should return 1' do
-        expect(result).to eq(1)
+      it 'should return the entity' do
+        expect(result).to eq(entity)
       end
       it 'should have removed entity' do
         expect(storage.entities.select { |entity| entity.id == 'abc' }.any?).to eq(false)
@@ -153,8 +153,8 @@ RSpec.describe Storages::MemoryTable do
         result = storage.delete(id: 'xyz')
       end
 
-      it 'should return 0' do
-        expect(result).to eq(0)
+      it 'should return nil' do
+        expect(result).to eq(nil)
       end
     end
   end

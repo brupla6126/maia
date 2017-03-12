@@ -36,10 +36,7 @@ module Araignee
         end
 
         def delete(filters)
-          entity = @entities.delete(filters[:id])
-
-          return 1 if entity
-          0
+          @entities.delete(filters[:id])
         end
 
         def clear

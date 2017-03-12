@@ -114,7 +114,7 @@ RSpec.describe Storages::MemoryKV do
       end
 
       it 'should return 1' do
-        expect(result).to eq(1)
+        expect(result).to eq(entity)
       end
       it 'should have removed entity' do
         expect(storage.entities.key?('abc')).to eq(false)
@@ -128,7 +128,7 @@ RSpec.describe Storages::MemoryKV do
       end
 
       it 'should return 0' do
-        expect(result).to eq(0)
+        expect(result).to eq(nil)
       end
     end
   end
