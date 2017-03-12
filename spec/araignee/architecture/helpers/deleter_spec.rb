@@ -52,7 +52,7 @@ RSpec.describe Deleter do
         expect(storage).to receive(:delete).once.and_return(nil)
         expect(result).to be_a(Deleter::Result)
         expect(result.successful?).to eq(true)
-        expect(result.response).to eq(nil)
+        expect(result.entity).to eq(nil)
       end
     end
 
@@ -64,10 +64,10 @@ RSpec.describe Deleter do
         storage = double('storage')
         Repository.register(Impl::Entity, :storage, storage)
 
-        expect(storage).to receive(:delete).once.and_return(1)
+        expect(storage).to receive(:delete).once.and_return({ name: 'joe'})
         expect(result).to be_a(Deleter::Result)
         expect(result.successful?).to eq(true)
-        expect(result.response).to eq(1)
+        expect(result.entity[:name]).to eq('joe')
       end
     end
   end
@@ -88,17 +88,17 @@ RSpec.describe Deleter::Result do
       end
     end
 
-    context 'when response not set' do
+    context 'when entity not set' do
       let(:result) { Deleter::Result.new(Impl::Entity, { a: 1 }, nil, []) }
       it 'result entities should be empty' do
-        expect(result.response).to eq(nil)
+        expect(result.entity).to eq(nil)
       end
     end
 
-    context 'when response set' do
+    context 'when entity set' do
       let(:result) { Deleter::Result.new(Impl::Entity, { a: 1 }, 1, []) }
-      it 'result response should be set' do
-        expect(result.response).to eq(1)
+      it 'result entity should be set' do
+        expect(result.entity).to eq(1)
       end
     end
 

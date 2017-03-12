@@ -58,10 +58,7 @@ module Araignee
 
         def delete(filters)
           index = @entities.index { |entity| entity.id == filters[:id] }
-          entity = @entities.delete_at(index) if index
-
-          return 1 if entity
-          0
+          index ? @entities.delete_at(index) : nil
         end
 
         def clear

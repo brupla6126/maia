@@ -32,15 +32,15 @@ module Araignee
 
         # Result class for Deleter
         class Result
-          attr_reader :klass, :filters, :response, :messages
+          attr_reader :klass, :filters, :entity, :messages
 
-          def initialize(klass, filters, response, messages = [])
+          def initialize(klass, filters, entity, messages = [])
             raise ArgumentError, 'klass must be set' unless klass
             raise ArgumentError, 'filters empty' if filters.empty?
 
             @klass = klass
             @filters = filters
-            @response = response
+            @entity = entity
             @messages = messages
           end
 
