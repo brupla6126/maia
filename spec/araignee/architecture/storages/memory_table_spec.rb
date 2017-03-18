@@ -7,7 +7,7 @@ class MyEntity
   include Virtus.model
 
   attribute :id, String
-  attribute :name, String, default: ''
+  attribute :identifier, String, default: ''
 end
 
 RSpec.describe Storages::MemoryTable do
@@ -42,7 +42,7 @@ RSpec.describe Storages::MemoryTable do
   end
 
   describe '#one' do
-    let(:entity) { MyEntity.new(id: 'abc', name: 'ABC') }
+    let(:entity) { MyEntity.new(id: 'abc', identifier: 'ABC') }
 
     before do
       storage.entities << entity
@@ -50,14 +50,14 @@ RSpec.describe Storages::MemoryTable do
 
     context 'when using matching filter' do
       let(:filter_match_id) { { id: 'abc' } }
-      let(:filter_match_name) { { name: 'ABC' } }
+      let(:filter_match_identifier) { { identifier: 'ABC' } }
 
       it 'should find the entity by id' do
         expect(storage.one(filter_match_id)).to eq(entity)
       end
 
-      it 'should find the entity by name' do
-        expect(storage.one(filter_match_name)).to eq(entity)
+      it 'should find the entity by identifier' do
+        expect(storage.one(filter_match_identifier)).to eq(entity)
       end
     end
 
@@ -72,9 +72,9 @@ RSpec.describe Storages::MemoryTable do
 
   describe '#many' do
     let(:filter_id) { { id: 'abc' } }
-    let(:filter_name) { { name: 'ABC' } }
-    let(:entity1) { MyEntity.new(id: 'abc', name: 'ABC') }
-    let(:entity2) { MyEntity.new(id: 'xyz', name: 'XYZ') }
+    let(:filter_identifier) { { identifier: 'ABC' } }
+    let(:entity1) { MyEntity.new(id: 'abc', identifier: 'ABC') }
+    let(:entity2) { MyEntity.new(id: 'xyz', identifier: 'XYZ') }
 
     before do
       storage.entities << entity1
@@ -86,8 +86,8 @@ RSpec.describe Storages::MemoryTable do
         expect(storage.many(filter_id)).to eq([entity1])
       end
 
-      it 'should find the entity by name' do
-        expect(storage.many(filter_name)).to eq([entity1])
+      it 'should find the entity by identifier' do
+        expect(storage.many(filter_identifier)).to eq([entity1])
       end
     end
 
@@ -99,17 +99,17 @@ RSpec.describe Storages::MemoryTable do
   end
 
   describe '#create' do
-    let(:name) { 'abc' }
-    let(:entity) { MyEntity.new(name: name) }
+    let(:identifier) { 'abc' }
+    let(:entity) { MyEntity.new(identifier: identifier) }
 
     before do
       storage.create(entity)
     end
 
     it 'should have stored entity correctly' do
-      entity = storage.entities.select { |e| e.name == name }[0]
+      entity = storage.entities.select { |e| e.identifier == identifier }[0]
 
-      expect(entity.id).to eq(Digest::MD5.hexdigest(name))
+      expect(entity.id).to eq(Digest::MD5.hexdigest(identifier))
     end
   end
 

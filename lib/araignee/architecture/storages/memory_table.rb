@@ -39,7 +39,7 @@ module Araignee
 
         def create(entity)
           # generate id
-          entity.id = Digest::MD5.hexdigest(entity.name)
+          entity.id = Digest::MD5.hexdigest(entity.identifier)
 
           @entities << entity
 
