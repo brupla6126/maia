@@ -1,5 +1,3 @@
-require 'digest/sha2'
-
 module Araignee
   module Architecture
     module Storages
@@ -38,8 +36,7 @@ module Araignee
         end
 
         def create(entity)
-          # generate id
-          entity.id = Digest::MD5.hexdigest(entity.identifier)
+          entity.id = [('a'..'z'), ('A'..'Z')].map(&:to_a).flatten.shuffle[0, 16].join unless entity.id
 
           @entities << entity
 

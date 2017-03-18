@@ -106,10 +106,23 @@ RSpec.describe Storages::MemoryTable do
       storage.create(entity)
     end
 
-    it 'should have stored entity correctly' do
-      entity = storage.entities.select { |e| e.identifier == identifier }[0]
+    context 'id not set in entity' do
+      it 'should generate entity id' do
+        entity = storage.entities.select { |e| e.identifier == identifier }[0]
 
-      expect(entity.id).to eq(Digest::MD5.hexdigest(identifier))
+        expect(entity.id).not_to eq(nil)
+      end
+    end
+
+    context 'id already set in entity' do
+      let(:id) { 'abc' }
+      let(:entity) { MyEntity.new(id: id, identifier: identifier) }
+
+      it 'should not generate entity id' do
+        entity = storage.entities.select { |e| e.identifier == identifier }[0]
+
+        expect(entity.id).to eq(id)
+      end
     end
   end
 
