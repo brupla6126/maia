@@ -1,6 +1,6 @@
 require 'araignee/architecture/entity'
 require 'araignee/architecture/helpers/finder'
-require 'araignee/architecture/storages/memory_kv'
+require 'araignee/architecture/storages/memory_table'
 
 include Araignee::Architecture
 include Araignee::Architecture::Helpers
@@ -18,7 +18,7 @@ RSpec.describe Finder do
   before do
     Repository.register(Impl::Entity) do |helpers|
       helpers[:finder] = Finder.instance
-      helpers[:storage] = Storages::MemoryKV.new
+      helpers[:storage] = Storages::MemoryTable.new
     end
   end
 
@@ -84,6 +84,23 @@ RSpec.describe Finder do
   describe '#many' do
     after do
       Repository.clean
+    end
+
+    context 'with empty filters' do
+      let(:params) { { klass: Impl::Entity, filters: { name: 'joe' } } }
+      let(:result) { finder.many(params) }
+      let(:entities) { [ Impl::Entity.new(name: 'joe'), Impl::Entity.new(name: 'bill')] }
+
+      it 'should return all entities' do
+        storage = double('storage')
+        Repository.register(Impl::Entity, :storage, storage)
+
+        expect(storage).to receive(:many).once.and_return(entities)
+        expect(result).to be_a(Finder::Result)
+        expect(result.successful?).to eq(true)
+        expect(result.entities[0].name).to eq(entities[0].name)
+        expect(result.entities[1].name).to eq(entities[1].name)
+      end
     end
 
     context 'with unmatched filters' do
