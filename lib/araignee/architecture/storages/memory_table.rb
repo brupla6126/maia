@@ -26,13 +26,19 @@ module Araignee
         def many(filters = {}, _sort = nil, _limit = nil)
           return @entities if filters.empty?
 
-          selected = []
+          entities = []
 
-          filters.each_key do |key|
-            selected += @entities.select { |entity| entity.send(:"#{key}") == filters[key] }
+          @entities.each do |entity|
+            selected = true
+
+            filters.each_key do |key|
+              selected &= entity.respond_to?(:"#{key}") && entity.send(:"#{key}") == filters[key]
+            end
+
+            entities << entity if selected
           end
 
-          selected.uniq
+          entities.uniq
         end
 
         def create(entity)

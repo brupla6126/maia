@@ -8,6 +8,7 @@ class MyEntity
 
   attribute :id, String
   attribute :identifier, String, default: ''
+  attribute :context, String, default: ''
 end
 
 RSpec.describe Storages::MemoryTable do
@@ -73,11 +74,15 @@ RSpec.describe Storages::MemoryTable do
   describe '#many' do
     let(:filter_id) { { id: 'abc' } }
     let(:filter_identifier) { { identifier: 'ABC' } }
-    let(:entity1) { MyEntity.new(id: 'abc', identifier: 'ABC') }
-    let(:entity2) { MyEntity.new(id: 'xyz', identifier: 'XYZ') }
+    let(:filter_context) { { context: 'abc' } }
+    let(:filter_context_identifier) { { identifier: 'ABC', context: 'abc' } }
+
+    let(:entity1) { MyEntity.new(id: 'abc', identifier: 'ABC', context: 'abc') }
+    let(:entity2) { MyEntity.new(id: 'def', identifier: 'DEF', context: 'abc') }
+    let(:entity3) { MyEntity.new(id: 'xyz', identifier: 'XYZ', context: 'xyz') }
 
     before do
-      storage.entities << entity1 << entity2
+      storage.entities << entity1 << entity2 << entity3
     end
 
     context 'when using matching filter' do
@@ -88,11 +93,19 @@ RSpec.describe Storages::MemoryTable do
       it 'should find the entity by identifier' do
         expect(storage.many(filter_identifier)).to eq([entity1])
       end
+
+      it 'should find the entity by context and identifier' do
+        expect(storage.many(filter_context_identifier)).to eq([entity1])
+      end
+
+      it 'should find entities by context' do
+        expect(storage.many(filter_context)).to eq([entity1, entity2])
+      end
     end
 
     context 'when using empty filters' do
       it 'should return all entities' do
-        expect(storage.many({})).to eq([entity1, entity2])
+        expect(storage.many({})).to eq([entity1, entity2, entity3])
       end
     end
   end
