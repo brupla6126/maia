@@ -77,8 +77,7 @@ RSpec.describe Storages::MemoryTable do
     let(:entity2) { MyEntity.new(id: 'xyz', identifier: 'XYZ') }
 
     before do
-      storage.entities << entity1
-      storage.entities << entity2
+      storage.entities << entity1 << entity2
     end
 
     context 'when using matching filter' do
@@ -91,7 +90,7 @@ RSpec.describe Storages::MemoryTable do
       end
     end
 
-    context 'when using empty filter' do
+    context 'when using empty filters' do
       it 'should return all entities' do
         expect(storage.many({})).to eq([entity1, entity2])
       end

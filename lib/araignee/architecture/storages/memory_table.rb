@@ -44,6 +44,8 @@ module Araignee
         end
 
         def update(entity)
+          entity.id = [('a'..'z'), ('A'..'Z')].map(&:to_a).flatten.shuffle[0, 16].join unless entity.id
+
           if @entities.select { |e| e.id == entity.id }.any?
             @entities.map! { |e| e.id == entity.id ? entity : e }
           else
