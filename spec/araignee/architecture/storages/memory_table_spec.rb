@@ -43,27 +43,39 @@ RSpec.describe Storages::MemoryTable do
   end
 
   describe '#one' do
-    let(:entity) { MyEntity.new(id: 'abc', identifier: 'ABC') }
+    let(:entity1) { MyEntity.new(id: 'abc', identifier: 'ABC', context: 'abc') }
+    let(:entity2) { MyEntity.new(id: 'def', identifier: 'DEF', context: 'abc') }
+    let(:entity3) { MyEntity.new(id: 'xyz', identifier: 'XYZ', context: 'xyz') }
 
     before do
-      storage.entities << entity
+      storage.entities << entity1 << entity2 << entity3
     end
 
     context 'when using matching filter' do
-      let(:filter_match_id) { { id: 'abc' } }
-      let(:filter_match_identifier) { { identifier: 'ABC' } }
+      let(:filter_id) { { id: 'abc' } }
+      let(:filter_identifier) { { identifier: 'ABC' } }
+      let(:filter_context) { { context: 'abc' } }
+      let(:filter_context_identifier) { { identifier: 'ABC', context: 'abc' } }
 
       it 'should find the entity by id' do
-        expect(storage.one(filter_match_id)).to eq(entity)
+        expect(storage.one(filter_id)).to eq(entity1)
       end
 
       it 'should find the entity by identifier' do
-        expect(storage.one(filter_match_identifier)).to eq(entity)
+        expect(storage.one(filter_identifier)).to eq(entity1)
+      end
+
+      it 'should find the entity by context and identifier' do
+        expect(storage.one(filter_context_identifier)).to eq(entity1)
+      end
+
+      it 'should find entities by context' do
+        expect(storage.one(filter_context)).to eq(entity1)
       end
     end
 
     context 'when using unmatching filter' do
-      let(:filter_unmatch) { { id: 'xyz' } }
+      let(:filter_unmatch) { { id: '123' } }
 
       it 'should return nil' do
         expect(storage.one(filter_unmatch)).to eq(nil)

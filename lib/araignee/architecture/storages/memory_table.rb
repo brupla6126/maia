@@ -14,13 +14,19 @@ module Araignee
         end
 
         def one(filters)
-          selected = []
+          entities = []
 
-          filters.each_key do |key|
-            selected += @entities.select { |entity| entity.send(:"#{key}") == filters[key] }
+          @entities.each do |entity|
+            selected = true
+
+            filters.each_key do |key|
+              selected &= entity.respond_to?(:"#{key}") && entity.send(:"#{key}") == filters[key]
+            end
+
+            entities << entity if selected
           end
 
-          selected.uniq.any? ? selected[0] : nil
+          entities.uniq.any? ? entities[0] : nil
         end
 
         def many(filters = {}, _sort = nil, _limit = nil)
