@@ -64,7 +64,7 @@ RSpec.describe Deleter do
         storage = double('storage')
         Repository.register(Impl::Entity, :storage, storage)
 
-        expect(storage).to receive(:delete).once.and_return({ name: 'joe'})
+        expect(storage).to receive(:delete).once.and_return(name: 'joe')
         expect(result).to be_a(Deleter::Result)
         expect(result.successful?).to eq(true)
         expect(result.entity[:name]).to eq('joe')

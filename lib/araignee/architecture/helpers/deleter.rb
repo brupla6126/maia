@@ -19,15 +19,17 @@ module Araignee
           raise ArgumentError, 'klass invalid' unless klass
           raise ArgumentError, 'filters empty' if filters.empty?
 
-          response = delete_entity(klass, filters)
-
-          Result.new(klass, filters, response)
+          delete_entity(klass, filters)
         end
 
         protected
 
         def delete_entity(klass, filters)
-          storage(klass).delete(filters)
+          data = storage(klass).delete(filters)
+
+          entity = data ? klass.new(data) : nil
+
+          Result.new(klass, filters, entity)
         end
 
         # Result class for Deleter

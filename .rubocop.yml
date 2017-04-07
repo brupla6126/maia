@@ -6,6 +6,7 @@ AllCops:
     - 'Gemfile'
     - 'Guardfile'
     - 'spec/spec_helper.rb'
+    - 'tmp/**/*'
 
 Metrics/AbcSize:
   # The ABC size is a calculated magnitude, so this number can be a Fixnum or
