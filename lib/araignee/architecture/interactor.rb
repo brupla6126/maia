@@ -1,25 +1,17 @@
 module Araignee
   module Architecture
     # Interactor component part of Clean Architecture.
-    # It receives requests from controllers, gets/sets data from/to entities and modifies the response model.
+    # It receives requests from controllers, gets/sets data from/to entities and modifies the data model.
     class Interactor
-      def process(request_model, response_model, context = {})
-        raise ArgumentError, 'request_model not set' unless request_model
-        raise ArgumentError, 'response_model not set' unless response_model
-        raise ArgumentError, 'context not set' unless context
-
-        @request_model = request_model
-        @response_model = response_model
-        @context = context
-
-        interact
+      def process(request_model, data_model, context = nil)
+        interact(request_model, data_model, context)
       end
 
       protected
 
       # Derived class can process request model and store
       # the data from entities into the response model
-      def interact
+      def interact(request_model, data_model, context)
         raise NotImplementedError
       end
     end
