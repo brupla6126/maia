@@ -1,53 +1,54 @@
-require 'araignee/architecture/entity'
-require 'araignee/architecture/helpers/validator'
+require 'araignee/architecture/validator'
 
 include Araignee::Architecture
-include Araignee::Architecture::Helpers
-
-module Impl
-  class Entity < Araignee::Architecture::Entity
-    attribute :id, Integer
-    attribute :name, String
-  end
-end
-
-class ValidatorImplError < Validator
-  def validate_entity(klass: nil, entity: nil, context: nil)
-    %w(a b)
-  end
-end
 
 RSpec.describe Validator do
   let(:validator) { Validator.instance }
+  let(:errors) { %w(a b) }
+  let(:no_errors) { [] }
 
   describe '#validate' do
-    context 'when implemented class' do
-      let(:params) { { klass: Impl::Entity, entity: { name: 'joe' } } }
-      let(:result) { validator.validate(params) }
+    let(:entity) { { name: 'joe' } }
+    let(:context) { {} }
+    let(:result) { validator.validate(entity, context) }
 
-      it 'should return a Validator::Result' do
-        expect(result).to be_a(Validator::Result)
-      end
-
-      it 'should be successful' do
-        expect(result.successful?).to eq(true)
+    context 'when not implemented class' do
+      it 'should raise NotImplementedError' do
+        expect { result }.to raise_error(NotImplementedError)
       end
     end
 
-    context 'when implemented class with errors' do
-      let(:params) { { klass: Impl::Entity, entity: { name: 'joe' } } }
-      let(:result) { ValidatorImplError.instance.validate(params) }
+    context 'when implemented class' do
+      context 'without errors' do
+        before do
+          allow_any_instance_of(Validator).to receive(:validate_entity).and_return(no_errors)
+        end
 
-      it 'should return a Validator::Result' do
-        expect(result).to be_a(Validator::Result)
+        it 'should return a Validator::Result' do
+          expect(result).to be_a(Validator::Result)
+        end
+
+        it 'should be successful' do
+          expect(result.successful?).to eq(true)
+        end
       end
 
-      it 'should not be successful' do
-        expect(result.successful?).to eq(false)
-      end
+      context 'with errors' do
+        before do
+          allow_any_instance_of(Validator).to receive(:validate_entity).and_return(errors)
+        end
 
-      it 'should have 2 messages' do
-        expect(result.messages).to eq(%w(a b))
+        it 'should return a Validator::Result' do
+          expect(result).to be_a(Validator::Result)
+        end
+
+        it 'should not be successful' do
+          expect(result.successful?).to eq(false)
+        end
+
+        it 'should have 2 messages' do
+          expect(result.messages).to eq(%w(a b))
+        end
       end
     end
   end

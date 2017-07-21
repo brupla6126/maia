@@ -19,16 +19,17 @@ RSpec.describe Presenter do
     context 'when derived' do
       class PresenterImpl < Presenter
         def present(data_model, response_model, context)
-          response_model[:books_count] = data_model[:books_count].to_s
         end
+      end
+
+      before do
+        expect(presenter).to receive(:present).with(data_model, response_model, context)
       end
 
       let(:presenter) { PresenterImpl.new }
 
-      it 'model data should be presented into response_model model' do
+      it 'model data should be presented into response_model' do
         presenter.process(data_model, response_model, context)
-
-        expect(response_model[:books_count]).to eq('3')
       end
     end
   end

@@ -19,16 +19,17 @@ RSpec.describe Interactor do
     context 'when class is derived' do
       class InteractorImpl < Interactor
         def interact(request_model, data_model, context)
-          data_model[:books_count] = 3
         end
+      end
+
+      before do
+        expect(interactor).to receive(:interact).with(request_model, data_model, context)
       end
 
       let(:interactor) { InteractorImpl.new }
 
       it 'data model is updated' do
         interactor.process(request_model, data_model, context)
-
-        expect(data_model[:books_count]).to eq(3)
       end
     end
   end

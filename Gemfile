@@ -6,7 +6,7 @@ source 'https://rubygems.org' do
     gem 'rspec'
     gem 'rspec-mocks'
     gem 'simplecov'
-    gem 'timecop'
+#    gem 'timecop'
   end
 
   group :development do
@@ -16,10 +16,7 @@ source 'https://rubygems.org' do
     gem 'guard-rspec', '~> 4.7'
     gem 'rack-test'
     gem 'rack-contrib'
-    gem 'rubocop' # code smell
-#    gem 'reek' # code smell
-#    gem 'metric_fu' # code smell
-#    gem 'rails_best_practices' # code smell
+    gem 'rubocop'
     gem 'yard'
   end
 
@@ -35,6 +32,8 @@ source 'https://rubygems.org' do
 #    gem 'webmockets'
 #    gem 'httparty'
   end
+
+  gem 'supermodel', '~> 0.1'
 end
 
 # Specify your gem's dependencies in araignee.gemspec

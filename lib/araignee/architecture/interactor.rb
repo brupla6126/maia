@@ -11,7 +11,7 @@ module Araignee
 
       # Derived class can process request model and store
       # the data from entities into the response model
-      def interact(request_model, data_model, context)
+      def interact(_request_model, _data_model, _context)
         raise NotImplementedError
       end
     end
