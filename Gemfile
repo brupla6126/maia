@@ -6,7 +6,7 @@ source 'https://rubygems.org' do
     gem 'rspec'
     gem 'rspec-mocks'
     gem 'simplecov'
-#    gem 'timecop'
+    gem 'timecop'
   end
 
   group :development do
@@ -21,19 +21,7 @@ source 'https://rubygems.org' do
   end
 
   group :test do
-#    gem 'bskyb-sinatra-platform', '~> 8.0', require: %w(ext/string mysky/global/tasks)
-#    gem 'cucumber'
-#    gem 'selenium-webdriver'
-#    gem 'poltergeist', '~> 1.6.0'
-#    gem 'jasmine'
-#    gem 'jshintrb'
-#    gem 'execjs'
-#    gem 'therubyracer'
-#    gem 'webmockets'
-#    gem 'httparty'
   end
-
-  gem 'supermodel', '~> 0.1'
 end
 
 # Specify your gem's dependencies in araignee.gemspec
