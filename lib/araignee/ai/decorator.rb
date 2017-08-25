@@ -1,27 +1,22 @@
-#!/usr/bin/env ruby
-# encoding: utf-8
-
 require 'araignee/ai/node'
 
 # Module for gathering AI classes
-module Araignee::AI
+module AI
   # A Decorator Node Class, based on the Decorator Design Pattern
   class Decorator < Node
     attribute :node, Node, default: nil
 
     def initialize(attributes = {})
       super
-
-      self
     end
 
     def node=(new_node)
-      raise ArgumentError, 'new_node nil' unless new_node
+      @node.cancel if @node && @node.running?
 
-      @node.cancel if @node&.running?
-
-      super new_node
+      super(new_node)
     end
+
+    protected
 
     def start_node
       super
@@ -33,10 +28,8 @@ module Araignee::AI
       super
 
       # reset decorating node
-      @node.reset_node
+      @node.reset_node if @node
     end
-
-    protected
 
     def validate_attributes
       super

@@ -1,67 +1,87 @@
-#!/usr/bin/env ruby
-# encoding: utf-8
 require 'araignee/ai/composite'
+require 'araignee/ai/actions/succeeded'
 
-include Araignee::AI
+RSpec.describe AI::Composite do
+  let(:nodes) { [] }
+  let(:composite) { AI::Composite.new(nodes: nodes) }
 
-RSpec.describe Araignee::AI::Composite do
   describe '#initialize' do
-    context 'when has no children' do
-      it 'should raise ArgumentError must have at least one child node' do
-        expect { Composite.new(nodes: []) }.to raise_error(ArgumentError, 'must have at least one child node')
+    context 'when initializing without children nodes' do
+      it 'should  have no children' do
+        expect(composite.nodes.count).to eq(0)
       end
     end
 
-    context 'when initializing with 2 nodes' do
-      let!(:composing1) { Node.new }
-      let!(:composing2) { Node.new }
-      let(:node) { Composite.new(nodes: [composing1, composing2]) }
+    context 'when initializing with nodes' do
+      let(:child1) { AI::Node.new }
+      let(:child2) { AI::Node.new }
+      let(:nodes) { [child1, child2] }
 
-      it 'should have 2 nodes' do
-        expect(node.nodes.size).to eq(2)
-      end
-
-      it 'first child should be :composing1' do
-        expect(node.nodes[0]).to eq(composing1)
-      end
-      it 'first child should be :composing2' do
-        expect(node.nodes[1]).to eq(composing2)
+      it 'should have set children nodes' do
+        expect(composite.nodes.size).to eq(2)
+        expect(composite.nodes[0]).to eq(child1)
+        expect(composite.nodes[1]).to eq(child2)
       end
     end
   end
 
   describe '#start' do
-    let(:composing1) { Node.new }
-    let(:composing2) { Node.new }
+    context 'children nodes set' do
+      let(:nodes) { [ActionSucceeded.new] }
 
-    let(:node) { Composite.new(nodes: [composing1, composing2]) }
-    before { node.fire_state_event(:start) }
+      before { composite.fire_state_event(:start) }
 
-    it 'all nodes states should equal :running' do
-      expect(composing1.running?).to eq(true)
-      expect(composing2.running?).to eq(true)
+      it 'composite should be running' do
+        expect(composite.running?).to eq(true)
+      end
+
+      it 'children nodes should be running' do
+        nodes.each { |node| expect(node.running?).to eq(true) }
+      end
     end
   end
 
-  describe '#reset_node' do
-    let(:node) { Node.new }
-    let(:composite) { Composite.new(nodes: [node]) }
-    before { composite.reset_node }
+  describe '#add_node' do
+    let(:child1) { AI::Node.new }
+    let(:child2) { AI::Node.new }
+    let(:nodes) { [child1, child2] }
 
-    it 'node initialized? should equal true' do
-      expect(composite.initialized?).to eq(true)
+    let(:added_node) { AI::Node.new }
+    let(:index) { :last }
+
+    before { composite.add_node(added_node, index) }
+    subject { composite.nodes }
+
+    it 'should have all nodes' do
+      expect(subject.count).to eq(3)
     end
-    it 'compositing node initialized? should equal true' do
-      expect(node.initialized?).to eq(true)
+
+    context 'when insert at last position' do
+      it 'should have inserted' do
+        expect(subject[subject.count - 1]).to eq(added_node)
+      end
     end
-    it 'compositing node running? should equal false' do
-      expect(node.running?).to eq(false)
+
+    context 'when insert at specified position' do
+      let(:index) { 1 }
+
+      it 'should have inserted' do
+        expect(subject[index]).to eq(added_node)
+      end
     end
-    it 'compositing node succeeded? should equal false' do
-      expect(node.succeeded?).to eq(false)
-    end
-    it 'compositing node failed? should equal false' do
-      expect(node.failed?).to eq(false)
+  end
+
+  describe '#remove_node' do
+    let(:child1) { AI::Node.new }
+    let(:nodes) { [child1] }
+
+    let(:removed_node) { child1 }
+
+    before { composite.remove_node(removed_node) }
+    subject { composite.nodes }
+
+    it 'should have all nodes' do
+      expect(subject.count).to eq(0)
     end
   end
 end

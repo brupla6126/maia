@@ -1,7 +1,5 @@
 require 'araignee/utils/plugin'
 
-include Araignee, Araignee::Utils
-
 class EntityModel < Plugin
 end
 
@@ -22,7 +20,7 @@ class ModelFake < Plugin
   end
 end
 
-RSpec.describe Utils::Plugin do
+RSpec.describe Plugin do
   describe '#initialize' do
     let(:plugin) { Plugin.new([:one]) }
     let(:plugin_1c_0a) { Plugin.new([:crud]) }

@@ -1,8 +1,6 @@
 require 'araignee/utils/log'
 
-include Araignee, Araignee::Utils
-
-RSpec.describe Utils::Log do
+RSpec.describe Log do
   context 'when Log is not configured' do
     it 'should set default logger' do
       expect(Log[:default]).not_to eq(nil)

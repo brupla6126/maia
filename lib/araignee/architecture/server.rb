@@ -1,58 +1,54 @@
 require 'araignee/utils/plugin'
 
-include Araignee::Utils
+module Architecture
+  # Class for service server
+  class Server < Plugin
+    attr_accessor :controllers
 
-module Araignee
-  module Architecture
-    # Class for service server
-    class Server < Plugin
-      attr_accessor :controllers
+    def initialize(_contracts = [], adapters = [])
+      super([:server], adapters)
 
-      def initialize(_contracts = [], adapters = [])
-        super([:server], adapters)
+      @controllers = {}
 
-        @controllers = {}
+      Log[@name].debug { "initialize: #{self.class}" }
+    end
 
-        Log[@name].debug { "initialize: #{self.class}" }
-      end
+    def configure(config)
+      super
 
-      def configure(config)
-        super
-
-        if @config[:server]
-          @config[:server][:controllers].each do |name, klass|
-            @controllers[name] = klass.new
-            @controllers[name].configure(@config)
-          end
+      if @config[:server]
+        @config[:server][:controllers].each do |name, klass|
+          @controllers[name] = klass.new
+          @controllers[name].configure(@config)
         end
-
-        Log[@name].info { "Controllers: #{@controllers.keys}" }
       end
 
-      # called per request
-      def initiate
-        Log[@name].info { "#{@name}::initiate()" }
+      Log[@name].info { "Controllers: #{@controllers.keys}" }
+    end
 
-        @adapters.map(&:initiate)
-      end
+    # called per request
+    def initiate
+      Log[@name].info { "#{@name}::initiate()" }
 
-      # called per request
-      def terminate
-        Log[@name].info { "#{@name}::terminate()" }
+      @adapters.map(&:initiate)
+    end
 
-        @adapters.map(&:terminate)
-      end
+    # called per request
+    def terminate
+      Log[@name].info { "#{@name}::terminate()" }
 
-      def serve
-      end
+      @adapters.map(&:terminate)
+    end
 
-      def operation_supported?(object, action)
-        @controllers.key?(object) && @controllers[object].respond_to?(action)
-      end
+    def serve
+    end
 
-      def execute(object, action, request)
-        @controllers[object].send(action, request)
-      end
+    def operation_supported?(object, action)
+      @controllers.key?(object) && @controllers[object].respond_to?(action)
+    end
+
+    def execute(object, action, request)
+      @controllers[object].send(action, request)
     end
   end
 end

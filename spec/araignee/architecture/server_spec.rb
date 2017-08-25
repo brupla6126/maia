@@ -1,9 +1,7 @@
 require 'araignee/architecture/server'
 require 'araignee/utils/plugger'
 
-include Araignee, Araignee::Architecture
-
-RSpec.describe Server do
+RSpec.describe Architecture::Server do
   class ControllerTest
     def configure(config)
     end
@@ -13,7 +11,7 @@ RSpec.describe Server do
   end
 
   describe '#initialize' do
-    let(:server1) { Server.new }
+    let(:server1) { Architecture::Server.new }
 
     context 'initializes a server with no contract and no adapters' do
       it 'name should be generated from classname' do
@@ -30,7 +28,7 @@ RSpec.describe Server do
 
   describe '#configure' do
     let(:adapter) { double('adapter') }
-    let(:server) { Server.new([], [adapter]) }
+    let(:server) { Architecture::Server.new([], [adapter]) }
 
     before do
       Plugger.add_contract(:server, [:initiate, :terminate])
@@ -62,7 +60,7 @@ RSpec.describe Server do
 
   describe '#initiate' do
     let(:adapter) { double('adapter') }
-    let(:server) { Server.new([], [adapter]) }
+    let(:server) { Architecture::Server.new([], [adapter]) }
 
     before do
       Plugger.add_contract(:server, [:initiate, :terminate])
@@ -78,7 +76,7 @@ RSpec.describe Server do
 
   describe '#terminate' do
     let(:adapter) { double('adapter') }
-    let(:server) { Server.new([], [adapter]) }
+    let(:server) { Architecture::Server.new([], [adapter]) }
 
     before do
       Plugger.add_contract(:server, [:initiate, :terminate])
@@ -93,7 +91,7 @@ RSpec.describe Server do
   end
 
   describe '#operation_supported?' do
-    let(:server) { Server.new }
+    let(:server) { Architecture::Server.new }
 
     before do
       Plugger.add_contract(:server, [:initiate, :terminate])
@@ -109,7 +107,7 @@ RSpec.describe Server do
 
   describe '#execute' do
     let(:controller) { double('adapter') }
-    let(:server) { Server.new }
+    let(:server) { Architecture::Server.new }
 
     before do
       Plugger.add_contract(:server, [:initiate, :terminate])

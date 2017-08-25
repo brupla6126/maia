@@ -1,7 +1,5 @@
 require 'araignee/utils/plugger'
 
-include Araignee, Araignee::Utils
-
 class EntityModel < Plugin
   def initialize(contracts = [], adapters = [])
     super

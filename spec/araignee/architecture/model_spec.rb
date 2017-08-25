@@ -1,9 +1,7 @@
 require 'araignee/architecture/model'
 
-include Araignee::Architecture
-
-RSpec.describe Araignee::Architecture::Model do
-  class User < Model
+RSpec.describe Architecture::Model do
+  class User < Architecture::Model
     attributes :name
     attributes :age
     attributes :country

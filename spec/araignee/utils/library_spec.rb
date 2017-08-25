@@ -1,7 +1,5 @@
 require 'araignee/utils/library'
 
-include Araignee, Araignee::Utils
-
 library = File.join File.dirname(__FILE__), 'data'
 
 RSpec.configure do |config|

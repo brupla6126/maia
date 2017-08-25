@@ -1,15 +1,13 @@
 require 'araignee/architecture/orchestrator'
 
-include Araignee::Architecture
-
-RSpec.describe Orchestrator do
+RSpec.describe Architecture::Orchestrator do
   describe '#process' do
     let(:interactor) { double('interactor') }
     let(:presenter) { double('presenter') }
     let(:request_model) { { operation: 'books.count' } }
 
     context 'when class is derived' do
-      let(:orchestrator) { Orchestrator.new([interactor], [presenter]) }
+      let(:orchestrator) { Architecture::Orchestrator.new([interactor], [presenter]) }
 
       let(:data_model) { {} }
       let(:response_model) { {} }

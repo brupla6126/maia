@@ -1,9 +1,7 @@
 require 'araignee/architecture/validator'
 
-include Araignee::Architecture
-
-RSpec.describe Validator do
-  let(:validator) { Validator.instance }
+RSpec.describe Architecture::Validator do
+  let(:validator) { Architecture::Validator.instance }
   let(:errors) { %w(a b) }
   let(:no_errors) { [] }
 
@@ -21,11 +19,11 @@ RSpec.describe Validator do
     context 'when implemented class' do
       context 'without errors' do
         before do
-          allow_any_instance_of(Validator).to receive(:validate_entity).and_return(no_errors)
+          allow_any_instance_of(Architecture::Validator).to receive(:validate_entity).and_return(no_errors)
         end
 
         it 'should return a Validator::Result' do
-          expect(result).to be_a(Validator::Result)
+          expect(result).to be_a(Architecture::Validator::Result)
         end
 
         it 'should be successful' do
@@ -35,11 +33,11 @@ RSpec.describe Validator do
 
       context 'with errors' do
         before do
-          allow_any_instance_of(Validator).to receive(:validate_entity).and_return(errors)
+          allow_any_instance_of(Architecture::Validator).to receive(:validate_entity).and_return(errors)
         end
 
         it 'should return a Validator::Result' do
-          expect(result).to be_a(Validator::Result)
+          expect(result).to be_a(Architecture::Validator::Result)
         end
 
         it 'should not be successful' do
@@ -54,9 +52,9 @@ RSpec.describe Validator do
   end
 end
 
-RSpec.describe Validator::Result do
+RSpec.describe Architecture::Validator::Result do
   describe '#initialize' do
-    let(:result) { Validator::Result.new }
+    let(:result) { Architecture::Validator::Result.new }
 
     it 'messages should be empty' do
       expect(result.messages.empty?).to eq(true)
@@ -64,8 +62,8 @@ RSpec.describe Validator::Result do
   end
 
   describe '#successful?' do
-    let(:result) { Validator::Result.new }
-    let(:result_error) { Validator::Result.new }
+    let(:result) { Architecture::Validator::Result.new }
+    let(:result_error) { Architecture::Validator::Result.new }
 
     context 'when messages not set' do
       it 'successful? should return true' do
@@ -89,7 +87,7 @@ RSpec.describe Validator::Result do
   end
 
   describe '#<<' do
-    let(:result_error) { Validator::Result.new }
+    let(:result_error) { Architecture::Validator::Result.new }
 
     context 'when messages are not set' do
       before { result_error << nil }

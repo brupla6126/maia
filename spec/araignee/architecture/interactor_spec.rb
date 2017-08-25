@@ -1,15 +1,13 @@
 require 'araignee/architecture/interactor'
 
-include Araignee::Architecture
-
-RSpec.describe Interactor do
+RSpec.describe Architecture::Interactor do
   describe '#process' do
     let(:request_model) { { operation: 'books.count' } }
     let(:data_model) { {} }
     let(:context) { {} }
 
     context 'when class is not derived' do
-      let(:interactor) { Interactor.new }
+      let(:interactor) { Architecture::Interactor.new }
 
       it 'should raise NotImplementedError' do
         expect { interactor.process(request_model, data_model, context) }.to raise_error(NotImplementedError)
@@ -17,7 +15,7 @@ RSpec.describe Interactor do
     end
 
     context 'when class is derived' do
-      class InteractorImpl < Interactor
+      class InteractorImpl < Architecture::Interactor
         def interact(request_model, data_model, context)
         end
       end

@@ -1,5 +1,5 @@
 describe Araignee do
-  describe 'require araignee_architecture' do
+  describe 'require araignee.rb' do
     it 'should not raise error' do
       expect { require 'araignee' }.not_to raise_error
     end

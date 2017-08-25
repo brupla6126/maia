@@ -1,13 +1,11 @@
-#!/usr/bin/env ruby
-# encoding: utf-8
 require 'araignee/ai/leaf'
 
-include Araignee::AI
+RSpec.describe AI::Leaf do
+  let(:leaf) { AI::Leaf.new }
 
-RSpec.describe Araignee::AI::Leaf do
   describe '#initialize' do
-    context 'when initialze ok' do
-      # node = Leaf.new
+    it 'should not raise error' do
+      expect { leaf }.not_to raise_error
     end
   end
 end

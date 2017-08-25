@@ -1,11 +1,9 @@
 require 'araignee/architecture/client'
 require 'araignee/utils/plugger'
 
-include Araignee::Architecture
-
-RSpec.describe Araignee::Architecture::Client do
+RSpec.describe Architecture::Client do
   describe '#initialize' do
-    let(:client1) { Client.new }
+    let(:client1) { Architecture::Client.new }
 
     context 'initializes a client with no contract and no adapters' do
       it 'name should be generated from classname' do
@@ -22,7 +20,7 @@ RSpec.describe Araignee::Architecture::Client do
 
   describe '#configure' do
     let(:adapter) { double('adapter') }
-    let(:client) { Client.new([], [adapter]) }
+    let(:client) { Architecture::Client.new([], [adapter]) }
 
     before do
       Plugger.add_contract(:client, [:initiate, :terminate])
@@ -38,7 +36,7 @@ RSpec.describe Araignee::Architecture::Client do
 
   describe '#initiate' do
     let(:adapter) { double('adapter') }
-    let(:client) { Client.new([], [adapter]) }
+    let(:client) { Architecture::Client.new([], [adapter]) }
 
     before do
       Plugger.add_contract(:client, [:initiate, :terminate])
@@ -54,7 +52,7 @@ RSpec.describe Araignee::Architecture::Client do
 
   describe '#terminate' do
     let(:adapter) { double('adapter') }
-    let(:client) { Client.new([], [adapter]) }
+    let(:client) { Architecture::Client.new([], [adapter]) }
 
     before do
       Plugger.add_contract(:client, [:initiate, :terminate])
