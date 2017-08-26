@@ -20,6 +20,9 @@
 #$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 #puts "LOAD_PATH: #{$LOAD_PATH}"
 
+require 'araignee/utils/log'
+require 'pry-byebug'
+
 require 'simplecov'
 SimpleCov.start
 

@@ -3,9 +3,9 @@
 source 'https://rubygems.org' do
   group :development, :test do
     gem 'parallel_tests'
+    gem 'pry-byebug', '~> 3.5'
     gem 'rspec'
     gem 'rspec-mocks'
-    gem 'simplecov'
     gem 'timecop'
   end
 
@@ -21,6 +21,7 @@ source 'https://rubygems.org' do
   end
 
   group :test do
+    gem 'simplecov'
   end
 end
 
