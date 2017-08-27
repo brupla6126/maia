@@ -8,6 +8,8 @@ module AI
       def process(entity, world)
         super
 
+        busy! unless running?
+
         self
       end
     end

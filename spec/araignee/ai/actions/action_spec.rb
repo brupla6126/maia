@@ -8,12 +8,10 @@ RSpec.describe AI::Actions::Action do
 
   let(:action) { ActionSucceeded.new }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
-    before { action.fire_state_event(:start) }
+    before { action.start! }
     subject { action.process(entity, world) }
 
     it 'should have succeeded' do

@@ -13,7 +13,7 @@ module AI
 
         entity[:number] += 1
 
-        fire_state_event(:success)
+        succeed! unless succeeded?
 
         self
       end
@@ -28,10 +28,10 @@ module AI
         @called ||= 1
 
         if @called <= @times
-          fire_state_event(:success)
+          succeed! unless succeeded?
         else
-          fire_state_event(:start)
-          fire_state_event(:failure)
+          start! unless started?
+          failure!
         end
 
         @called += 1

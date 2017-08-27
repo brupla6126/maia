@@ -4,13 +4,17 @@ require 'araignee/ai/actions/action'
 module AI
   # Module for gathering Behavior Tree Action classes
   module Actions
-    class ActionCanceled < AI::Actions::Action
+    class ActionStopped < AI::Actions::Action
       def initialize(attributes = {})
         super
       end
 
-      def start_node
-        fire_state_event(:cancel)
+      def process(entity, world)
+        super
+
+        stop! unless stopped?
+
+        self
       end
     end
   end

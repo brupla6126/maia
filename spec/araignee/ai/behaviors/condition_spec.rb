@@ -1,4 +1,5 @@
 require 'araignee/ai/actions/failed'
+require 'araignee/ai/actions/running'
 require 'araignee/ai/actions/succeeded'
 require 'araignee/ai/behaviors/condition'
 
@@ -13,9 +14,7 @@ RSpec.describe AI::Behaviors::Condition do
   let(:no) { ActionFailed.new }
   let(:condition) { AI::Behaviors::Condition.new(term: term, yes: yes, no: no) }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#initialize' do
     context 'when term, yes and no are set' do
@@ -31,8 +30,8 @@ RSpec.describe AI::Behaviors::Condition do
     end
   end
 
-  describe '#start' do
-    subject { condition.fire_state_event(:start) }
+  describe '#start!' do
+    subject { condition.start! }
 
     context 'when term is not set' do
       let(:term) { nil }
@@ -65,14 +64,29 @@ RSpec.describe AI::Behaviors::Condition do
     end
   end
 
+  describe '#stop!' do
+    before { condition.start! }
+    before { condition.stop! }
+
+    it 'condition should be stopped' do
+      expect(condition.stopped?).to eq(true)
+    end
+
+    it 'term, yes, no should be stopped' do
+      expect(term.stopped?).to eq(true)
+      expect(yes.stopped?).to eq(true)
+      expect(no.stopped?).to eq(true)
+    end
+  end
+
   describe '#process' do
+    before { condition.start! }
+    subject { condition.process(entity, world) }
+
     context 'when term resolve to true' do
       let(:term) { ActionSucceeded.new }
       let(:yes) { ActionSucceeded.new }
       let(:no) { ActionFailed.new }
-
-      before { condition.fire_state_event(:start) }
-      subject { condition.process(entity, world) }
 
       it 'should have succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -84,11 +98,18 @@ RSpec.describe AI::Behaviors::Condition do
       let(:yes) { ActionSucceeded.new }
       let(:no) { ActionFailed.new }
 
-      before { condition.fire_state_event(:start) }
-      subject { condition.process(entity, world) }
-
       it 'should have failed' do
         expect(subject.failed?).to eq(true)
+      end
+    end
+
+    context 'when executed node state is running' do
+      let(:term) { ActionSucceeded.new }
+      let(:yes) { ActionRunning.new }
+      let(:no) { ActionFailed.new }
+
+      it 'should be running' do
+        expect(subject.running?).to eq(true)
       end
     end
   end

@@ -12,8 +12,8 @@ module AI
 
         @node.process(entity, world)
 
-        fire_state_event(:failure) if @node.succeeded?
-        fire_state_event(:success) if @node.failed?
+        failure! if @node.succeeded?
+        succeed! if @node.failed?
 
         self
       end

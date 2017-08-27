@@ -9,9 +9,9 @@ module AI
       def process(entity, world)
         super
 
-        @node.process(entity, world) if @node.running?
+        @node.process(entity, world) if @node.active?
 
-        fire_state_event(:failure)
+        failure! unless failed?
 
         self
       end

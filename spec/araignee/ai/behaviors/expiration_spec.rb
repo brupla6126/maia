@@ -13,9 +13,7 @@ RSpec.describe AI::Behaviors::Expiration do
   let(:expires) { 5 }
   let(:expiration) { AI::Behaviors::Expiration.new(node: node, expires: expires) }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#initialize' do
     context 'when expires is not set' do
@@ -31,7 +29,7 @@ RSpec.describe AI::Behaviors::Expiration do
       let(:expires) { nil }
 
       it 'should raise ArgumentError expires not set' do
-        expect { expiration.fire_state_event(:start) }.to raise_error(ArgumentError, ':expires not set')
+        expect { expiration.start! }.to raise_error(ArgumentError, ':expires not set')
       end
     end
   end
@@ -39,11 +37,10 @@ RSpec.describe AI::Behaviors::Expiration do
   describe '#process' do
     let(:expires) { 3 }
 
-    before { expiration.fire_state_event(:start) }
+    before { expiration.start! }
+    subject { expiration }
 
     context 'when doing 2 loops of ActionSucceeded and maximum equals to 3' do
-      subject { expiration.succeeded? }
-
       it 'should have succeeded' do
         1.upto(2) do
           expiration.process(entity, world)
@@ -51,7 +48,7 @@ RSpec.describe AI::Behaviors::Expiration do
           Timecop.travel(Time.now + 1)
         end
 
-        expect(subject).to eq(true)
+        expect(subject.succeeded?).to eq(true)
 
         Timecop.return
       end
@@ -60,8 +57,6 @@ RSpec.describe AI::Behaviors::Expiration do
     context 'when doing 5 loops of ActionSucceeded but maximum equals to 3' do
       let(:node) { ActionRunning.new }
 
-      subject { expiration.failed? }
-
       it 'should have failed' do
         1.upto(5) do
           expiration.process(entity, world)
@@ -69,10 +64,14 @@ RSpec.describe AI::Behaviors::Expiration do
           Timecop.travel(Time.now + 1)
         end
 
-        expect(subject).to eq(true)
+        expect(subject.failed?).to eq(true)
 
         Timecop.return
       end
+    end
+
+    it 'returns self' do
+      expect(subject).to eq(expiration)
     end
   end
 end

@@ -13,12 +13,10 @@ RSpec.describe AI::Behaviors::Inverter do
   let(:node) { action_success }
   let(:inverter) { AI::Behaviors::Inverter.new(node: node) }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
-    before { inverter.fire_state_event(:start) }
+    before { inverter.start! }
     subject { inverter.process(entity, world) }
 
     context 'when inverter processes a node that succeeded' do

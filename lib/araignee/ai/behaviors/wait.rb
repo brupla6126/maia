@@ -14,14 +14,18 @@ module AI
 
         reset_attribute(:start_time) unless @start_time
 
-        fire_state_event(:success) if Time.now - @start_time > @delay
+        if Time.now - @start_time > @delay
+          succeed!
+        else
+          busy!
+        end
 
         self
       end
 
       protected
 
-      def start_node
+      def node_starting
         super
 
         reset_attribute(:start_time)

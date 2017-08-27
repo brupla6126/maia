@@ -2,6 +2,8 @@ require 'araignee/ai/actions/succeeded'
 require 'araignee/ai/behaviors/repeater'
 require 'araignee/ai/behaviors/repetition/repeat_number_times'
 
+include AI::Actions
+
 RSpec.describe AI::Behaviors::Repetition::RepeatNumberTimes do
   class RepetitionNumberTimes < AI::Behaviors::Repeater
     include AI::Behaviors::Repetition::RepeatNumberTimes
@@ -14,12 +16,10 @@ RSpec.describe AI::Behaviors::Repetition::RepeatNumberTimes do
   let(:times) { 5 }
   let(:repetition) { RepetitionNumberTimes.new(node: node, times: times) }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#repeat_process' do
-    before { repetition.fire_state_event(:start) }
+    before { repetition.start! }
     subject { repetition.repeat_process(entity, world) }
 
     context 'number of times negative' do

@@ -26,7 +26,7 @@ class Plugin
   end
 
   def configure(config)
-    Log[@name].info { "#{@name}::configure()" }
+    Log.info { "#{@name}::configure()" }
 
     @config = config
 

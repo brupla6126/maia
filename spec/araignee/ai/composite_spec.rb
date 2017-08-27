@@ -1,13 +1,15 @@
 require 'araignee/ai/composite'
 require 'araignee/ai/actions/succeeded'
 
+include AI::Actions
+
 RSpec.describe AI::Composite do
   let(:nodes) { [] }
   let(:composite) { AI::Composite.new(nodes: nodes) }
 
   describe '#initialize' do
     context 'when initializing without children nodes' do
-      it 'should  have no children' do
+      it 'should have no children' do
         expect(composite.nodes.count).to eq(0)
       end
     end
@@ -22,21 +24,46 @@ RSpec.describe AI::Composite do
         expect(composite.nodes[0]).to eq(child1)
         expect(composite.nodes[1]).to eq(child2)
       end
+
+      it 'composite should be ready' do
+        expect(composite.ready?).to eq(true)
+      end
+
+      it 'children nodes should be ready' do
+        nodes.each { |node| expect(node.ready?).to eq(true) }
+      end
     end
   end
 
-  describe '#start' do
+  describe '#start!' do
     context 'children nodes set' do
       let(:nodes) { [ActionSucceeded.new] }
 
-      before { composite.fire_state_event(:start) }
+      before { composite.start! }
 
-      it 'composite should be running' do
-        expect(composite.running?).to eq(true)
+      it 'composite should be started' do
+        expect(composite.started?).to eq(true)
       end
 
-      it 'children nodes should be running' do
-        nodes.each { |node| expect(node.running?).to eq(true) }
+      it 'children nodes should be started' do
+        nodes.each { |node| expect(node.started?).to eq(true) }
+      end
+    end
+  end
+
+  describe '#stop!' do
+    context 'children nodes set' do
+      let(:nodes) { [ActionSucceeded.new] }
+
+      before { composite.start! }
+      before { composite.stop! }
+
+      it 'composite should be stopped' do
+        expect(composite.stopped?).to eq(true)
+      end
+
+      it 'children nodes should be stopped' do
+        nodes.each { |node| expect(node.stopped?).to eq(true) }
       end
     end
   end

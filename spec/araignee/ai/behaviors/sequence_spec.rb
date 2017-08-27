@@ -12,12 +12,10 @@ RSpec.describe AI::Behaviors::Sequence do
   let(:sequence) { AI::Behaviors::Sequence.new(nodes: nodes) }
   let(:entity) { { number: 0 } }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
-    before { sequence.fire_state_event(:start) }
+    before { sequence.start! }
     subject { sequence.process(entity, world) }
 
     let(:nodes) { [ActionSucceeded.new] }
@@ -50,7 +48,7 @@ RSpec.describe AI::Behaviors::Sequence do
       let(:succeeded_node) { ActionSucceeded.new }
       let(:nodes) { [ActionSucceeded.new, succeeded_node] }
 
-      before { succeeded_node.fire_state_event(:success) }
+      before { succeeded_node.succeed! }
 
       it 'should have failed' do
         expect(subject.succeeded?).to eq(true)

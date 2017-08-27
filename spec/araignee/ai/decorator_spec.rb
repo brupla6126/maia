@@ -12,24 +12,39 @@ RSpec.describe AI::Decorator do
     end
   end
 
-  describe '#start' do
+  describe '#start!' do
     context 'child node nil' do
       let(:decorating) { nil }
 
       it 'raise ArgumentError' do
-        expect { decorator.fire_state_event(:start) }.to raise_error(ArgumentError)
+        expect { decorator.start! }.to raise_error(ArgumentError)
       end
     end
 
     context 'child node set' do
-      before { decorator.fire_state_event(:start) }
+      before { decorator.start! }
 
-      it 'decorator should be running' do
-        expect(decorator.running?).to eq(true)
+      it 'decorator should be started' do
+        expect(decorator.started?).to eq(true)
       end
 
-      it 'decorating node should be running' do
-        expect(decorator.node.running?).to eq(true)
+      it 'decorating node should be started' do
+        expect(decorator.node.started?).to eq(true)
+      end
+    end
+  end
+
+  describe '#stop!' do
+    context 'child node set' do
+      before { decorator.start! }
+      before { decorator.stop! }
+
+      it 'decorator should be stopped' do
+        expect(decorator.stopped?).to eq(true)
+      end
+
+      it 'child node should be stopped' do
+        expect(decorating.stopped?).to eq(true)
       end
     end
   end

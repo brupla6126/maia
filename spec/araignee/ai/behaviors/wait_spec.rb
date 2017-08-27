@@ -1,15 +1,11 @@
 require 'timecop'
 require 'araignee/ai/behaviors/wait'
 
-include AI::Actions
-
 RSpec.describe AI::Behaviors::Wait do
   let(:world) { double('[world]') }
   let(:entity) { { number: 0 } }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   let(:delay) { 3 }
   let(:wait) { AI::Behaviors::Wait.new(delay: delay) }
@@ -19,13 +15,13 @@ RSpec.describe AI::Behaviors::Wait do
       let(:wait) { AI::Behaviors::Wait.new }
 
       it 'should raise ArgumentError delay must be > 0' do
-        expect { wait.fire_state_event(:start) }.to raise_error(ArgumentError, 'delay must be > 0')
+        expect { wait.start! }.to raise_error(ArgumentError, 'delay must be > 0')
       end
     end
   end
 
   describe '#process' do
-    before { wait.fire_state_event(:start) }
+    before { wait.start! }
     subject { wait.process(entity, world) }
 
     context 'when wait of 3 seconds' do

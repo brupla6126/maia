@@ -1,4 +1,5 @@
 require 'araignee/ai/actions/failed'
+require 'araignee/ai/actions/running'
 require 'araignee/ai/actions/succeeded'
 require 'araignee/ai/behaviors/selector'
 
@@ -11,9 +12,7 @@ RSpec.describe AI::Behaviors::Selector do
   let(:nodes) { [ActionSucceeded.new] }
   let(:selector) { AI::Behaviors::Selector.new(nodes: nodes) }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#initialize' do
     context 'when given nodes' do
@@ -24,19 +23,11 @@ RSpec.describe AI::Behaviors::Selector do
   end
 
   describe '#process' do
-    before { selector.fire_state_event(:start) }
+    before { selector.start! }
     subject { selector.process(entity, world) }
 
     context 'when ActionSucceeded' do
       let(:nodes) { [ActionSucceeded.new] }
-
-      it 'should have succeeded' do
-        expect(subject.succeeded?).to eq(true)
-      end
-    end
-
-    context 'when ActionSucceeded, ActionSucceeded' do
-      let(:nodes) { [ActionSucceeded.new, ActionSucceeded.new] }
 
       it 'should have succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -48,6 +39,14 @@ RSpec.describe AI::Behaviors::Selector do
 
       it 'should have succeeded' do
         expect(subject.succeeded?).to eq(true)
+      end
+    end
+
+    context 'when ActionFailed, ActionRunning' do
+      let(:nodes) { [ActionFailed.new, ActionRunning.new] }
+
+      it 'should be running' do
+        expect(subject.running?).to eq(true)
       end
     end
 

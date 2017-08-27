@@ -11,7 +11,7 @@ module AI
 
         @node.process(entity, world) if @node.running?
 
-        fire_state_event(:success)
+        succeed!
 
         self
       end

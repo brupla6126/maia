@@ -26,12 +26,6 @@ module AI
 
           winner = ranges.keys.select { |range| range.include?(lucky_number) }.first
 
-          puts "total_weight: #{total_weight}"
-          puts "ranges: #{ranges}"
-          puts "lucky_number: #{lucky_number}"
-          puts "winner: #{winner}"
-          puts "winning node: #{ranges[winner].inspect}"
-
           ranges[winner]
         end
       end

@@ -15,12 +15,10 @@ RSpec.describe AI::Behavior::Repetition::RepeatUntilSuccess do
   let(:node) { ActionTemporarySucceeded.new(times: 3) }
   let(:repeater) { RepeaterUntilSuccess.new(node: node) }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
-    before { repeater.fire_state_event(:start) }
+    before { repeater.start! }
     subject { repeater.process(entity, world) }
 
     it 'should have succeeded' do

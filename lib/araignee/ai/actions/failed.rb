@@ -11,7 +11,7 @@ module AI
       def process(entity, world)
         super
 
-        fire_state_event(:failure)
+        failure! unless failed?
 
         self
       end
@@ -26,10 +26,10 @@ module AI
         @called ||= 1
 
         if @called <= @times
-          fire_state_event(:failure)
+          failure! unless failed?
         else
-          fire_state_event(:start)
-          fire_state_event(:success)
+          start! unless started?
+          succeed!
         end
 
         @called += 1

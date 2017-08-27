@@ -15,26 +15,29 @@ module AI
       def process(entity, world)
         super
 
-        stats = { failed: 0 }
-        nodes_processed = 0
+        running = 0
+        succeeded = 0
 
-        nodes = @nodes.select(&:running?)
+        nodes = @nodes.select(&:active?)
         nodes = order_nodes(nodes) if respond_to?(:order_nodes)
 
         nodes.each do |node|
           case node.process(entity, world).state_name
+          when :running
+            running += 1
           when :succeeded
-            fire_state_event(:success)
+            succeeded += 1
             break
-          when :failed
-            stats[:failed] += 1
           end
-
-          nodes_processed += 1
         end
 
-        # fail if all children nodes have failed
-        fire_state_event(:failure) if stats[:failed] == nodes_processed
+        if succeeded > 0
+          succeed!
+        elsif running > 0
+          busy!
+        else
+          failure!
+        end
 
         self
       end

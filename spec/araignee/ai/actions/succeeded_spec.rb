@@ -13,7 +13,7 @@ RSpec.describe AI::Actions::ActionSucceeded do
   end
 
   describe '#process' do
-    before { action.fire_state_event(:start) }
+    before { action.start! }
     subject { action.process(entity, world) }
 
     it 'should have succeeded' do
@@ -26,15 +26,13 @@ RSpec.describe AI::Actions::ActionTemporarySucceeded do
   let(:world) { double('[world]') }
   let(:entity) { { number: 0 } }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
     let(:times) { 0 }
     let(:action) { ActionTemporarySucceeded.new(times: times) }
 
-    before { action.fire_state_event(:start) }
+    before { action.start! }
     subject { action.process(entity, world) }
 
     it 'should have failed' do

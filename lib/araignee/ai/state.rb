@@ -46,22 +46,22 @@ module AI
 
     # called when entering the state
     def enter
-      Log[:state].info { "Entering state #{self.class}" }
+      Log[:ai].info { "Entering state #{self.class}" }
     end
 
     # called when pausing the state
     def pause
-      Log[:state].info { "Pausing state #{self.class}" }
+      Log[:ai].info { "Pausing state #{self.class}" }
     end
 
     # called when resuming the state
     def resume
-      Log[:state].info { "Resuming state #{self.class}" }
+      Log[:ai].info { "Resuming state #{self.class}" }
     end
 
     # called when leaving the state
     def leave
-      Log[:state].info { "Leaving state #{self.class}" }
+      Log[:ai].info { "Leaving state #{self.class}" }
     end
   end
 end

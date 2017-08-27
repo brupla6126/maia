@@ -6,19 +6,19 @@ module Architecture
     def initialize(_contracts = [], adapters = [])
       super([:client], adapters)
 
-      Log[@name].debug { "initialize: #{self.class}" }
+      Log[:architecture].debug { "initialize: #{self.class}" }
     end
 
     # called per request
     def initiate
-      Log[@name].info { "#{@name}::initiate()" }
+      Log[:architecture].info { "#{@name}::initiate()" }
 
       @adapters.map(&:initiate)
     end
 
     # called per request
     def terminate
-      Log[@name].info { "#{@name}::terminate()" }
+      Log[:architecture].info { "#{@name}::terminate()" }
 
       @adapters.map(&:terminate)
     end

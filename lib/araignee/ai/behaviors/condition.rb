@@ -20,23 +20,41 @@ module AI
 
         case @term.process(entity, world).state_name
         when :succeeded
-          send_event(@yes.process(entity, world).state_name)
+          executing_node = @yes
         when :failed
-          send_event(@no.process(entity, world).state_name)
+          executing_node = @no
         end
+
+        handle_result(executing_node.process(entity, world).state_name) if executing_node
 
         self
       end
 
-      def start_node
+      protected
+
+      def node_starting
         super
 
-        @term.fire_state_event(:start)
-        @yes.fire_state_event(:start)
-        @no.fire_state_event(:start)
+        @term.start!
+        @yes.start!
+        @no.start!
       end
 
-      protected
+      def node_stopping
+        super
+
+        @term.stop!
+        @yes.stop!
+        @no.stop!
+      end
+
+      def handle_result(result)
+        case result
+        when :succeeded then succeed!
+        when :failed then failure!
+        when :running then busy!
+        end
+      end
 
       def validate_attributes
         super

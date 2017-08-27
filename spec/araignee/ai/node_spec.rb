@@ -3,16 +3,15 @@ require 'araignee/ai/node'
 RSpec.describe AI::Node do
   let(:world) { double('[world]') }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   let(:node) { AI::Node.new }
+  subject { node }
 
   describe '#initialize' do
     context 'without attributes' do
-      it 'state should be initialized' do
-        expect(node.state?(:initialized)).to eq(true)
+      it 'state should be ready' do
+        expect(node.ready?).to eq(true)
       end
 
       it 'elapsed should equal 0' do
@@ -27,8 +26,6 @@ RSpec.describe AI::Node do
 
   describe '' do
     context 'with values set with accessors' do
-      before { node.fire_state_event(:start) }
-
       it 'values should be set' do
         node.elapsed = 25
 
@@ -41,10 +38,8 @@ RSpec.describe AI::Node do
     let(:entity) { {} }
 
     context 'when entity parameter is nil' do
-      before do
-        node.failure
-        node.process(entity, world)
-      end
+      before { subject.start! }
+      before { subject.process(entity, world) }
 
       it 'node @elapsed should be updated' do
         expect(node.elapsed).to eq(1)
@@ -56,750 +51,481 @@ RSpec.describe AI::Node do
     end
   end
 
-  describe '#start' do
-    before do
-      node.fire_state_event(:start)
-    end
-
-    context 'from state :initiated' do
-      it 'running? should equal true' do
-        expect(node.running?).to eq(true)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
+  describe '#active?' do
+    context 'with state :ready' do
+      it 'should be true' do
+        expect(subject.active?).to eq(false)
       end
     end
 
-    context 'from state :running' do
-      before do
-        node.fire_state_event(:start)
+    context 'started' do
+      before { subject.start! }
+
+      context 'with state :started' do
+        it 'should be true' do
+          expect(subject.active?).to eq(true)
+        end
       end
 
-      it 'running? should stay equal true' do
-        expect(node.running?).to eq(true)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'with state :stopped' do
+        before { subject.stop! }
 
-    context 'from state :canceled' do
-      before do
-        node.fire_state_event(:cancel)
-        node.fire_state_event(:start)
+        it 'should be true' do
+          expect(subject.active?).to eq(false)
+        end
       end
 
-      it 'running? should equal true' do
-        expect(node.running?).to eq(true)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'with state :paused' do
+        before { subject.pause! }
 
-    context 'from state :paused' do
-      before do
-        node.fire_state_event(:pause)
-        node.fire_state_event(:start)
+        it 'should be true' do
+          expect(subject.active?).to eq(false)
+        end
       end
 
-      it 'paused? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(true)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'with state :running' do
+        before { subject.busy! }
 
-    context 'from state :succeeded' do
-      before do
-        node.fire_state_event(:success)
-        node.fire_state_event(:start)
+        it 'should be true' do
+          expect(subject.active?).to eq(true)
+        end
       end
 
-      it 'running? should equal true' do
-        expect(node.running?).to eq(true)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'with state :succeeded' do
+        before { subject.succeed! }
 
-    context 'from state :failed' do
-      before do
-        node.fire_state_event(:failure)
-        node.fire_state_event(:start)
+        it 'should be true' do
+          expect(subject.active?).to eq(true)
+        end
       end
 
-      it 'running? should equal true' do
-        expect(node.running?).to eq(true)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'with state :failed' do
+        before { subject.failure! }
 
-    context 'from state :terminated' do
-      before do
-        node.fire_state_event(:terminate)
-        node.fire_state_event(:start)
-      end
-
-      it 'terminated? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
+        it 'should be true' do
+          expect(subject.active?).to eq(true)
+        end
       end
     end
   end
 
-  describe '#success' do
-    before do
-      node.fire_state_event(:start)
-    end
+  describe '#start!' do
+    context 'from state :ready' do
+      before { subject.start! }
 
-    context 'from state :running' do
-      before do
-        node.fire_state_event(:success)
-      end
-
-      it 'running? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(true)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
+      it 'should be started' do
+        expect(subject.started?).to eq(true)
       end
     end
 
-    context 'from state :canceled' do
-      before do
-        node.fire_state_event(:cancel)
-        node.fire_state_event(:success)
+    context 'started' do
+      before { subject.start! }
+
+      context 'from state :started' do
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.start! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'canceled? should stay equal true' do
-        expect(node.running?).to eq(false)
-        # expect(node.processing?).to eq(true)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(true)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :stopped' do
+        before { subject.stop! }
+        before { subject.start! }
 
-    context 'from state :paused' do
-      before do
-        node.fire_state_event(:pause)
-        node.fire_state_event(:success)
+        it 'should be started' do
+          expect(subject.started?).to eq(true)
+        end
       end
 
-      it 'paused? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(true)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :running' do
+        before { subject.busy! }
 
-    context 'from state :succeeded' do
-      before do
-        node.fire_state_event(:success)
-        node.fire_state_event(:success)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.start! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'running? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(true)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :succeeded' do
+        before { subject.succeed! }
+        before { subject.start! }
 
-    context 'from state :failed' do
-      before do
-        node.fire_state_event(:failure)
-        node.fire_state_event(:success)
+        it 'should be started' do
+          expect(subject.started?).to eq(true)
+        end
       end
 
-      it 'failed? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(true)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :failed' do
+        before { subject.failure! }
+        before { subject.start! }
 
-    context 'from state :terminated' do
-      before do
-        node.fire_state_event(:terminate)
-        node.fire_state_event(:success)
-      end
-
-      it 'terminated? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
+        it 'should be started' do
+          expect(subject.started?).to eq(true)
+        end
       end
     end
   end
 
-  describe '#failure' do
-    before do
-      node.fire_state_event(:start)
-    end
-
-    context 'from state :running' do
-      before do
-        node.fire_state_event(:failure)
-      end
-
-      it 'running? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(true)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
+  describe '#stop!' do
+    context 'from state :ready' do
+      it 'should raise StateMachines::InvalidTransition' do
+        expect { subject.stop! }.to raise_error(StateMachines::InvalidTransition)
       end
     end
 
-    context 'from state :canceled' do
-      before do
-        node.fire_state_event(:cancel)
-        node.fire_state_event(:failure)
+    context 'started' do
+      before { subject.start! }
+
+      context 'from state :started' do
+        before { subject.stop! }
+
+        it 'should be stopped' do
+          expect(node.stopped?).to eq(true)
+        end
       end
 
-      it 'canceled? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(true)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :stopped' do
+        before { subject.stop! }
 
-    context 'from state :paused' do
-      before do
-        node.fire_state_event(:pause)
-        node.fire_state_event(:failure)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.stop! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'paused? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(true)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :paused' do
+        before { subject.pause! }
+        before { subject.stop! }
 
-    context 'from state :succeeded' do
-      before do
-        node.fire_state_event(:success)
-        node.fire_state_event(:failure)
+        it 'should be stopped' do
+          expect(node.stopped?).to eq(true)
+        end
       end
 
-      it 'running? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(true)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :running' do
+        before { subject.busy! }
+        before { subject.stop! }
 
-    context 'from state :failed' do
-      before do
-        node.fire_state_event(:failure)
-        node.fire_state_event(:failure)
+        it 'should be stopped' do
+          expect(node.stopped?).to eq(true)
+        end
       end
 
-      it 'failed? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(true)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :succeeded' do
+        before { subject.succeed! }
+        before { subject.stop! }
 
-    context 'from state :terminated' do
-      before do
-        node.fire_state_event(:terminate)
-        node.fire_state_event(:failure)
+        it 'should be stopped' do
+          expect(node.stopped?).to eq(true)
+        end
       end
 
-      it 'terminated? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
+      context 'from state :failed' do
+        before { subject.failure! }
+        before { subject.stop! }
+
+        it 'should be stopped' do
+          expect(node.stopped?).to eq(true)
+        end
       end
     end
   end
 
-  describe '#cancel' do
-    before do
-      node.fire_state_event(:start)
-    end
-
-    context 'from state :running' do
-      before do
-        node.fire_state_event(:cancel)
-      end
-
-      it 'running? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(true)
-        expect(node.terminated?).to eq(false)
-      end
-    end
-  end
-
-  describe '#pause' do
-    before do
-      node.fire_state_event(:start)
-    end
-
-    context 'from state :running' do
-      before do
-        node.fire_state_event(:pause)
-      end
-
-      it 'running? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(true)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
+  describe '#pause!' do
+    context 'from state :ready' do
+      it 'should raise StateMachines::InvalidTransition' do
+        expect { subject.pause! }.to raise_error(StateMachines::InvalidTransition)
       end
     end
 
-    context 'from state :canceled' do
-      before do
-        node.fire_state_event(:cancel)
-        node.fire_state_event(:pause)
+    context 'started' do
+      before { subject.start! }
+
+      context 'from state :started' do
+        before { subject.pause! }
+
+        it 'should be paused' do
+          expect(node.paused?).to eq(true)
+        end
       end
 
-      it 'canceled? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(true)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :stopped' do
+        before { subject.stop! }
 
-    context 'from state :paused' do
-      before do
-        node.fire_state_event(:pause)
-        node.fire_state_event(:pause)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.pause! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'paused? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(true)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :paused' do
+        before { subject.pause! }
 
-    context 'from state :succeeded' do
-      before do
-        node.fire_state_event(:success)
-        node.fire_state_event(:pause)
+        it 'should be paused' do
+          expect(node.paused?).to eq(true)
+        end
       end
 
-      it 'succeeded? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(true)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :running' do
+        before { subject.busy! }
+        before { subject.pause! }
 
-    context 'from state :failed' do
-      before do
-        node.fire_state_event(:failure)
-        node.fire_state_event(:pause)
+        it 'should be paused' do
+          expect(node.paused?).to eq(true)
+        end
       end
 
-      it 'failed? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(true)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :succeeded' do
+        before { subject.succeed! }
 
-    context 'from state :terminated' do
-      before do
-        node.fire_state_event(:terminate)
-        node.fire_state_event(:pause)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.pause! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'terminated? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
+      context 'from state :failed' do
+        before { subject.failure! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.pause! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
     end
   end
 
-  describe '#resume' do
-    before do
-      node.fire_state_event(:start)
-    end
-
-    context 'from state :running' do
-      before do
-        node.fire_state_event(:resume)
-      end
-
-      it 'running? should equal true' do
-        expect(node.running?).to eq(true)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
+  describe '#resume!' do
+    context 'from state :ready' do
+      it 'should raise StateMachines::InvalidTransition' do
+        expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
       end
     end
 
-    context 'from state :canceled' do
-      before do
-        node.fire_state_event(:cancel)
-        node.fire_state_event(:resume)
+    context 'started' do
+      before { subject.start! }
+
+      context 'from state :started' do
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'canceled? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(true)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :stopped' do
+        before { subject.stop! }
 
-    context 'from state :paused' do
-      before do
-        node.fire_state_event(:pause)
-        node.fire_state_event(:resume)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'running? should equal true' do
-        expect(node.running?).to eq(true)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :paused' do
+        before { subject.pause! }
+        before { subject.resume! }
 
-    context 'from state :succeeded' do
-      before do
-        node.fire_state_event(:success)
-        node.fire_state_event(:resume)
+        it 'should be started' do
+          expect(node.started?).to eq(true)
+        end
       end
 
-      it 'succeeded? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(true)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :running' do
+        before { subject.busy! }
 
-    context 'from state :failed' do
-      before do
-        node.fire_state_event(:failure)
-        node.fire_state_event(:resume)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'failed? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(true)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
+      context 'from state :succeeded' do
+        before { subject.succeed! }
 
-    context 'from state :terminated' do
-      before do
-        node.fire_state_event(:terminate)
-        node.fire_state_event(:resume)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'terminated? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
-      end
-    end
+      context 'from state :failed' do
+        before { subject.failure! }
 
-    context 'from state :canceled' do
-      before do
-        node.fire_state_event(:cancel)
-        node.fire_state_event(:cancel)
-      end
-
-      it 'canceled? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(true)
-        expect(node.terminated?).to eq(false)
-      end
-    end
-
-    context 'from state :paused' do
-      before do
-        node.fire_state_event(:pause)
-        node.fire_state_event(:cancel)
-      end
-
-      it 'paused? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(true)
-        expect(node.terminated?).to eq(false)
-      end
-    end
-
-    context 'from state :succeeded' do
-      before do
-        node.fire_state_event(:success)
-        node.fire_state_event(:cancel)
-      end
-
-      it 'running? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(true)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
-
-    context 'from state :failed' do
-      before do
-        node.fire_state_event(:failure)
-        node.fire_state_event(:cancel)
-      end
-
-      it 'failed? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(true)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(false)
-      end
-    end
-
-    context 'from state :terminated' do
-      before do
-        node.fire_state_event(:terminate)
-        node.fire_state_event(:cancel)
-      end
-
-      it 'terminated? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
     end
   end
 
-  describe '#terminate' do
-    before do
-      node.fire_state_event(:start)
-    end
-
-    context 'from state :running' do
-      before do
-        node.fire_state_event(:terminate)
-      end
-
-      it 'terminated? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
+  describe '#busy!' do
+    context 'from state :ready' do
+      it 'should raise StateMachines::InvalidTransition' do
+        expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
       end
     end
 
-    context 'from state :canceled' do
-      before do
-        node.fire_state_event(:cancel)
-        node.fire_state_event(:terminate)
+    context 'started' do
+      before { subject.start! }
+
+      context 'from state :started' do
+        before { subject.busy! }
+
+        it 'should be running' do
+          expect(node.running?).to eq(true)
+        end
       end
 
-      it 'terminated? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
-      end
-    end
+      context 'from state :stopped' do
+        before { subject.stop! }
 
-    context 'from state :paused' do
-      before do
-        node.fire_state_event(:pause)
-        node.fire_state_event(:terminate)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'terminated? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
-      end
-    end
+      context 'from state :paused' do
+        before { subject.pause! }
 
-    context 'from state :succeeded' do
-      before do
-        node.fire_state_event(:success)
-        node.fire_state_event(:terminate)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'terminated? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
-      end
-    end
+      context 'from state :running' do
+        before { subject.busy! }
 
-    context 'from state :failed' do
-      before do
-        node.fire_state_event(:failure)
-        node.fire_state_event(:terminate)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'terminated? should equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
-      end
-    end
+      context 'from state :succeeded' do
+        before { subject.succeed! }
 
-    context 'from state :terminated' do
-      before do
-        node.fire_state_event(:terminate)
-        node.fire_state_event(:terminate)
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
 
-      it 'terminated? should stay equal true' do
-        expect(node.running?).to eq(false)
-        expect(node.succeeded?).to eq(false)
-        expect(node.failed?).to eq(false)
-        expect(node.paused?).to eq(false)
-        expect(node.canceled?).to eq(false)
-        expect(node.terminated?).to eq(true)
+      context 'from state :failed' do
+        before { subject.failure! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
     end
   end
 
-  describe '#send_event' do
-    before { node.fire_state_event(:start) }
-
-    context 'sending event :succeeded' do
-      it 'node should have succeeded' do
-        expect(node.send(:send_event, :succeeded).succeeded?).to eq(true)
+  describe '#succeed!' do
+    context 'from state :ready' do
+      it 'should raise StateMachines::InvalidTransition' do
+        expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
       end
     end
 
-    context 'sending event :failed' do
-      it 'node should have failed' do
-        expect(node.send(:send_event, :failed).failed?).to eq(true)
+    context 'started' do
+      before { subject.start! }
+
+      context 'from state :started' do
+        before { subject.succeed! }
+
+        it 'should be succeeded' do
+          expect(node.succeeded?).to eq(true)
+        end
+      end
+
+      context 'from state :stopped' do
+        before { subject.stop! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
+        end
+      end
+
+      context 'from state :paused' do
+        before { subject.pause! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
+        end
+      end
+
+      context 'from state :running' do
+        before { subject.busy! }
+        before { subject.succeed! }
+
+        it 'should be succeeded' do
+          expect(node.succeeded?).to eq(true)
+        end
+      end
+
+      context 'from state :succeeded' do
+        before { subject.succeed! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
+        end
+      end
+
+      context 'from state :failed' do
+        before { subject.failure! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
+        end
+      end
+    end
+  end
+
+  describe '#failure!' do
+    context 'from state :ready' do
+      it 'should raise StateMachines::InvalidTransition' do
+        expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
       end
     end
 
-    context 'sending event :running' do
-      it 'node should be running' do
-        # expect(node.send(:send_event, :running).running?).to eq(true)
-      end
-    end
+    context 'started' do
+      before { subject.start! }
 
-    context 'sending event :paused' do
-      it 'node should be paused' do
-        # expect(node.send(:send_event, :paused).paused?).to eq(true)
+      context 'from state :started' do
+        before { subject.failure! }
+
+        it 'should be failed' do
+          expect(node.failed?).to eq(true)
+        end
+      end
+
+      context 'from state :stopped' do
+        before { subject.stop! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
+        end
+      end
+
+      context 'from state :paused' do
+        before { subject.pause! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
+        end
+      end
+
+      context 'from state :running' do
+        before { subject.busy! }
+        before { subject.failure! }
+
+        it 'should be failed' do
+          expect(node.failed?).to eq(true)
+        end
+      end
+
+      context 'from state :succeeded' do
+        before { subject.succeed! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
+        end
+      end
+
+      context 'from state :failed' do
+        before { subject.failure! }
+
+        it 'should raise StateMachines::InvalidTransition' do
+          expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
+        end
       end
     end
   end

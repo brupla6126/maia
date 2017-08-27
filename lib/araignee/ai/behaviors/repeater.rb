@@ -12,15 +12,14 @@ module AI
       def process(entity, world)
         super
 
-        repeat_process(entity, world) if @node.running?
+        repeat_process(entity, world) if @node.active?
 
         self
       end
 
       protected
 
-      def repeat_process(entity, world)
-      end
+      def repeat_process(entity, world); end
     end
   end
 end

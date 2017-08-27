@@ -9,10 +9,10 @@ module AI
     # completion policy: how many need to succeed to report success: Integer >= 0, Integer::MAX means all
     class Parallel < Composite
       attribute :completion, Integer, default: 0
-      attribute :failure, Integer, default: 0
+      attribute :failures, Integer, default: 0
 
       # param attributes Hash :completion, Integer::MAX means all
-      # param attributes Hash :failure, Integer::MAX means all
+      # param attributes Hash :failures, Integer::MAX means all
       def initialize(attributes = {})
         super
       end
@@ -23,14 +23,12 @@ module AI
         states = { running: 0, succeeded: 0, failed: 0 }
 
         @nodes.each do |node|
-          state = node.running? ? node.process(entity, world).state_name : node.state_name
+          state = node.process(entity, world).state_name
 
           # count states
           states[state] ||= 0
           states[state] += 1
         end
-
-        Log[self.class].debug { "states: #{states}" }
 
         succeeding =
           case @completion
@@ -40,14 +38,19 @@ module AI
           end
 
         failing =
-          case @failure
+          case @failures
           when 0 then false
           when Integer::MAX then states[:failed] == nodes.size
-          else states[:failed] >= @failure
+          else states[:failed] >= @failures
           end
 
-        failing && fire_state_event(:failure)
-        succeeding && !failing && fire_state_event(:success)
+        if succeeding
+          succeed!
+        elsif failing
+          failure!
+        else
+          busy!
+        end
 
         self
       end
@@ -58,9 +61,9 @@ module AI
         super
 
         raise ArgumentError, 'completion must be >= 0' unless @completion >= 0
-        raise ArgumentError, 'failure must be >= 0' unless @failure >= 0
+        raise ArgumentError, 'failures must be >= 0' unless @failures >= 0
 
-        raise ArgumentError, 'completion and failure must not equal' if @completion.positive? && @completion == @failure
+        raise ArgumentError, 'completion and failures must not equal' if @completion.positive? && @completion == @failures
       end
     end
   end

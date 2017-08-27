@@ -11,17 +11,15 @@ RSpec.describe AI::Behaviors::Succeeder do
   let(:node) { ActionSucceeded.new }
   let(:succeeder) { AI::Behaviors::Succeeder.new(node: node) }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
-    before { succeeder.fire_state_event(:start) }
+    before { succeeder.start! }
     subject { succeeder.process(entity, world) }
 
     context 'when node is not running' do
       let(:node) { ActionSucceeded.new }
-      before { node.fire_state_event(:cancel) }
+      before { node.stop! }
 
       it 'should have succeeded' do
         expect(subject.succeeded?).to eq(true)

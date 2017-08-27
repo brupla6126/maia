@@ -16,9 +16,7 @@ RSpec.describe AI::Behaviors::Limiter do
   let(:times) { nil }
   let(:limiter) { AI::Behaviors::Limiter.new(node: node, times: times) }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#initialize' do
     let(:limiter) { AI::Behaviors::Limiter.new(node: node) }
@@ -33,13 +31,13 @@ RSpec.describe AI::Behaviors::Limiter do
       let(:times) { 0 }
 
       it 'should raise ArgumentError, times must be > 0' do
-        expect { limiter.fire_state_event(:start) }.to raise_error(ArgumentError, 'times must be > 0')
+        expect { limiter.start! }.to raise_error(ArgumentError, 'times must be > 0')
       end
     end
   end
 
   describe '#process' do
-    before { limiter.fire_state_event(:start) }
+    before { limiter.start! }
     subject { limiter }
 
     let(:times) { 3 }

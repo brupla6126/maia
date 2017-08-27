@@ -1,5 +1,5 @@
-require 'araignee/ai/actions/canceled'
 require 'araignee/ai/actions/failed'
+require 'araignee/ai/actions/stopped'
 require 'araignee/ai/actions/succeeded'
 require 'araignee/ai/behaviors/parallel'
 
@@ -10,23 +10,20 @@ RSpec.describe AI::Behaviors::Parallel do
   let(:entity) { { number: 0 } }
 
   let(:completion) { 0 }
-  let(:failure) { 0 }
+  let(:failures) { 0 }
 
   let(:nodes) { [ActionSucceeded.new, ActionFailed.new] }
-  let(:times) { nil }
-  let(:parallel) { AI::Behaviors::Parallel.new(nodes: nodes, completion: completion, failure: failure) }
+  let(:parallel) { AI::Behaviors::Parallel.new(nodes: nodes, completion: completion, failures: failures) }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#initialize' do
-    context 'when attributes :completion and failure are not set' do
-      it ':completion and failure should default to 0' do
+    context 'when attributes :completion and failures are not set' do
+      it ':completion and failures should default to 0' do
         parallel = AI::Behaviors::Parallel.new(nodes: nodes)
 
         expect(parallel.completion).to eq(0)
-        expect(parallel.failure).to eq(0)
+        expect(parallel.failures).to eq(0)
       end
     end
   end
@@ -36,62 +33,62 @@ RSpec.describe AI::Behaviors::Parallel do
       let(:completion) { -2 }
 
       it 'should raise ArgumentError, completion policy' do
-        expect { parallel.fire_state_event(:start) }.to raise_error(ArgumentError, 'completion must be >= 0')
+        expect { parallel.start! }.to raise_error(ArgumentError, 'completion must be >= 0')
       end
     end
 
-    context 'when failure is set' do
+    context 'when failures is set' do
       let(:completion) { 0 }
-      let(:failure) { -3 }
+      let(:failures) { -3 }
 
-      it 'should raise ArgumentError, failure' do
-        expect { parallel.fire_state_event(:start) }.to raise_error(ArgumentError, 'failure must be >= 0')
+      it 'should raise ArgumentError, failures' do
+        expect { parallel.start! }.to raise_error(ArgumentError, 'failures must be >= 0')
       end
     end
 
-    context 'when completion and failure are equal' do
+    context 'when completion and failures are equal' do
       let(:completion) { 1 }
-      let(:failure) { 1 }
+      let(:failures) { 1 }
 
-      it 'should raise ArgumentError, completion and failure must not equal' do
-        expect { parallel.fire_state_event(:start) }.to raise_error(ArgumentError, 'completion and failure must not equal')
+      it 'should raise ArgumentError, completion and failures must not equal' do
+        expect { parallel.start! }.to raise_error(ArgumentError, 'completion and failures must not equal')
       end
     end
   end
 
   describe '#process' do
-    before { parallel.fire_state_event(:start) }
+    before { parallel.start! }
     subject { parallel.process(entity, world) }
 
-    context 'when ActionSucceeded, ActionFailed, ActionFailed, ActionCanceled.new and :completion, :failure are not set' do
-      let(:nodes) { [ActionSucceeded.new, ActionFailed.new, ActionFailed.new, ActionCanceled.new] }
+    context 'when ActionSucceeded, ActionFailed, ActionFailed, ActionStopped.new and :completion, :failures are not set' do
+      let(:nodes) { [ActionSucceeded.new, ActionFailed.new, ActionFailed.new, ActionStopped.new] }
 
       it 'should stay running' do
         expect(subject.running?).to eq(true)
       end
     end
 
-    context 'when ActionSucceeded, ActionFailed, ActionFailed and :completion => 1' do
-      let(:completion) { Integer::MAX }
+    context 'when ActionSucceeded, ActionFailed, ActionFailed and :completion = 1' do
+      let(:completion) { 1 }
       let(:nodes) { [ActionSucceeded.new, ActionFailed.new, ActionFailed.new] }
 
-      it 'should stay running' do
-        expect(subject.running?).to eq(true)
+      it 'should have succeeded' do
+        expect(subject.succeeded?).to eq(true)
       end
     end
 
-    context 'when ActionSucceeded, ActionFailed, ActionFailed and :completion => 2' do
+    context 'when ActionSucceeded, ActionFailed, ActionFailed and :completion = 2' do
       let(:completion) { 2 }
       let(:nodes) { [ActionSucceeded.new, ActionFailed.new, ActionFailed.new] }
 
-      it 'should stay running' do
+      it 'should be running' do
         expect(subject.running?).to eq(true)
       end
     end
 
-    context 'when ActionSucceeded, ActionFailed, ActionFailed and :failure => Integer::MAX' do
+    context 'when ActionSucceeded, ActionFailed, ActionFailed and :failures = Integer::MAX' do
       let(:completion) { 0 }
-      let(:failure) { Integer::MAX }
+      let(:failures) { Integer::MAX }
 
       let(:nodes) { [ActionSucceeded.new, ActionFailed.new, ActionFailed.new] }
 
@@ -100,7 +97,7 @@ RSpec.describe AI::Behaviors::Parallel do
       end
     end
 
-    context 'when ActionSucceeded, ActionFailed and :completion => Integer::MAX' do
+    context 'when ActionSucceeded, ActionFailed and :completion = Integer::MAX' do
       let(:completion) { Integer::MAX }
       let(:nodes) { [ActionSucceeded.new, ActionFailed.new] }
 
@@ -109,8 +106,8 @@ RSpec.describe AI::Behaviors::Parallel do
       end
     end
 
-    context 'when ActionSucceeded, ActionFailed, ActionSucceeded and :failure => 1' do
-      let(:failure) { 1 }
+    context 'when ActionSucceeded, ActionFailed, ActionSucceeded and :failures = 1' do
+      let(:failures) { 1 }
 
       let(:nodes) { [ActionSucceeded.new, ActionFailed.new, ActionSucceeded.new] }
 
@@ -119,8 +116,8 @@ RSpec.describe AI::Behaviors::Parallel do
       end
     end
 
-    context 'when ActionSucceeded, ActionFailed, ActionFailed and :failure => 2' do
-      let(:failure) { 2 }
+    context 'when ActionSucceeded, ActionFailed, ActionFailed and :failures = 2' do
+      let(:failures) { 2 }
 
       let(:nodes) { [ActionSucceeded.new, ActionFailed.new, ActionFailed.new] }
 
@@ -129,8 +126,8 @@ RSpec.describe AI::Behaviors::Parallel do
       end
     end
 
-    context 'when ActionSucceeded, ActionFailed, ActionFailed and :failure => Integer::MAX' do
-      let(:failure) { Integer::MAX }
+    context 'when ActionSucceeded, ActionFailed, ActionFailed and :failures = Integer::MAX' do
+      let(:failures) { Integer::MAX }
 
       let(:nodes) { [ActionSucceeded.new, ActionFailed.new, ActionFailed.new] }
 
@@ -139,8 +136,8 @@ RSpec.describe AI::Behaviors::Parallel do
       end
     end
 
-    context 'when ActionFailed, ActionFailed, ActionFailed and :failure => Integer::MAX' do
-      let(:failure) { Integer::MAX }
+    context 'when ActionFailed, ActionFailed, ActionFailed and :failures = Integer::MAX' do
+      let(:failures) { Integer::MAX }
 
       let(:nodes) { [ActionFailed.new, ActionFailed.new, ActionFailed.new] }
 
@@ -149,9 +146,9 @@ RSpec.describe AI::Behaviors::Parallel do
       end
     end
 
-    context 'when ActionSucceeded, ActionFailed, ActionFailed, ActionFailed and :completion => 3, :failure => 2' do
+    context 'when ActionSucceeded, ActionFailed, ActionFailed, ActionFailed and :completion = 3, :failures = 2' do
       let(:completion) { 3 }
-      let(:failure) { 2 }
+      let(:failures) { 2 }
 
       let(:nodes) { [ActionSucceeded.new, ActionFailed.new, ActionFailed.new, ActionFailed.new] }
 
@@ -160,9 +157,9 @@ RSpec.describe AI::Behaviors::Parallel do
       end
     end
 
-    context 'when ActionFailed, ActionFailed, ActionFailed and :completion => 3' do
+    context 'when ActionFailed, ActionFailed, ActionFailed and :completion = 3' do
       let(:completion) { 3 }
-      let(:failure) { Integer::MAX }
+      let(:failures) { Integer::MAX }
 
       let(:nodes) { [ActionFailed.new, ActionFailed.new, ActionFailed.new] }
 

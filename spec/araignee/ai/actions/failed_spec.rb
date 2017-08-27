@@ -8,12 +8,10 @@ RSpec.describe AI::Actions::ActionFailed do
 
   let(:action) { ActionFailed.new }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
-    before { action.fire_state_event(:start) }
+    before { action.start! }
     subject { action.process(entity, world) }
 
     it 'should have failed' do
@@ -26,15 +24,13 @@ RSpec.describe AI::Actions::ActionTemporaryFailed do
   let(:world) { double('[world]') }
   let(:entity) { { number: 0 } }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
     let(:times) { 0 }
     let(:action) { ActionTemporaryFailed.new(times: times) }
 
-    before { action.fire_state_event(:start) }
+    before { action.start! }
     subject { action.process(entity, world) }
 
     it 'should have succeeded' do

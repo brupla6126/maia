@@ -15,14 +15,12 @@ module AI
       def process(entity, world)
         super
 
-        node = pick_node(nodes.select(&:running?))
+        node = pick_node(@nodes.select(&:active?))
 
         if node
-          node.process(entity, world)
-
-          fire_state_event(node.state_name) unless node.running?
+          handle_result(node.process(entity, world).state_name)
         else
-          fire_state_event(:success)
+          succeed! unless succeeded?
         end
 
         self
@@ -30,6 +28,17 @@ module AI
     end
 
     protected
+
+    def handle_result(state)
+      case state
+      when :succeeded
+        succeed! unless succeeded?
+      when :failed
+        failure! unless failed?
+      when :running
+        busy! unless running?
+      end
+    end
 
     # Derived classes must implement and return a node
     def pick_node(_nodes)

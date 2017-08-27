@@ -19,7 +19,7 @@ module AI
           @count ||= 0
 
           loop do
-            @node.fire_state_event(:start) unless @node.running?
+            @node.start! unless @node.started?
             @node.process(entity, world)
 
             break unless @node.succeeded? || @node.failed?
@@ -31,8 +31,7 @@ module AI
             end
           end
 
-          @node.succeeded? && fire_state_event(:success)
-          @node.failed? && fire_state_event(:failure)
+          succeed!
 
           self
         end

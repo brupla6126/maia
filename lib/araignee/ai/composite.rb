@@ -23,10 +23,16 @@ module AI
 
     protected
 
-    def start_node
+    def node_starting
       super
 
-      @nodes.each { |node| node.fire_state_event(:start) }
+      @nodes.each(&:start!)
+    end
+
+    def node_stopping
+      super
+
+      @nodes.each(&:stop!)
     end
 
     def reset_node
@@ -39,7 +45,7 @@ module AI
     def validate_attributes
       super
 
-      Log[self.class].warn { 'node: #{inspect} has no children' } if @nodes.empty?
+      Log[:ai].warn { "node: #{inspect} has no children" } if @nodes.empty?
     end
   end
 end

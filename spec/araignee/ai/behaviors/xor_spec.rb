@@ -1,4 +1,5 @@
 require 'araignee/ai/actions/failed'
+require 'araignee/ai/actions/running'
 require 'araignee/ai/actions/succeeded'
 require 'araignee/ai/behaviors/xor'
 
@@ -8,28 +9,17 @@ RSpec.describe AI::Behaviors::Xor do
   let(:world) { double('[world]') }
   let(:entity) { { number: 0 } }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  before { allow(world).to receive(:delta) { 1 } }
 
   let(:nodes) { [ActionFailed.new] }
   let(:term_xor) { AI::Behaviors::Xor.new(nodes: nodes) }
 
-  describe '#start' do
-    context 'when nodes empty' do
-      let(:nodes) { [] }
-
-      it 'should raise ArgumentError must have at least one child node' do
-        expect { term_xor.fire_state_event(:start) }.to raise_error(ArgumentError, 'must have at least one child node')
-      end
-    end
-  end
-
   describe 'process' do
-    before { term_xor.fire_state_event(:start) }
-    subject { term_xor.process(entity, world) }
+    before { term_xor.start! }
+    before { term_xor.process(entity, world) }
+    subject { term_xor }
 
-    context 'when terms are [false, false]' do
+    context 'when terms are [:failed, :failed]' do
       let(:nodes) { [ActionFailed.new, ActionFailed.new] }
 
       it 'should have failed' do
@@ -37,7 +27,7 @@ RSpec.describe AI::Behaviors::Xor do
       end
     end
 
-    context 'when terms are [false, true]' do
+    context 'when terms are [:failed, :succeeded]' do
       let(:nodes) { [ActionFailed.new, ActionSucceeded.new] }
 
       it 'should have succeeded' do
@@ -45,7 +35,7 @@ RSpec.describe AI::Behaviors::Xor do
       end
     end
 
-    context 'when terms are [true, false]' do
+    context 'when terms are [:succeeded, :failed]' do
       let(:nodes) { [ActionSucceeded.new, ActionFailed.new] }
 
       it 'should have succeeded' do
@@ -53,11 +43,19 @@ RSpec.describe AI::Behaviors::Xor do
       end
     end
 
-    context 'when terms are [true, true]' do
+    context 'when terms are [:succeeded, :succeeded]' do
       let(:nodes) { [ActionSucceeded.new, ActionSucceeded.new] }
 
       it 'should have failed' do
         expect(subject.failed?).to eq(true)
+      end
+    end
+
+    context 'when terms are [:succeeded, :running, :succeeded]' do
+      let(:nodes) { [ActionSucceeded.new, ActionRunning.new, ActionSucceeded.new] }
+
+      it 'should be running' do
+        expect(subject.running?).to eq(true)
       end
     end
 

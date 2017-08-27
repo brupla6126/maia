@@ -10,7 +10,7 @@ module Architecture
 
       @controllers = {}
 
-      Log[@name].debug { "initialize: #{self.class}" }
+      Log[:architecture].debug { "initialize: #{self.class}" }
     end
 
     def configure(config)
@@ -23,19 +23,19 @@ module Architecture
         end
       end
 
-      Log[@name].info { "Controllers: #{@controllers.keys}" }
+      Log[:architecture].info { "Controllers: #{@controllers.keys}" }
     end
 
     # called per request
     def initiate
-      Log[@name].info { "#{@name}::initiate()" }
+      Log[:architecture].info { "#{@name}::initiate()" }
 
       @adapters.map(&:initiate)
     end
 
     # called per request
     def terminate
-      Log[@name].info { "#{@name}::terminate()" }
+      Log[:architecture].info { "#{@name}::terminate()" }
 
       @adapters.map(&:terminate)
     end

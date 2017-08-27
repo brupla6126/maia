@@ -18,16 +18,21 @@ module AI
 
     protected
 
-    def start_node
+    def node_starting
       super
 
-      @node.fire_state_event(:start)
+      @node.start!
+    end
+
+    def node_stopping
+      super
+
+      @node.stop!
     end
 
     def reset_node
       super
 
-      # reset decorating node
       @node.reset_node if @node
     end
 

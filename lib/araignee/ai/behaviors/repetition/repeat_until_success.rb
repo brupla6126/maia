@@ -7,12 +7,12 @@ module AI
         def repeat_process(entity, world)
           loop do
             # restart node if failed before
-            @node.failed? && @node.fire_state_event(:start)
+            @node.failed? && @node.start!
 
             break if @node.process(entity, world).succeeded?
           end
 
-          fire_state_event(:success)
+          succeed!
 
           self
         end
