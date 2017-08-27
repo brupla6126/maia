@@ -3,18 +3,15 @@ require 'araignee/utils/library'
 library = File.join File.dirname(__FILE__), 'data'
 
 RSpec.configure do |config|
-  # puts "library: #{library}"
   config.before(:suite) do
-    # puts "creating directories"
     system 'mkdir', '-p', "#{library}/a/b/c"
     system 'mkdir', '-p', "#{library}/a/b/recursos"
     system 'mkdir', '-p', "#{library}/a/b/reportes"
     system 'mkdir', '-p', "#{library}/a/b/vinculos"
     system 'touch', "#{library}/a/abc.txt"
-    system 'ls', '-l', "#{library}/a"
   end
+
   config.after(:suite) do
-    # puts "deleting directories"
     system 'rm', '-rf', library
   end
 end
@@ -41,8 +38,6 @@ RSpec.describe Library do
     context 'search files not recursively' do
       it 'returns children directories' do
         Library.search "#{library}/a", false do |_directory, subdirectories|
-          # puts "#{directory} subdirectories: #{subdirectories}"
-
           expect(subdirectories).to include("#{library}/a/b")
           expect(subdirectories).not_to include("#{library}/a/b/c")
           expect(subdirectories).not_to include("#{library}/a/c")
@@ -56,13 +51,13 @@ RSpec.describe Library do
     context 'search files recursively' do
       it 'returns children directories of /a' do
         Library.search "#{library}/a", true do |directory, subdirectories|
-          # puts "#{directory} subdirectories: #{subdirectories}"
           if directory == "#{library}/a"
             expect(subdirectories).to include("#{library}/a/b")
             expect(subdirectories).not_to include("#{library}/a/b/c")
             expect(subdirectories).not_to include("#{library}/a/c")
             expect(subdirectories).not_to include("#{library}/a/abc.txt")
           end
+
           subdirectories.reject { |dir| %w(recursos reportes vinculos).include? dir.split(File::SEPARATOR).last }
         end
       end

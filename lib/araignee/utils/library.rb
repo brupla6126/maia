@@ -1,17 +1,10 @@
 # class Library
 class Library
   def self.get_container_path(library, container)
-    # Log.debug { "library: #{library}" }
-    # Log.debug { "container: #{container}" }
-
     File.join(library, container)
   end
 
   def self.get_file_path(library, container, file)
-    # Log.debug { "library: #{library}" }
-    # Log.debug { "container: #{container}" }
-    # Log.debug { "file: #{file}" }
-
     File.join(library, container, file)
   end
 
