@@ -2,38 +2,40 @@ require 'araignee/utils/log'
 
 # To represent a stack of states
 class State
-  @states = []
+  def self.states
+    @states ||= []
+    @states
+  end
 
   def self.current
-    @states ||= []
-    @states.last
+    states.last
   end
 
   def self.push(state)
     current.pause if current
 
-    @states.push(state)
+    states.push(state)
 
     state.enter
   end
 
   def self.pop
     current && current.leave
-    @states.pop
+    states.pop
 
     current.resume if current
   end
 
   def self.pop_until(state)
-    pop until current == state || @states.empty?
+    pop until current == state || states.empty?
   end
 
   def self.count
-    @states.count
+    states.count
   end
 
   def self.clear
-    @states.clear
+    states.clear
   end
 
   # called when entering the state
