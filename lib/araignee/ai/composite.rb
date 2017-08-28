@@ -9,6 +9,10 @@ module AI
       super
     end
 
+    def child(identifier)
+      @nodes.select { |node| node.identifier == identifier }.first
+    end
+
     def add_node(node, index = :last)
       if index == :last
         @nodes << node

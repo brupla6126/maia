@@ -35,6 +35,28 @@ RSpec.describe AI::Composite do
     end
   end
 
+  describe '#child' do
+    let(:child1) { AI::Node.new }
+    let(:child2) { AI::Node.new }
+    let(:nodes) { [child1, child2] }
+
+    let(:child_identifier) { child2.identifier }
+
+    subject { composite.child(child_identifier) }
+
+    it 'should find child node' do
+      expect(subject).to eq(child2)
+    end
+
+    context 'unknown node' do
+      let(:child_identifier) { 'abcdef' }
+
+      it 'should not find child node' do
+        expect(subject).to eq(nil)
+      end
+    end
+  end
+
   describe '#start!' do
     context 'children nodes set' do
       let(:nodes) { [ActionSucceeded.new] }
