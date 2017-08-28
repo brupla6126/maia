@@ -12,7 +12,9 @@ RSpec.describe AI::Behaviors::Condition do
   let(:term) { ActionFailed.new }
   let(:yes) { ActionSucceeded.new }
   let(:no) { ActionFailed.new }
-  let(:condition) { AI::Behaviors::Condition.new(term: term, yes: yes, no: no) }
+  let(:nodes) { [term, yes, no] }
+
+  let(:condition) { AI::Behaviors::Condition.new(nodes: nodes) }
 
   before { allow(world).to receive(:delta) { 1 } }
 
@@ -23,44 +25,18 @@ RSpec.describe AI::Behaviors::Condition do
       let(:no) { ActionFailed.new }
 
       it 'term, yes, no should be set' do
-        expect(condition.term).to eq(term)
-        expect(condition.yes).to eq(yes)
-        expect(condition.no).to eq(no)
+        expect(condition.child(term.identifier)).to eq(term)
+        expect(condition.child(yes.identifier)).to eq(yes)
+        expect(condition.child(no.identifier)).to eq(no)
       end
     end
   end
 
   describe '#start!' do
-    subject { condition.start! }
+    before { condition.start! }
 
-    context 'when term is not set' do
-      let(:term) { nil }
-      let(:yes) { ActionSucceeded.new }
-      let(:no) { ActionFailed.new }
-
-      it 'should raise ArgumentError term is nil' do
-        expect { subject }.to raise_error(ArgumentError, 'term nil')
-      end
-    end
-
-    context 'when yes is not set' do
-      let(:term) { ActionSucceeded.new }
-      let(:yes) { nil }
-      let(:no) { ActionFailed.new }
-
-      it 'should raise ArgumentError yes is nil' do
-        expect { subject }.to raise_error(ArgumentError, 'yes nil')
-      end
-    end
-
-    context 'when no is not set' do
-      let(:term) { ActionSucceeded.new }
-      let(:yes) { ActionFailed.new }
-      let(:no) { nil }
-
-      it 'should raise ArgumentError no is nil' do
-        expect { subject }.to raise_error(ArgumentError, 'no nil')
-      end
+    it 'condition should be started' do
+      expect(condition.started?).to eq(true)
     end
   end
 
