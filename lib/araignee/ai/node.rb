@@ -7,7 +7,7 @@ module AI
   class Node
     include Virtus.model
 
-    attribute :identifier, String, default: SecureRandom.hex
+    attribute :identifier, String
     attribute :parent, Node
     attribute :elapsed, Integer, default: 0
 
@@ -61,6 +61,12 @@ module AI
 
     def initialize(attributes = {})
       super
+
+      # need to initialize identifier here instead of
+      # attribute default value since Virtus seems to cache
+      # SecureRandom.hex and identifier is not unique across
+      # all nodes
+      @identifier = SecureRandom.hex
     end
 
     def process(_entity, world)
