@@ -7,6 +7,7 @@ module AI
   class Node
     include Virtus.model
 
+    attribute :identifier, String, default: SecureRandom.hex
     attribute :parent, Node
     attribute :elapsed, Integer, default: 0
 

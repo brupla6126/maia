@@ -10,6 +10,10 @@ RSpec.describe AI::Node do
 
   describe '#initialize' do
     context 'without attributes' do
+      it 'identifier should not be nil' do
+        expect(node.identifier).not_to eq(nil)
+      end
+
       it 'state should be ready' do
         expect(node.ready?).to eq(true)
       end
