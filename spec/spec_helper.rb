@@ -17,9 +17,6 @@
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
-#$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-#puts "LOAD_PATH: #{$LOAD_PATH}"
-
 require 'araignee/utils/log'
 require 'pry-byebug'
 
@@ -28,8 +25,23 @@ SimpleCov.start
 
 # enable logging
 if ENV['development'] # true #
-  Log[:default] = Logger.new(STDOUT)
-  Log[:default].formatter = 
+  stdout = Logger.new(STDOUT)
+
+  Log[:default] = stdout
+  Log[:default].formatter =
+    proc do |severity, _datetime, _progname, msg|
+      "#{msg}\n"
+    end
+
+  Log[:architecture] = stdout
+  Log[:architecture].formatter =
+    proc do |severity, datetime, _progname, msg|
+      date_format = datetime.strftime('%Y-%m-%d %H:%M:%S.%L')
+      "#{date_format} #{severity.rjust(5)} | #{msg}\n"
+    end
+
+  Log[:ai] = stdout
+  Log[:ai].formatter =
     proc do |severity, _datetime, _progname, msg|
       "#{msg}\n"
     end
