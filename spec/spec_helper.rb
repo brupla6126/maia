@@ -19,6 +19,7 @@
 
 require 'araignee/utils/log'
 require 'pry-byebug'
+require 'state_machines-rspec'
 
 require 'simplecov'
 SimpleCov.start
@@ -61,6 +62,8 @@ RSpec.configure do |config|
     #     # => "be bigger than 2"
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
+
+  config.include StateMachinesRspec::Matchers
 
   # rspec-mocks config goes here. You can use an alternate test double
   # library (such as bogus or mocha) by changing the `mock_with` option here.

@@ -9,6 +9,7 @@
 /spec/data/
 /test/data/
 /tmp/
+/turbulence/
 *.bundle
 *.so
 *.o
