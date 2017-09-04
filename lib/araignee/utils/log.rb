@@ -32,7 +32,7 @@ class Log
       raise ArgumentError, 'id nil' unless id
       raise ArgumentError, 'logger nil' unless logger
 
-      loggers[id] ||= logger
+      loggers[id] = logger
     end
 
     def [](id)
