@@ -11,45 +11,45 @@ module AI
       # expects nodes[0] be the term
       # expects nodes[1] be the yes node
       # expects nodes[2] be the no node
-      def initialize(attributes = {})
-        super
-
-        @term_identifier = @nodes[0].identifier
-        @yes_identifier = @nodes[1].identifier
-        @no_identifier = @nodes[2].identifier
+      def initialize(attributes)
+        super(attributes)
       end
 
       def process(entity, world)
-        super
+        super(entity, world)
 
-        case child(@term_identifier).process(entity, world).state_name
+        case nodes[0].process(entity, world).response
         when :succeeded
-          executing_node = child(@yes_identifier)
+          executing_node = nodes[1]
         when :failed
-          executing_node = child(@no_identifier)
+          executing_node = nodes[2]
         end
 
-        handle_result(executing_node.process(entity, world).state_name) if executing_node
+        response = :succeeded
+        response = executing_node.process(entity, world).response if executing_node
+
+        update_response(handle_response(response))
 
         self
       end
 
       protected
 
-      def handle_result(result)
-        case result
-        when :succeeded then succeed!
-        when :failed then failure!
-        when :running then busy!
+      def handle_response(response)
+        case response
+        when :failed then :failed
+        when :busy then :busy
+        else
+          :succeeded
         end
       end
 
       def validate_attributes
-        super
+        super()
 
-        raise ArgumentError, 'term_identifier nil' unless @term_identifier
-        raise ArgumentError, 'yes_identifier nil' unless @yes_identifier
-        raise ArgumentError, 'no_identifier nil' unless @no_identifier
+        raise ArgumentError, 'term node must be set in nodes[0]' unless nodes.fetch(0)
+        raise ArgumentError, 'yes node must be set in nodes[1]' unless nodes.fetch(1)
+        raise ArgumentError, 'no node must be set in nodes[2]' unless nodes.fetch(2)
       end
     end
   end

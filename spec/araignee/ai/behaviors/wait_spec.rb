@@ -3,26 +3,25 @@ require 'araignee/ai/behaviors/wait'
 
 RSpec.describe AI::Behaviors::Wait do
   let(:world) { double('[world]') }
-  let(:entity) { { number: 0 } }
-
+  let(:entity) { {} }
   before { allow(world).to receive(:delta) { 1 } }
 
   let(:delay) { 3 }
   let(:wait) { AI::Behaviors::Wait.new(delay: delay) }
 
-  describe '#start' do
+  describe '#initialize' do
     context 'when wait is not set' do
-      let(:wait) { AI::Behaviors::Wait.new }
+      let(:wait) { AI::Behaviors::Wait.new({}) }
 
       it 'should raise ArgumentError delay must be > 0' do
-        expect { wait.start! }.to raise_error(ArgumentError, 'delay must be > 0')
+        expect { wait }.to raise_error(ArgumentError, 'delay must be > 0')
       end
     end
   end
 
   describe '#process' do
-    before { wait.start! }
     subject { wait.process(entity, world) }
+    before { wait.start! }
 
     context 'when wait of 3 seconds' do
       context 'before wait expires' do

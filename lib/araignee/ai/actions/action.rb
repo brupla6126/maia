@@ -6,8 +6,8 @@ module AI
   module Actions
     # Action
     class Action < Leaf
-      def initialize(attributes = {})
-        super
+      def initialize(attributes)
+        super(attributes)
       end
     end
   end

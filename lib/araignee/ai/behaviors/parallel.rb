@@ -13,44 +13,47 @@ module AI
 
       # param attributes Hash :completion, Integer::MAX means all
       # param attributes Hash :failures, Integer::MAX means all
-      def initialize(attributes = {})
-        super
+      def initialize(attributes)
+        super(attributes)
       end
 
       def process(entity, world)
-        super
+        super(entity, world)
 
-        states = { running: 0, succeeded: 0, failed: 0 }
+        responses = { busy: 0, succeeded: 0, failed: 0 }
 
-        @nodes.each do |node|
-          state = node.process(entity, world).state_name
+        nodes.each do |node|
+          response = node.process(entity, world).response
 
-          # count states
-          states[state] ||= 0
-          states[state] += 1
+          # count responses
+          responses[response] ||= 0
+          responses[response] += 1
         end
 
         succeeding =
           case @completion
           when 0 then false
-          when Integer::MAX then states[:succeeded] == nodes.size
-          else states[:succeeded] >= @completion
+          when Integer::MAX then responses[:succeeded] == nodes.size
+          else responses[:succeeded] >= @completion
           end
 
         failing =
           case @failures
           when 0 then false
-          when Integer::MAX then states[:failed] == nodes.size
-          else states[:failed] >= @failures
+          when Integer::MAX then responses[:failed] == nodes.size
+          else responses[:failed] >= @failures
           end
 
-        if succeeding
-          succeed!
-        elsif failing
-          failure!
-        else
-          busy!
-        end
+        response =
+          if succeeding
+            :succeeded
+          elsif failing
+            :failed
+          else
+            :busy
+          end
+
+        update_response(response)
 
         self
       end

@@ -10,23 +10,34 @@ module AI
       attribute :times, Integer, default: 1
 
       def process(entity, world)
-        super
+        super(entity, world)
 
-        if @count < @times
-          @count += 1
+        response =
+          if @count < @times
+            @count += 1
 
-          @node.process(entity, world)
+            node.process(entity, world).response
+          else
+            :failed
+          end
 
-          failure! if @node.failed?
-          succeed! if @node.succeeded?
-        else
-          failure!
-        end
+        update_response(handle_response(response))
 
         self
       end
 
       protected
+
+      def handle_response(response)
+        case response
+        when :failed
+          :failed
+        when :busy
+          :busy
+        else
+          :succeeded
+        end
+      end
 
       def validate_attributes
         super

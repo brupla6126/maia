@@ -8,37 +8,41 @@ RSpec.describe AI::Decisions::Assertion do
   end
 
   let(:world) { double('[world]') }
-  let(:entity) { { number: 0 } }
+  let(:entity) { {} }
 
   before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
-    before { assertion.start! }
-
     subject { assertion.process(entity, world) }
 
-    context 'when not derived' do
-      let(:assertion) { AI::Decisions::Assertion.new }
+    let(:assertion) { AI::Decisions::Assertion.new({}) }
 
+    context 'when not derived' do
       it 'should raise NotImplementedError' do
         expect { subject }.to raise_error(NotImplementedError)
       end
     end
 
     context 'when derived' do
-      let(:assertion) { AssertionDerived.new }
+      before { assertion.start! }
+
+      let(:assertion) { AssertionDerived.new({}) }
+
+      it 'node @elapsed should be updated' do
+        expect(subject.elapsed).to eq(1)
+      end
 
       context 'when assertion test resolves to :succeeded' do
-        before { subject }
+        before { allow(assertion).to receive(:assert).with(entity, world) { :succeeded } }
 
         it 'should have succeeded' do
+          expect(assertion).to receive(:assert).with(entity, world)
           expect(subject.succeeded?).to eq(true)
         end
       end
 
       context 'when assertion test does not resolve to :succeeded or :failed' do
-        before { allow_any_instance_of(AssertionDerived).to receive(:assert).and_return(:running) }
-        before { subject }
+        before { allow_any_instance_of(AssertionDerived).to receive(:assert) { :running } }
 
         it 'should fail' do
           expect(subject.failed?).to eq(true)

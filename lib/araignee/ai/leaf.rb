@@ -4,8 +4,8 @@ require 'araignee/ai/node'
 module AI
   # A Leaf Node Class, does not have any children. It is usually an Action.
   class Leaf < Node
-    def initialize(attributes = {})
-      super
+    def initialize(attributes)
+      super(attributes)
     end
   end
 end

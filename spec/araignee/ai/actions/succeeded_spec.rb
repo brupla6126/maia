@@ -4,20 +4,35 @@ include AI::Actions
 
 RSpec.describe AI::Actions::ActionSucceeded do
   let(:world) { double('[world]') }
-  let(:entity) { { number: 0 } }
+  let(:entity) { {} }
 
-  let(:action) { ActionSucceeded.new }
+  before { allow(world).to receive(:delta) { 1 } }
 
-  before do
-    allow(world).to receive(:delta) { 1 }
-  end
+  let(:action) { ActionSucceeded.new({}) }
 
   describe '#process' do
-    before { action.start! }
     subject { action.process(entity, world) }
 
-    it 'should have succeeded' do
-      expect(subject.succeeded?).to eq(true)
+    before { action.start! }
+
+    context 'before process' do
+      it 'should NOT be busy' do
+        expect(action.busy?).to eq(false)
+      end
+    end
+
+    context 'after process' do
+      it 'should have succeeded' do
+        expect(subject.succeeded?).to eq(true)
+      end
+    end
+
+    it 'node @elapsed should be updated' do
+      expect(subject.elapsed).to eq(1)
+    end
+
+    it 'returns self' do
+      expect(subject).to eq(action)
     end
   end
 end

@@ -5,17 +5,17 @@ include AI::Actions
 
 RSpec.describe AI::Behaviors::Repeater do
   let(:world) { double('[world]') }
-  let(:entity) { { number: 0 } }
+  let(:entity) { {} }
+  before { allow(world).to receive(:delta) { 1 } }
 
-  let(:node) { ActionFailed.new }
+  let(:node) { ActionFailed.new({}) }
   let(:times) { nil }
   let(:repeater) { AI::Behaviors::Repeater.new(node: node, times: times) }
 
-  before { allow(world).to receive(:delta) { 1 } }
-
   describe '#process' do
-    before { repeater.start! }
     subject { repeater.process(entity, world) }
+
+    before { repeater.start! }
 
     context 'when decorated node valid' do
     end

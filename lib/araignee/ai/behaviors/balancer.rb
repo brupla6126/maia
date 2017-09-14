@@ -8,41 +8,39 @@ module AI
     # will return the picked node state if one
     # otherwise will return success
     class Balancer < Composite
-      def initialize(attributes = {})
-        super
+      def initialize(attributes)
+        super(attributes)
       end
 
       def process(entity, world)
-        super
+        super(entity, world)
 
-        node = pick_node(@nodes.select(&:active?))
+        node = pick_node(@nodes.select(&:running?))
 
-        if node
-          handle_result(node.process(entity, world).state_name)
-        else
-          succeed! unless succeeded?
-        end
+        response = :succeeded
+
+        response = handle_response(node.process(entity, world).response) if node
+
+        update_response(response)
 
         self
       end
-    end
 
-    protected
+      protected
 
-    def handle_result(state)
-      case state
-      when :succeeded
-        succeed! unless succeeded?
-      when :failed
-        failure! unless failed?
-      when :running
-        busy! unless running?
+      def handle_response(response)
+        case response
+        when :failed then :failed
+        when :busy then :busy
+        else
+          :succeeded
+        end
       end
-    end
 
-    # Derived classes must implement and return a node
-    def pick_node(_nodes)
-      raise NotImplementedError
+      # Derived classes must implement and return a node
+      def pick_node(_nodes)
+        raise NotImplementedError
+      end
     end
   end
 end

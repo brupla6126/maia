@@ -9,7 +9,7 @@ module AI
     class ActionLuckiest < AI::Actions::Action
       include AI::Traits::Probability
 
-      def initialize(attributes = {})
+      def initialize(attributes)
         super(attributes.merge(probability: 70))
       end
     end
@@ -17,7 +17,7 @@ module AI
     class ActionBummer < AI::Actions::Action
       include AI::Traits::Probability
 
-      def initialize(attributes = {})
+      def initialize(attributes)
         super(attributes.merge(probability: 40))
       end
     end
@@ -25,7 +25,7 @@ module AI
     class ActionLooser < AI::Actions::Action
       include AI::Traits::Probability
 
-      def initialize(attributes = {})
+      def initialize(attributes)
         super(attributes.merge(probability: 10))
       end
     end

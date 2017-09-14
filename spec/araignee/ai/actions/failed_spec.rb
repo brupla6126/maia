@@ -6,16 +6,23 @@ RSpec.describe AI::Actions::ActionFailed do
   let(:world) { double('[world]') }
   let(:entity) { { number: 0 } }
 
-  let(:action) { ActionFailed.new }
-
   before { allow(world).to receive(:delta) { 1 } }
 
+  let(:action) { ActionFailed.new({}) }
+
   describe '#process' do
-    before { action.start! }
     subject { action.process(entity, world) }
 
     it 'should have failed' do
       expect(subject.failed?).to eq(true)
+    end
+
+    it 'node @elapsed should be updated' do
+      expect(subject.elapsed).to eq(1)
+    end
+
+    it 'returns self' do
+      expect(subject).to eq(action)
     end
   end
 end

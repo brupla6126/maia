@@ -19,7 +19,7 @@ module AI
           @count ||= 0
 
           loop do
-            @node.start! unless @node.started?
+            @node.start! unless @node.running?
             @node.process(entity, world)
 
             break unless @node.succeeded? || @node.failed?
@@ -31,7 +31,7 @@ module AI
             end
           end
 
-          succeed!
+          update_response(:succeeded)
 
           self
         end

@@ -5,14 +5,10 @@ module AI
   # Module for gathering Behavior Tree Action classes
   module Actions
     class ActionStopped < AI::Actions::Action
-      def initialize(attributes = {})
-        super
-      end
-
       def process(entity, world)
-        super
+        super(entity, world)
 
-        stop! unless stopped?
+        stop! if can_stop?
 
         self
       end

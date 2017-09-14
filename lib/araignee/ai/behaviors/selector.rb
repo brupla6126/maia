@@ -13,31 +13,34 @@ module AI
     # check multiple conditions to see if any one of them is true.
     class Selector < Composite
       def process(entity, world)
-        super
+        super(entity, world)
 
-        running = 0
+        busy = 0
         succeeded = 0
 
-        nodes = @nodes.select(&:active?)
-        nodes = order_nodes(nodes) if respond_to?(:order_nodes)
+        nodes_selected = nodes.select(&:running?)
+        nodes_selected = order_nodes(nodes_selected) if respond_to?(:order_nodes)
 
-        nodes.each do |node|
-          case node.process(entity, world).state_name
-          when :running
-            running += 1
+        nodes_selected.each do |node|
+          case node.process(entity, world).response
+          when :busy
+            busy += 1
           when :succeeded
             succeeded += 1
             break
           end
         end
 
-        if succeeded > 0
-          succeed!
-        elsif running > 0
-          busy!
-        else
-          failure!
-        end
+        response =
+          if succeeded > 0
+            :succeeded
+          elsif busy > 0
+            :busy
+          else
+            :failed
+          end
+
+        update_response(response)
 
         self
       end

@@ -7,11 +7,11 @@ module AI
     # A failer will always return failure, irrespective of what the child node actually returned. These are useful in cases where you want to process a branch of a tree where a success is expected or anticipated, but you do not want to abandon processing of a sequence that branch sits on
     class Failer < AI::Decorator
       def process(entity, world)
-        super
+        super(entity, world)
 
-        @node.process(entity, world) if @node.active?
+        @node.process(entity, world) if @node.running?
 
-        failure! unless failed?
+        update_response(:failed)
 
         self
       end

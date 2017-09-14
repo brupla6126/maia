@@ -10,15 +10,18 @@ module AI
       attribute :start_time, Time, default: Time.now
 
       def process(entity, world)
-        super
+        super(entity, world)
 
         reset_attribute(:start_time) unless @start_time
 
-        if Time.now - @start_time > @delay
-          succeed!
-        else
-          busy!
-        end
+        response =
+          if Time.now - @start_time > @delay
+            :succeeded
+          else
+            :busy
+          end
+
+        update_response(response)
 
         self
       end

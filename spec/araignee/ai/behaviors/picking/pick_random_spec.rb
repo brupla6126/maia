@@ -14,9 +14,6 @@ RSpec.describe AI::Behaviors::Picking::PickRandom do
   describe '#pick_nodes' do
     subject { picking.pick_node(nodes) }
 
-    let(:action1) { ActionSucceeded.new }
-    let(:action2) { ActionFailed.new }
-
     context 'when no nodes' do
       let(:nodes) { [] }
 
@@ -26,6 +23,9 @@ RSpec.describe AI::Behaviors::Picking::PickRandom do
     end
 
     context 'when there are nodes' do
+      let(:action1) { ActionSucceeded.new({}) }
+      let(:action2) { ActionFailed.new({}) }
+
       let(:nodes) { [action1, action2] }
 
       it 'should return a node' do

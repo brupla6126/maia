@@ -10,17 +10,16 @@ RSpec.describe AI::Behaviors::Repetition::RepeatNumberTimes do
   end
 
   let(:world) { double('[world]') }
-  let(:entity) { { number: 0 } }
+  let(:entity) { {} }
+  before { allow(world).to receive(:delta) { 1 } }
 
-  let(:node) { ActionSucceeded.new }
+  let(:node) { ActionSucceeded.new({}) }
   let(:times) { 5 }
   let(:repetition) { RepetitionNumberTimes.new(node: node, times: times) }
 
-  before { allow(world).to receive(:delta) { 1 } }
-
   describe '#repeat_process' do
-    before { repetition.start! }
     subject { repetition.repeat_process(entity, world) }
+    before { repetition.start! }
 
     context 'number of times negative' do
       let(:times) { -2 }

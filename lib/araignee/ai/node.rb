@@ -1,3 +1,4 @@
+require 'securerandom'
 require 'state_machines'
 require 'virtus'
 require 'araignee/utils/log'
@@ -10,133 +11,126 @@ module AI
     attribute :identifier, String
     attribute :parent, Node
     attribute :elapsed, Integer, default: 0
+    attribute :response, Symbol, default: :unknown # [:busy, :failed, :succeeded]
 
     state_machine :state, initial: :ready do
       event :start do
-        transition %i[failed ready stopped succeeded] => :started
+        transition %i[ready stopped] => :running
       end
 
       event :stop do
-        transition %i[failed paused running started succeeded] => :stopped
+        transition %i[paused running] => :stopped
       end
 
       event :pause do
-        transition %i[running started] => :paused
+        transition %i[running] => :paused
       end
 
       event :resume do
-        transition %i[paused] => :started
+        transition %i[paused] => :running
       end
 
-      event :busy do
-        transition %i[started] => :running
-      end
-
-      event :succeed do
-        transition %i[running started] => :succeeded
-      end
-
-      event :failure do
-        transition %i[running started] => :failed
-      end
-
-      before_transition any - :started => :started, do: %i[reset_node node_starting]
-      after_transition any - :started => :started, do: :node_started
-
-      before_transition any - :stopped => :stopped, do: :node_stopping
-      after_transition any - :stopped => :stopped, do: :node_stopped
-
-      before_transition any - :succeeded => :succeeded, do: :node_succeeding
-      after_transition any - :succeeded => :succeeded, do: :node_succeeded
-
-      before_transition any - :failed => :failed, do: :node_failing
-      after_transition any - :failed => :failed, do: :node_failed
-
-      before_transition any - :paused => :paused, do: :node_pausing
-      after_transition any - :paused => :paused, do: :node_paused
-
-      after_transition started: :paused, do: :pause_node
-      after_transition paused: :started, do: :resume_node
+      before_transition %i[ready resume start] => :running, do: :node_starting
+      after_transition %i[ready resume start] => :running, do: :node_started
+      before_transition %i[paused running] => :stopped, do: :node_stopping
+      after_transition %i[paused running] => :stopped, do: :node_stopped
+      before_transition %i[running] => :paused, do: :node_pausing
+      after_transition %i[running] => :paused, do: :node_paused
+      before_transition %i[paused] => :running, do: :node_resuming
+      after_transition %i[paused] => :running, do: :node_resumed
     end
 
-    def initialize(attributes = {})
+    def initialize(attributes)
+      raise ArgumentError, 'attributes must be Hash' unless attributes.instance_of?(Hash)
+
       super
 
       # need to initialize identifier here instead of
       # attribute default value since Virtus seems to cache
       # SecureRandom.hex and identifier is not unique across
       # all nodes
-      @identifier = SecureRandom.hex
+
+      # do not overwrite identifier if was set from attributes
+      @identifier ||= SecureRandom.hex
+
+      validate_attributes
     end
 
-    def process(_entity, world)
+    def can_stop?
+      %i[paused running].include?(state_name)
+    end
+
+    def process(entity, world)
+      # raise ArgumentError, 'entity must be set' unless entity
+      # raise ArgumentError, 'world must be set' unless world
+
       @elapsed += world.delta
 
       self
     end
 
-    def active?
-      !%i[paused ready stopped].include?(state_name)
+    def busy?
+      response.equal?(:busy)
     end
 
-    protected
-
-    def node_starting
-      Log[:ai].debug { "Starting... #{inspect}" }
-
-      validate_attributes
+    def failed?
+      response.equal?(:failed)
     end
 
-    def node_started
-      Log[:ai].debug { "Started... #{inspect}" }
-    end
-
-    def node_stopping
-      Log[:ai].debug { "Stopping... #{inspect}" }
-    end
-
-    def node_stopped
-      Log[:ai].debug { "Stopped... #{inspect}" }
-    end
-
-    def node_succeeding
-      Log[:ai].debug { "Succeeding... #{inspect}" }
-    end
-
-    def node_succeeded
-      Log[:ai].debug { "Succeeded... #{inspect}" }
-    end
-
-    def node_failing
-      Log[:ai].debug { "Failing... #{inspect}" }
-    end
-
-    def node_failed
-      Log[:ai].debug { "Failed... #{inspect}" }
-    end
-
-    def node_pausing
-      Log[:ai].debug { "Pausing... #{inspect}" }
-    end
-
-    def node_paused
-      Log[:ai].debug { "Paused... #{inspect}" }
-    end
-
-    def pause_node
-      Log[:ai].debug { "Pause... #{inspect}" }
-    end
-
-    def resume_node
-      Log[:ai].debug { "Resume... #{inspect}" }
-
-      validate_attributes
+    def succeeded?
+      response.equal?(:succeeded)
     end
 
     def reset_node
       reset_attribute(:elapsed)
     end
 
-    def validate_attributes; end
+    protected
+
+    def node_starting
+      Log[:ai].debug { "Starting: #{inspect}" }
+
+      reset_node
+
+      nil
+    end
+
+    def node_started
+      Log[:ai].debug { "Started: #{inspect}" }
+    end
+
+    def node_stopping
+      Log[:ai].debug { "Stopping: #{inspect}" }
+    end
+
+    def node_stopped
+      Log[:ai].debug { "Stopped: #{inspect}" }
+    end
+
+    def node_pausing
+      Log[:ai].debug { "Pausing: #{inspect}" }
+    end
+
+    def node_paused
+      Log[:ai].debug { "Paused: #{inspect}" }
+    end
+
+    def node_resuming
+      Log[:ai].debug { "Resuming: #{inspect}" }
+    end
+
+    def node_resumed
+      Log[:ai].debug { "Resumed: #{inspect}" }
+    end
+
+    def update_response(response)
+      raise ArgumentError, "invalid response: #{response}" unless %i[busy failed succeeded].include?(response)
+
+      self.response = response
+    end
+
+    def validate_attributes
+      raise ArgumentError, "invalid identifier: #{identifier}" unless identifier.instance_of?(String)
+    end
   end
 end

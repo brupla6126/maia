@@ -9,26 +9,29 @@ module AI
       def process(entity, world)
         super
 
-        states = { running: 0, succeeded: 0, failed: 0 }
+        states = { busy: 0, succeeded: 0, failed: 0 }
 
-        nodes = @nodes.select(&:active?)
+        nodes = @nodes.select(&:running?)
         nodes = order_nodes(nodes) if respond_to?(:order_nodes)
 
         nodes.each do |node|
-          states[node.process(entity, world).state_name] += 1
+          states[node.process(entity, world).response] += 1
 
-          # no need to process further if this node is still running or has failed
-          break if node.running?
+          # no need to process further if this node is busy or has failed
+          break if node.busy? || node.failed?
         end
 
-        # succeed if all children have succeeded
-        if states[:succeeded] == nodes.count
-          succeed!
-        elsif states[:failed].positive?
-          failure!
-        else
-          busy!
-        end
+        response =
+          # succeed if all children have succeeded
+          if states[:succeeded] == nodes.count
+            :succeeded
+          elsif states[:failed].positive?
+            :failed
+          else
+            :busy
+          end
+
+        update_response(response)
 
         self
       end

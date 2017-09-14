@@ -5,51 +5,61 @@ module AI
   class Composite < Node
     attribute :nodes, Array, default: []
 
-    def initialize(attributes = {})
-      super
+    def initialize(attributes)
+      super(attributes)
     end
 
     def child(identifier)
-      @nodes.select { |node| node.identifier == identifier }.first
+      nodes.select { |node| node.identifier.equal?(identifier) }.first
     end
 
-    def add_node(node, index = :last)
-      if index == :last
-        @nodes << node
+    def add_node(node, index)
+      index ||= :last
+
+      raise ArgumentError, "invalid index: #{index}" unless index.equal?(:last) || index.is_a?(Integer)
+
+      if index.equal?(:last)
+        nodes << node
       else
-        @nodes.insert(index, node)
+        nodes.insert(index, node)
       end
     end
 
     def remove_node(node)
-      @nodes.delete(node)
+      nodes.delete(node)
+    end
+
+    def reset_node
+      super()
+
+      # reset children nodes
+      nodes.each(&:reset_node)
+
+      nil
     end
 
     protected
 
     def node_starting
-      super
+      super()
 
-      @nodes.each(&:start!)
+      nodes.each(&:start!)
+
+      nil
     end
 
     def node_stopping
-      super
+      super()
 
-      @nodes.each(&:stop!)
-    end
+      nodes.each(&:stop!)
 
-    def reset_node
-      super
-
-      # reset children nodes
-      @nodes.each(&:reset_node)
+      nil
     end
 
     def validate_attributes
-      super
+      super()
 
-      Log[:ai].warn { "node: #{inspect} has no children" } if @nodes.empty?
+      raise ArgumentError, 'nodes must be Array' if nodes.empty?
     end
   end
 end

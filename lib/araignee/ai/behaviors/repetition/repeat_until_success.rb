@@ -12,7 +12,7 @@ module AI
             break if @node.process(entity, world).succeeded?
           end
 
-          succeed!
+          update_response(:succeeded)
 
           self
         end

@@ -8,22 +8,32 @@ module AI
     # Success becomes failure, and failure becomes success.
     class Inverter < Decorator
       def process(entity, world)
-        super
+        super(entity, world)
 
-        @node.process(entity, world)
+        response = @node.process(entity, world).response
 
-        failure! if @node.succeeded?
-        succeed! if @node.failed?
+        update_response(handle_response(response))
 
         self
       end
 
       protected
 
+      def handle_response(response)
+        case response
+        when :succeeded
+          :failed
+        when :failed
+          :succeeded
+        else
+          response
+        end
+      end
+
       def validate_attributes
         super
 
-        raise ArgumentError, ':node must be set' unless @node
+        raise ArgumentError, 'node must be set' unless node
       end
     end
   end

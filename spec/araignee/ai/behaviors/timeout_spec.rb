@@ -3,26 +3,25 @@ require 'araignee/ai/behaviors/timeout'
 
 RSpec.describe AI::Behaviors::Timeout do
   let(:world) { double('[world]') }
-  let(:entity) { { number: 0 } }
+  let(:entity) { {} }
+  before { allow(world).to receive(:delta) { 1 } }
 
   let(:delay) { 3 }
   let(:timeout) { AI::Behaviors::Timeout.new(delay: delay) }
 
-  before { allow(world).to receive(:delta) { 1 } }
-
-  describe '#start' do
+  describe '#initialize' do
     context 'when delay is not set' do
-      let(:timeout) { AI::Behaviors::Timeout.new }
+      let(:timeout) { AI::Behaviors::Timeout.new({}) }
 
       it 'should raise ArgumentError delay must be > 0' do
-        expect { timeout.start! }.to raise_error(ArgumentError, 'delay must be > 0')
+        expect { timeout }.to raise_error(ArgumentError, 'delay must be > 0')
       end
     end
   end
 
   describe '#process' do
-    before { timeout.start! }
     subject { timeout.process(entity, world) }
+    before { timeout.start! }
 
     context 'when delay of 3 seconds' do
       context 'before timeout expires' do

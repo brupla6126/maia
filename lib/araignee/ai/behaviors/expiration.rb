@@ -9,33 +9,47 @@ module AI
       attribute :expires, Integer, default: 0
       attribute :start_time, Time, default: Time.now
 
-      def initialize(attributes = {})
-        super
-      end
-
       def process(entity, world)
-        super
+        super(entity, world)
 
-        unless @node.stopped? || @node.succeeded?
+        if @node.running?
           reset_attribute(:start_time) unless @start_time
 
           @elapsed = Time.now - @start_time
 
-          if @elapsed <= @expires
-            succeed! if @node.process(entity, world).succeeded?
-          else
-            Log[:ai].debug { "#{self.class} Elapsed..." }
+          response =
+            if @elapsed <= @expires
+              if !@node.busy?
+                @node.response
+              else
+                @node.process(entity, world).response
+              end
+            else
+              Log[:ai].debug { "Elapsed: #{node.inspect}" }
 
-            @node.stop!
+              @node.stop!
 
-            failure!
-          end
+              :failed
+            end
+
+          update_response(handle_response(response))
         end
 
         self
       end
 
       protected
+
+      def handle_response(response)
+        case response
+        when :failed
+          :failed
+        when :busy
+          :busy
+        else
+          :succeeded
+        end
+      end
 
       def node_starting
         super

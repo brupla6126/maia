@@ -1,5 +1,5 @@
 require 'araignee/ai/actions/failed'
-require 'araignee/ai/actions/running'
+require 'araignee/ai/actions/busy'
 require 'araignee/ai/actions/succeeded'
 require 'araignee/ai/behaviors/selector'
 
@@ -7,51 +7,48 @@ include AI::Actions
 
 RSpec.describe AI::Behaviors::Selector do
   let(:world) { double('[world]') }
-  let(:entity) { { number: 0 } }
-
-  let(:nodes) { [ActionSucceeded.new] }
-  let(:selector) { AI::Behaviors::Selector.new(nodes: nodes) }
-
+  let(:entity) { {} }
   before { allow(world).to receive(:delta) { 1 } }
 
+  let(:nodes) { [ActionSucceeded.new({})] }
+  let(:selector) { AI::Behaviors::Selector.new(nodes: nodes) }
+
   describe '#initialize' do
-    context 'when given nodes' do
-      it 'should have children nodes set' do
-        expect(selector.nodes).to eq(nodes)
-      end
+    subject { selector }
+
+    it 'should have children nodes set' do
+      expect(subject.nodes).to eq(nodes)
     end
   end
 
   describe '#process' do
-    before { selector.start! }
     subject { selector.process(entity, world) }
+    before { selector.start! }
 
     context 'when ActionSucceeded' do
-      let(:nodes) { [ActionSucceeded.new] }
-
       it 'should have succeeded' do
         expect(subject.succeeded?).to eq(true)
       end
     end
 
     context 'when ActionFailed, ActionFailed, ActionSucceeded' do
-      let(:nodes) { [ActionFailed.new, ActionFailed.new, ActionSucceeded.new] }
+      let(:nodes) { [ActionFailed.new({}), ActionFailed.new({}), ActionSucceeded.new({})] }
 
       it 'should have succeeded' do
         expect(subject.succeeded?).to eq(true)
       end
     end
 
-    context 'when ActionFailed, ActionRunning' do
-      let(:nodes) { [ActionFailed.new, ActionRunning.new] }
+    context 'when ActionFailed, ActionBusy' do
+      let(:nodes) { [ActionFailed.new({}), ActionBusy.new({})] }
 
-      it 'should be running' do
-        expect(subject.running?).to eq(true)
+      it 'should be busy' do
+        expect(subject.busy?).to eq(true)
       end
     end
 
     context 'when ActionFailed, ActionFailed' do
-      let(:nodes) { [ActionFailed.new, ActionFailed.new] }
+      let(:nodes) { [ActionFailed.new({}), ActionFailed.new({})] }
 
       it 'should have failed' do
         expect(subject.failed?).to eq(true)

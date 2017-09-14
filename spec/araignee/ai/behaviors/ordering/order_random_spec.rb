@@ -13,9 +13,9 @@ RSpec.describe AI::Behaviors::Ordering::OrderRandom do
   describe '#order_nodes' do
     subject { ordering.order_nodes(nodes) }
 
-    let(:action1) { ActionLuckiest.new }
-    let(:action2) { ActionLooser.new }
-    let(:action3) { ActionBummer.new }
+    let(:action1) { ActionLuckiest.new({}) }
+    let(:action2) { ActionLooser.new({}) }
+    let(:action3) { ActionBummer.new({}) }
     let(:nodes) { [action1, action2, action3] }
 
     it 'nodes should have been ordered' do

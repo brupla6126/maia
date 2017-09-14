@@ -6,18 +6,17 @@ include AI::Actions
 
 RSpec.describe AI::Behaviors::Failer do
   let(:world) { double('[world]') }
-  let(:entity) { { number: 0 } }
-
-  let(:failer) { AI::Behaviors::Failer.new(node: node) }
+  let(:entity) { {} }
 
   before { allow(world).to receive(:delta) { 1 } }
 
   describe '#process' do
-    let(:node) { ActionSucceeded.new }
+    subject { failer.process(entity, world) }
 
     before { failer.start! }
 
-    subject { failer.process(entity, world) }
+    let(:failer) { AI::Behaviors::Failer.new(node: node) }
+    let(:node) { ActionSucceeded.new({}) }
 
     context 'when ActionSucceeded' do
       before { allow(node).to receive(:process).with(entity, world) }
@@ -33,7 +32,7 @@ RSpec.describe AI::Behaviors::Failer do
     end
 
     context 'when ActionFailed' do
-      let(:node) { ActionFailed.new }
+      let(:node) { ActionFailed.new({}) }
 
       it 'child node should be processed' do
         expect(node).to receive(:process).with(entity, world)

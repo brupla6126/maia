@@ -9,50 +9,43 @@ module AI
     class Guard < Composite
       # expects nodes[0] be the assertion
       # expects nodes[1] be the guarded node
-      def initialize(attributes = {})
-        super
-
-        @assertion_identifier = @nodes[0].identifier
-        @guarded_identifier = @nodes[1].identifier
+      def initialize(attributes)
+        super(attributes)
       end
 
       # if assertion evaluate to :succeeded, the guard
       # will return the processed node state otherwise
       # returns :succeeded
       def process(entity, world)
-        super
+        super(entity, world)
 
-        result = :succeeded
+        response = :succeeded
 
-        assertion = child(@assertion_identifier)
-        assertion.process(entity, world)
-
-        if assertion.succeeded?
-          guarded = child(@guarded_identifier)
-          result = guarded.process(entity, world).state_name
+        if nodes[0].process(entity, world).succeeded?
+          response = nodes[1].process(entity, world).response
         end
 
-        handle_result(result)
+        update_response(handle_response(response))
 
         self
       end
 
       protected
 
-      def handle_result(result)
-        case result
-        when :failed then failure! unless failed?
-        when :running then busy! unless running?
+      def handle_response(response)
+        case response
+        when :failed then :failed
+        when :busy then :busy
         else
-          succeed! unless succeeded?
+          :succeeded
         end
       end
 
       def validate_attributes
         super
 
-        raise ArgumentError, 'assertion_identifier nil' unless @assertion_identifier
-        raise ArgumentError, 'guarded_identifier nil' unless @guarded_identifier
+        raise ArgumentError, 'assertion_identifier nil' unless nodes[0]
+        raise ArgumentError, 'guarded_identifier nil' unless nodes[1]
       end
     end
   end

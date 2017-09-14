@@ -9,9 +9,9 @@ module AI
       include AI::Traits::Prioritized
 
       def process(entity, world)
-        super
+        super(entity, world)
 
-        failure! unless failed?
+        update_response(:failed)
 
         self
       end
@@ -21,16 +21,18 @@ module AI
       attribute :times, Integer, default: 0
 
       def process(entity, world)
-        super
+        super(entity, world)
 
         @called ||= 1
 
-        if @called <= @times
-          failure! unless failed?
-        else
-          start! unless started?
-          succeed!
-        end
+        response =
+          if @called <= @times
+            :failed
+          else
+            :succeeded
+          end
+
+        update_response(response)
 
         @called += 1
 

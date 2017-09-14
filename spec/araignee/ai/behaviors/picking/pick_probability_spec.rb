@@ -13,9 +13,9 @@ RSpec.describe AI::Behaviors::Picking::PickProbability do
   describe '#pick_nodes' do
     subject { picking.pick_node(nodes) }
 
-    let(:action1) { ActionLuckiest.new }
-    let(:action2) { ActionBummer.new }
-    let(:action3) { ActionLooser.new }
+    let(:action1) { ActionLuckiest.new({}) }
+    let(:action2) { ActionBummer.new({}) }
+    let(:action3) { ActionLooser.new({}) }
 
     context 'when no nodes' do
       let(:nodes) { [] }

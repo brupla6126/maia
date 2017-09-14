@@ -5,13 +5,45 @@ RSpec.describe AI::Node do
 
   before { allow(world).to receive(:delta) { 1 } }
 
-  let(:node) { AI::Node.new }
+  before { Log[:ai] = double('Log[:ai] stop!') }
+  before { allow(Log[:ai]).to receive(:debug) }
+  after { Log[:ai] = Log[:default] }
+
+  it { is_expected.to have_states(:ready, :running, :paused, :stopped, on: :state) }
+
+  it { is_expected.to handle_events :start, when: :ready, on: :state }
+  it { is_expected.to handle_events :start, when: :stopped, on: :state }
+  it { is_expected.to handle_events :stop, when: :paused, on: :state }
+  it { is_expected.to handle_events :stop, when: :running, on: :state }
+  it { is_expected.to handle_events :pause, when: :running, on: :state }
+  it { is_expected.to handle_events :resume, when: :paused, on: :state }
+
+  let(:attributes_empty) { {} }
+  let(:attributes) { attributes_empty }
+  let(:node) { AI::Node.new(attributes) }
+
   subject { node }
 
   describe '#initialize' do
-    context 'without attributes' do
+    context 'with attributes nil' do
+      let(:attributes) { nil }
+
+      it 'should raise ArgumentError' do
+        expect { subject }.to raise_error(ArgumentError, "attributes must be Hash")
+      end
+    end
+
+    context 'attributes of invalid type' do
+      let(:attributes) { [] }
+
+      it 'should raise ArgumentError' do
+        expect { subject }.to raise_error(ArgumentError, "attributes must be Hash")
+      end
+    end
+
+    context 'with attributes empty' do
       it 'identifier should not be nil' do
-        expect(node.identifier).not_to eq(nil)
+        expect(node.identifier).to be_a(String)
       end
 
       it 'state should be ready' do
@@ -22,8 +54,39 @@ RSpec.describe AI::Node do
         expect(node.elapsed).to eq(0)
       end
 
+      it 'response should be :unknown' do
+        expect(node.response).to eq(:unknown)
+      end
+
       it 'parent should equal nil' do
         expect(node.parent).to eq(nil)
+      end
+    end
+
+    context 'with attributes' do
+      let(:identifier) { 'abcdef' }
+      let(:parent) { AI::Node.new({}) }
+      let(:elapsed) { 5 }
+      let(:attributes) { { identifier: identifier, parent: parent, elapsed: elapsed } }
+
+      it 'should set identifier' do
+        expect(node.identifier).to eq(identifier)
+      end
+
+      it 'should set parent' do
+        expect(node.parent).to eq(parent)
+      end
+
+      it 'should set elapsed' do
+        expect(node.elapsed).to eq(elapsed)
+      end
+
+      context 'invalid identifier' do
+        let(:identifier) { AI::Node.new({}) }
+
+        it 'should raise ArgumentError' do
+          expect { node }.to raise_error(ArgumentError, "invalid identifier: #{identifier}")
+        end
       end
     end
   end
@@ -38,499 +101,210 @@ RSpec.describe AI::Node do
     end
   end
 
+  describe '#can_stop?' do
+    subject { node.can_stop? }
+
+    context 'when state equals ready' do
+      it 'should return false' do
+        expect(subject).to eq(false)
+      end
+    end
+
+    context 'when state equals running' do
+      before { node.start! }
+
+      it 'should return true' do
+        expect(subject).to eq(true)
+      end
+    end
+
+    context 'when state equals paused' do
+      before { node.start! }
+      before { node.pause! }
+
+      it 'should return true' do
+        expect(subject).to eq(true)
+      end
+    end
+  end
+
   describe '#process' do
     let(:entity) { {} }
 
-    context 'when entity parameter is nil' do
+    context 'when entity parameter is empty' do
       before { subject.start! }
       before { subject.process(entity, world) }
 
       it 'node @elapsed should be updated' do
-        expect(node.elapsed).to eq(1)
+        expect(subject.elapsed).to eq(1)
       end
     end
 
     it 'returns self' do
-      expect(node.process(entity, world)).to eq(node)
+      expect(subject.process(entity, world)).to eq(node)
+    end
+
+    it 'response should be :unknown' do
+      expect(subject.response).to eq(:unknown)
     end
   end
 
-  describe '#active?' do
-    context 'with state :ready' do
-      it 'should be true' do
-        expect(subject.active?).to eq(false)
-      end
+  describe 'busy?' do
+    before { subject.response = :busy }
+
+    it 'should return true' do
+      expect(subject.busy?).to eq(true)
     end
+  end
 
-    context 'started' do
-      before { subject.start! }
+  describe 'failed?' do
+    before { subject.response = :failed }
 
-      context 'with state :started' do
-        it 'should be true' do
-          expect(subject.active?).to eq(true)
-        end
-      end
+    it 'should return true' do
+      expect(subject.failed?).to eq(true)
+    end
+  end
 
-      context 'with state :stopped' do
-        before { subject.stop! }
+  describe 'succeeded?' do
+    before { subject.response = :succeeded }
 
-        it 'should be true' do
-          expect(subject.active?).to eq(false)
-        end
-      end
+    it 'should return true' do
+      expect(subject.succeeded?).to eq(true)
+    end
+  end
 
-      context 'with state :paused' do
-        before { subject.pause! }
+  describe 'reset_node' do
+    after { subject.send(:reset_node) }
 
-        it 'should be true' do
-          expect(subject.active?).to eq(false)
-        end
-      end
-
-      context 'with state :running' do
-        before { subject.busy! }
-
-        it 'should be true' do
-          expect(subject.active?).to eq(true)
-        end
-      end
-
-      context 'with state :succeeded' do
-        before { subject.succeed! }
-
-        it 'should be true' do
-          expect(subject.active?).to eq(true)
-        end
-      end
-
-      context 'with state :failed' do
-        before { subject.failure! }
-
-        it 'should be true' do
-          expect(subject.active?).to eq(true)
-        end
-      end
+    it 'should call reset_attribute' do
+      expect(subject).to receive(:reset_attribute).with(:elapsed)
     end
   end
 
   describe '#start!' do
-    context 'from state :ready' do
-      before { subject.start! }
+    before { subject.start! }
 
-      it 'should be started' do
-        expect(subject.started?).to eq(true)
-      end
-    end
-
-    context 'started' do
-      before { subject.start! }
-
-      context 'from state :started' do
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.start! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :stopped' do
-        before { subject.stop! }
-        before { subject.start! }
-
-        it 'should be started' do
-          expect(subject.started?).to eq(true)
-        end
-      end
-
-      context 'from state :running' do
-        before { subject.busy! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.start! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :succeeded' do
-        before { subject.succeed! }
-        before { subject.start! }
-
-        it 'should be started' do
-          expect(subject.started?).to eq(true)
-        end
-      end
-
-      context 'from state :failed' do
-        before { subject.failure! }
-        before { subject.start! }
-
-        it 'should be started' do
-          expect(subject.started?).to eq(true)
-        end
-      end
+    it 'should be running and call Log[:ai].debug twice' do
+      expect(subject.running?).to eq(true)
+      expect(Log[:ai]).to have_received(:debug).twice # node_starting, node_started
     end
   end
 
   describe '#stop!' do
-    context 'from state :ready' do
-      it 'should raise StateMachines::InvalidTransition' do
-        expect { subject.stop! }.to raise_error(StateMachines::InvalidTransition)
-      end
-    end
+    before { subject.start! }
+    before { subject.stop! }
 
-    context 'started' do
-      before { subject.start! }
-
-      context 'from state :started' do
-        before { subject.stop! }
-
-        it 'should be stopped' do
-          expect(node.stopped?).to eq(true)
-        end
-      end
-
-      context 'from state :stopped' do
-        before { subject.stop! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.stop! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :paused' do
-        before { subject.pause! }
-        before { subject.stop! }
-
-        it 'should be stopped' do
-          expect(node.stopped?).to eq(true)
-        end
-      end
-
-      context 'from state :running' do
-        before { subject.busy! }
-        before { subject.stop! }
-
-        it 'should be stopped' do
-          expect(node.stopped?).to eq(true)
-        end
-      end
-
-      context 'from state :succeeded' do
-        before { subject.succeed! }
-        before { subject.stop! }
-
-        it 'should be stopped' do
-          expect(node.stopped?).to eq(true)
-        end
-      end
-
-      context 'from state :failed' do
-        before { subject.failure! }
-        before { subject.stop! }
-
-        it 'should be stopped' do
-          expect(node.stopped?).to eq(true)
-        end
-      end
+    it 'should be stopped and call Log[:ai].debug twice' do
+      expect(node.stopped?).to eq(true)
+      expect(Log[:ai]).to have_received(:debug).exactly(4).times
     end
   end
 
   describe '#pause!' do
-    context 'from state :ready' do
-      it 'should raise StateMachines::InvalidTransition' do
-        expect { subject.pause! }.to raise_error(StateMachines::InvalidTransition)
-      end
-    end
+    before { subject.start! }
+    before { subject.pause! }
 
-    context 'started' do
-      before { subject.start! }
-
-      context 'from state :started' do
-        before { subject.pause! }
-
-        it 'should be paused' do
-          expect(node.paused?).to eq(true)
-        end
-      end
-
-      context 'from state :stopped' do
-        before { subject.stop! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.pause! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :paused' do
-        before { subject.pause! }
-
-        it 'should be paused' do
-          expect(node.paused?).to eq(true)
-        end
-      end
-
-      context 'from state :running' do
-        before { subject.busy! }
-        before { subject.pause! }
-
-        it 'should be paused' do
-          expect(node.paused?).to eq(true)
-        end
-      end
-
-      context 'from state :succeeded' do
-        before { subject.succeed! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.pause! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :failed' do
-        before { subject.failure! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.pause! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
+    it 'should be paused and call Log[:ai].debug twice' do
+      expect(node.paused?).to eq(true)
+      expect(Log[:ai]).to have_received(:debug).exactly(4).times
     end
   end
 
   describe '#resume!' do
-    context 'from state :ready' do
-      it 'should raise StateMachines::InvalidTransition' do
-        expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
+    before { subject.start! }
+    before { subject.pause! }
+    before { subject.resume! }
+
+    it 'should be running and call Log[:ai].debug' do
+      expect(node.running?).to eq(true)
+      expect(Log[:ai]).to have_received(:debug).exactly(6).times
+    end
+  end
+
+  describe 'node_starting' do
+    it 'should call Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Starting: #{subject.inspect}" }
+      subject.send(:node_starting)
+    end
+
+    it 'should return nil' do
+      expect(subject.send(:node_starting)).to eq(nil)
+    end
+
+    it 'should reset node' do
+      subject.elapsed = 5
+      subject.send(:node_starting)
+      expect(subject.elapsed).to eq(0)
+    end
+  end
+
+  describe 'node_started' do
+    it 'should call Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.inspect}") }
+      subject.send(:node_started)
+    end
+  end
+
+  describe 'node_stopping' do
+    it 'should call Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Stopping: #{subject.inspect}" }
+      subject.send(:node_stopping)
+    end
+  end
+
+  describe 'node_stopped' do
+    it 'should call Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Stopped: #{subject.inspect}" }
+      subject.send(:node_stopped)
+    end
+  end
+
+  describe 'node_pausing' do
+    it 'should call Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Pausing: #{subject.inspect}" }
+      subject.send(:node_pausing)
+    end
+  end
+
+  describe 'node_paused' do
+    it 'should call Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Paused: #{subject.inspect}" }
+      subject.send(:node_paused)
+    end
+  end
+
+  describe 'node_resuming' do
+    it 'should call Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Resuming: #{subject.inspect}" }
+      subject.send(:node_resuming)
+    end
+  end
+
+  describe 'node_resumed' do
+    it 'should call Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Resumed: #{subject.inspect}" }
+      subject.send(:node_resumed)
+    end
+  end
+
+  describe 'update_response' do
+    context 'invalid response' do
+      it 'should call reset_attribute' do
+        expect { subject.send(:update_response, nil) }.to raise_error(ArgumentError, 'invalid response: ')
+        expect { subject.send(:update_response, :done) }.to raise_error(ArgumentError, 'invalid response: done')
       end
     end
 
-    context 'started' do
-      before { subject.start! }
+    context 'valid response' do
+      let(:responses) { %i[busy failed succeeded] }
 
-      context 'from state :started' do
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :stopped' do
-        before { subject.stop! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :paused' do
-        before { subject.pause! }
-        before { subject.resume! }
-
-        it 'should be started' do
-          expect(node.started?).to eq(true)
-        end
-      end
-
-      context 'from state :running' do
-        before { subject.busy! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :succeeded' do
-        before { subject.succeed! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :failed' do
-        before { subject.failure! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.resume! }.to raise_error(StateMachines::InvalidTransition)
+      it 'should call reset_attribute' do
+        responses.each do |response|
+          expect { subject.send(:update_response, response) }.not_to raise_error
+          expect(subject.response).to eq(response)
         end
       end
     end
   end
 
-  describe '#busy!' do
-    context 'from state :ready' do
-      it 'should raise StateMachines::InvalidTransition' do
-        expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
-      end
-    end
-
-    context 'started' do
-      before { subject.start! }
-
-      context 'from state :started' do
-        before { subject.busy! }
-
-        it 'should be running' do
-          expect(node.running?).to eq(true)
-        end
-      end
-
-      context 'from state :stopped' do
-        before { subject.stop! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :paused' do
-        before { subject.pause! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :running' do
-        before { subject.busy! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :succeeded' do
-        before { subject.succeed! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :failed' do
-        before { subject.failure! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.busy! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-    end
-  end
-
-  describe '#succeed!' do
-    context 'from state :ready' do
-      it 'should raise StateMachines::InvalidTransition' do
-        expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
-      end
-    end
-
-    context 'started' do
-      before { subject.start! }
-
-      context 'from state :started' do
-        before { subject.succeed! }
-
-        it 'should be succeeded' do
-          expect(node.succeeded?).to eq(true)
-        end
-      end
-
-      context 'from state :stopped' do
-        before { subject.stop! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :paused' do
-        before { subject.pause! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :running' do
-        before { subject.busy! }
-        before { subject.succeed! }
-
-        it 'should be succeeded' do
-          expect(node.succeeded?).to eq(true)
-        end
-      end
-
-      context 'from state :succeeded' do
-        before { subject.succeed! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :failed' do
-        before { subject.failure! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.succeed! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-    end
-  end
-
-  describe '#failure!' do
-    context 'from state :ready' do
-      it 'should raise StateMachines::InvalidTransition' do
-        expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
-      end
-    end
-
-    context 'started' do
-      before { subject.start! }
-
-      context 'from state :started' do
-        before { subject.failure! }
-
-        it 'should be failed' do
-          expect(node.failed?).to eq(true)
-        end
-      end
-
-      context 'from state :stopped' do
-        before { subject.stop! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :paused' do
-        before { subject.pause! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :running' do
-        before { subject.busy! }
-        before { subject.failure! }
-
-        it 'should be failed' do
-          expect(node.failed?).to eq(true)
-        end
-      end
-
-      context 'from state :succeeded' do
-        before { subject.succeed! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-
-      context 'from state :failed' do
-        before { subject.failure! }
-
-        it 'should raise StateMachines::InvalidTransition' do
-          expect { subject.failure! }.to raise_error(StateMachines::InvalidTransition)
-        end
-      end
-    end
-  end
 end

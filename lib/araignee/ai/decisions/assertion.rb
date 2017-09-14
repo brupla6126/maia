@@ -5,19 +5,15 @@ module AI
   # Module for gathering Decision classes
   module Decisions
     # An Assertion Node will evaluate a condition and
-    # its resulting state can only be :succeeded or :failed
+    # its response can only be :succeeded or :failed
     # Derived classed will implement the assertion test
     class Assertion < Leaf
-      def initialize(attributes = {})
-        super
-      end
-
       def process(entity, world)
-        super
+        super(entity, world)
 
-        result = assert(entity, world)
+        response = assert(entity, world)
 
-        handle_result(result)
+        update_response(handle_response(response))
 
         self
       end
@@ -30,12 +26,12 @@ module AI
 
       private
 
-      def handle_result(result)
+      def handle_response(response)
         # only accept :succeeded and :failed
-        case result
-        when :succeeded then succeed! unless succeeded?
+        case response
+        when :succeeded then :succeeded
         else
-          failure! unless failed?
+          :failed
         end
       end
     end

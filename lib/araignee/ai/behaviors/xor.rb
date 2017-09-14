@@ -7,36 +7,33 @@ module AI
     # Class Xor
     class Xor < Composite
       def process(entity, world)
-        super
+        super(entity, world)
 
         succeeded = 0
 
-        running = false
-        @nodes.each do |node|
-          case node.process(entity, world).state_name
-          when :running
-            running = true
+        busy = false
+        nodes.each do |node|
+          case node.process(entity, world).response
+          when :busy
+            busy = true
             break
           when :succeeded
             succeeded += 1
           end
         end
 
-        if running
-          busy!
-        else
-          succeeded == 1 ? succeed! : failure!
-        end
+        response =
+          if busy
+            :busy
+          elsif succeeded == 1
+            :succeeded
+          else
+            :failed
+          end
+
+        update_response(response)
 
         self
-      end
-
-      protected
-
-      def validate_attributes
-        super
-
-        raise ArgumentError, 'must have at least one child node' if @nodes.empty?
       end
     end
   end

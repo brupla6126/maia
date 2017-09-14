@@ -10,16 +10,20 @@ module AI
     # run their children a set number of times before returning to their parent
     class Repeater < Decorator
       def process(entity, world)
-        super
+        super(entity, world)
 
-        repeat_process(entity, world) if @node.active?
+        repeat_process(entity, world) if node.running?
+
+        update_response(:succeeded)
 
         self
       end
 
       protected
 
-      def repeat_process(entity, world); end
+      def repeat_process(entity, world)
+        :succeeded
+      end
     end
   end
 end

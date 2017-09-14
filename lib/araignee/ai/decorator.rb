@@ -6,40 +6,38 @@ module AI
   class Decorator < Node
     attribute :node, Node, default: nil
 
-    def initialize(attributes = {})
-      super
+    def initialize(attributes)
+      super(attributes)
     end
 
     def node=(new_node)
-      @node.cancel if @node && @node.running?
+      raise ArgumentError, 'invalid decorating node' unless new_node
+
+      node.stop! if node && node.can_stop?
 
       super(new_node)
+
+      node.start! if running?
     end
 
     protected
 
     def node_starting
-      super
+      super()
 
-      @node.start!
+      node.start!
     end
 
     def node_stopping
-      super
+      super()
 
-      @node.stop!
-    end
-
-    def reset_node
-      super
-
-      @node.reset_node if @node
+      node.stop!
     end
 
     def validate_attributes
-      super
+      super()
 
-      raise ArgumentError, 'node nil' unless @node
+      raise ArgumentError, 'invalid decorating node' unless node
     end
   end
 end
