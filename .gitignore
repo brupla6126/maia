@@ -10,14 +10,9 @@
 /test/data/
 /tmp/
 /turbulence/
+/vendor/
+.DS_Store
 *.bundle
-*.so
-*.o
-*.a
-mkmf.log
-*.*~
-*~
 *.gem
-*.pid
 *.log
 
