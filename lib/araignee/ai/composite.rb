@@ -10,7 +10,7 @@ module AI
     end
 
     def child(identifier)
-      nodes.select { |node| node.identifier.equal?(identifier) }.first
+      nodes.detect { |node| node.identifier.equal?(identifier) }
     end
 
     def add_node(node, index)
