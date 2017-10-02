@@ -2,6 +2,7 @@ require 'araignee/ai/node'
 
 RSpec.describe AI::Node do
   let(:world) { double('[world]') }
+  let(:entity) { {} }
 
   before { allow(world).to receive(:delta) { 1 } }
 
@@ -29,7 +30,7 @@ RSpec.describe AI::Node do
       let(:attributes) { nil }
 
       it 'should raise ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, "attributes must be Hash")
+        expect { subject }.to raise_error(ArgumentError, 'attributes must be Hash')
       end
     end
 
@@ -37,7 +38,7 @@ RSpec.describe AI::Node do
       let(:attributes) { [] }
 
       it 'should raise ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, "attributes must be Hash")
+        expect { subject }.to raise_error(ArgumentError, 'attributes must be Hash')
       end
     end
 
@@ -50,35 +51,17 @@ RSpec.describe AI::Node do
         expect(node.ready?).to eq(true)
       end
 
-      it 'elapsed should equal 0' do
-        expect(node.elapsed).to eq(0)
-      end
-
       it 'response should be :unknown' do
         expect(node.response).to eq(:unknown)
-      end
-
-      it 'parent should equal nil' do
-        expect(node.parent).to eq(nil)
       end
     end
 
     context 'with attributes' do
       let(:identifier) { 'abcdef' }
-      let(:parent) { AI::Node.new({}) }
-      let(:elapsed) { 5 }
-      let(:attributes) { { identifier: identifier, parent: parent, elapsed: elapsed } }
+      let(:attributes) { { identifier: identifier } }
 
       it 'should set identifier' do
         expect(node.identifier).to eq(identifier)
-      end
-
-      it 'should set parent' do
-        expect(node.parent).to eq(parent)
-      end
-
-      it 'should set elapsed' do
-        expect(node.elapsed).to eq(elapsed)
       end
 
       context 'invalid identifier' do
@@ -87,16 +70,6 @@ RSpec.describe AI::Node do
         it 'should raise ArgumentError' do
           expect { node }.to raise_error(ArgumentError, "invalid identifier: #{identifier}")
         end
-      end
-    end
-  end
-
-  describe '' do
-    context 'with values set with accessors' do
-      it 'values should be set' do
-        node.elapsed = 25
-
-        expect(node.elapsed).to eq(25)
       end
     end
   end
@@ -129,23 +102,25 @@ RSpec.describe AI::Node do
   end
 
   describe '#process' do
-    let(:entity) { {} }
+    subject { node.process(entity, world) }
 
-    context 'when entity parameter is empty' do
-      before { subject.start! }
-      before { subject.process(entity, world) }
-
-      it 'node @elapsed should be updated' do
-        expect(subject.elapsed).to eq(1)
-      end
-    end
+    before { node.start! }
 
     it 'returns self' do
-      expect(subject.process(entity, world)).to eq(node)
+      expect(subject).to eq(node)
     end
 
-    it 'response should be :unknown' do
-      expect(subject.response).to eq(:unknown)
+    context 'with a recorder' do
+      let(:attributes) { { recorder: Recorder.new(series: {}) } }
+
+      before { allow(node).to receive(:start_recording) }
+      before { allow(node).to receive(:stop_recording) }
+
+      it 'should call before_execute and after_execute hooks' do
+        expect(node).to receive(:start_recording)
+        expect(node).to receive(:stop_recording)
+        expect(subject.recorder.data[:values]).not_to eq([])
+      end
     end
   end
 
@@ -173,20 +148,12 @@ RSpec.describe AI::Node do
     end
   end
 
-  describe 'reset_node' do
-    after { subject.send(:reset_node) }
-
-    it 'should call reset_attribute' do
-      expect(subject).to receive(:reset_attribute).with(:elapsed)
-    end
-  end
-
   describe '#start!' do
     before { subject.start! }
 
     it 'should be running and call Log[:ai].debug twice' do
       expect(subject.running?).to eq(true)
-      expect(Log[:ai]).to have_received(:debug).twice # node_starting, node_started
+      expect(Log[:ai]).to have_received(:debug).twice
     end
   end
 
@@ -232,9 +199,8 @@ RSpec.describe AI::Node do
     end
 
     it 'should reset node' do
-      subject.elapsed = 5
+      expect(subject).to receive(:reset_node)
       subject.send(:node_starting)
-      expect(subject.elapsed).to eq(0)
     end
   end
 
@@ -306,5 +272,4 @@ RSpec.describe AI::Node do
       end
     end
   end
-
 end

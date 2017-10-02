@@ -1,17 +1,24 @@
+require 'hooks'
 require 'securerandom'
 require 'state_machines'
 require 'virtus'
 require 'araignee/utils/log'
+require 'araignee/utils/recorder'
 
 module AI
   # Node Class, base class for all nodes in the behavior tree
   class Node
+    include Hooks
     include Virtus.model
 
+    define_hook :before_execute, :after_execute
+
+    before_execute :start_recording
+    after_execute :stop_recording
+
     attribute :identifier, String
-    attribute :parent, Node
-    attribute :elapsed, Integer, default: 0
-    attribute :response, Symbol, default: :unknown # [:busy, :failed, :succeeded]
+    attribute :response, Symbol, default: :unknown
+    attribute :recorder, Recorder, default: nil
 
     state_machine :state, initial: :ready do
       event :start do
@@ -40,7 +47,7 @@ module AI
       after_transition %i[paused] => :running, do: :node_resumed
     end
 
-    def initialize(attributes)
+    def initialize(attributes = {})
       raise ArgumentError, 'attributes must be Hash' unless attributes.instance_of?(Hash)
 
       super
@@ -61,12 +68,28 @@ module AI
     end
 
     def process(entity, world)
-      # raise ArgumentError, 'entity must be set' unless entity
-      # raise ArgumentError, 'world must be set' unless world
-
-      @elapsed += world.delta
+      run_hook :before_execute
+      execute(entity, world)
+      run_hook :after_execute
 
       self
+    end
+
+    def start_recording
+      return unless recorder
+
+      @start_time = Time.now
+    end
+
+    def stop_recording
+      return unless recorder
+
+      duration = (Time.now - @start_time).round(4)
+
+      recorder.record(:duration, duration)
+      recorder.record(response, 1)
+
+      @start_time = nil
     end
 
     def busy?
@@ -81,9 +104,7 @@ module AI
       response.equal?(:succeeded)
     end
 
-    def reset_node
-      reset_attribute(:elapsed)
-    end
+    def reset_node; end
 
     protected
 
@@ -132,5 +153,9 @@ module AI
     def validate_attributes
       raise ArgumentError, "invalid identifier: #{identifier}" unless identifier.instance_of?(String)
     end
+
+    private
+
+    def execute(_entity, _world) end
   end
 end
