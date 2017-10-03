@@ -106,6 +106,10 @@ module AI
 
     def reset_node; end
 
+    def validate_attributes
+      raise ArgumentError, "invalid identifier: #{identifier}" unless identifier.instance_of?(String)
+    end
+
     protected
 
     def node_starting
@@ -148,10 +152,6 @@ module AI
       raise ArgumentError, "invalid response: #{response}" unless %i[busy failed succeeded].include?(response)
 
       self.response = response
-    end
-
-    def validate_attributes
-      raise ArgumentError, "invalid identifier: #{identifier}" unless identifier.instance_of?(String)
     end
 
     private
