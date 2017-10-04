@@ -19,6 +19,8 @@ module AI
     attribute :identifier, String
     attribute :response, Symbol, default: :unknown
     attribute :recorder, Recorder, default: nil
+    attribute :start_time, Time, default: nil, writer: :private
+    attribute :stop_time, Time, default: nil, writer: :private
 
     state_machine :state, initial: :ready do
       event :start do
@@ -47,10 +49,8 @@ module AI
       after_transition %i[paused] => :running, do: :node_resumed
     end
 
-    def initialize(attributes = {})
-      raise ArgumentError, 'attributes must be Hash' unless attributes.instance_of?(Hash)
-
-      super
+    def initialize
+      super()
 
       # need to initialize identifier here instead of
       # attribute default value since Virtus seems to cache
@@ -75,23 +75,6 @@ module AI
       self
     end
 
-    def start_recording
-      return unless recorder
-
-      @start_time = Time.now
-    end
-
-    def stop_recording
-      return unless recorder
-
-      duration = (Time.now - @start_time).round(4)
-
-      recorder.record(:duration, duration)
-      recorder.record(response, 1)
-
-      @start_time = nil
-    end
-
     def busy?
       response.equal?(:busy)
     end
@@ -104,13 +87,35 @@ module AI
       response.equal?(:succeeded)
     end
 
-    def reset_node; end
+    def reset_node
+      reset_attribute(:response)
+    end
 
     def validate_attributes
       raise ArgumentError, "invalid identifier: #{identifier}" unless identifier.instance_of?(String)
     end
 
     protected
+
+    def start_recording
+      return unless recorder
+
+      @start_time = Time.now
+
+      nil
+    end
+
+    def stop_recording
+      return unless recorder
+
+      @stop_time = Time.now
+      duration = (stop_time - start_time).round(4)
+
+      recorder.record(:duration, duration)
+      # recorder.record(response, 1)
+
+      nil
+    end
 
     def node_starting
       Log[:ai].debug { "Starting: #{inspect}" }
