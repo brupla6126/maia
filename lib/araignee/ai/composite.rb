@@ -3,37 +3,41 @@ require 'araignee/ai/node'
 module AI
   # A Composite Node Class, based on the Composite Design Pattern
   class Composite < Node
-    attribute :nodes, Array, default: []
+    attribute :children, Array, default: []
 
-    def initialize(attributes)
-      super(attributes)
+    def initialize
+      super()
     end
 
     def child(identifier)
-      nodes.detect { |node| node.identifier.equal?(identifier) }
+      children.detect { |child| child.identifier.equal?(identifier) }
     end
 
-    def add_node(node, index)
+    def add_child(child, index)
       index ||= :last
 
-      raise ArgumentError, "invalid index: #{index}" unless index.equal?(:last) || index.is_a?(Integer)
+      raise ArgumentError, "invalid index: #{index}" unless index.equal?(:last) || index.instance_of?(Integer)
 
       if index.equal?(:last)
-        nodes << node
+        children << child
       else
-        nodes.insert(index, node)
+        children.insert(index, child)
       end
+
+      self
     end
 
-    def remove_node(node)
-      nodes.delete(node)
+    def remove_child(child)
+      children.delete(child)
+
+      self
     end
 
     def reset_node
       super()
 
-      # reset children nodes
-      nodes.each(&:reset_node)
+      # reset children children
+      children.each(&:reset_node)
 
       nil
     end
@@ -43,7 +47,7 @@ module AI
     def node_starting
       super()
 
-      nodes.each(&:start!)
+      children.each(&:start!)
 
       nil
     end
@@ -51,15 +55,9 @@ module AI
     def node_stopping
       super()
 
-      nodes.each(&:stop!)
+      children.each(&:stop!)
 
       nil
-    end
-
-    def validate_attributes
-      super()
-
-      raise ArgumentError, 'nodes must be Array' if nodes.empty?
     end
   end
 end
