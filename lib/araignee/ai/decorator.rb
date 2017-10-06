@@ -4,20 +4,20 @@ require 'araignee/ai/node'
 module AI
   # A Decorator Node Class, based on the Decorator Design Pattern
   class Decorator < Node
-    attribute :node, Node, default: nil
+    attribute :child, Node, default: nil
 
-    def initialize(attributes)
-      super(attributes)
+    def initialize
+      super()
     end
 
-    def node=(new_node)
-      raise ArgumentError, 'invalid decorating node' unless new_node
+    def child=(new_child)
+      raise ArgumentError, 'invalid decorating child' unless new_child
 
-      node.stop! if node && node.can_stop?
+      child.stop! if child && child.can_stop?
 
-      super(new_node)
+      super(new_child)
 
-      node.start! if running?
+      child.start! if running?
     end
 
     protected
@@ -25,19 +25,13 @@ module AI
     def node_starting
       super()
 
-      node.start!
+      child.start!
     end
 
     def node_stopping
       super()
 
-      node.stop!
-    end
-
-    def validate_attributes
-      super()
-
-      raise ArgumentError, 'invalid decorating node' unless node
+      child.stop!
     end
   end
 end

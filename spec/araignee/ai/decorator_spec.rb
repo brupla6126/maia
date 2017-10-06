@@ -1,131 +1,97 @@
-require 'araignee/ai/actions/succeeded'
-require 'araignee/ai/decorator'
+require 'araignee/ai/fabricators/ai_node_fabricator'
+require 'araignee/ai/fabricators/ai_decorator_fabricator'
 
 RSpec.describe AI::Decorator do
-  let(:decorating) { AI::Node.new({}) }
-  let(:attributes) { { node: decorating } }
-  let(:decorator) { AI::Decorator.new(attributes) }
+  let(:decorating) { Fabricate(:ai_node) }
+  let(:decorator) { Fabricate(:ai_decorator, child: decorating) }
 
-  before { Log[:ai] = double('Log[:ai] start!') }
+  before { Log[:ai] = double('Log[:ai]') }
   before { allow(Log[:ai]).to receive(:debug) }
-  before { allow(Log[:ai]).to receive(:warn) }
   after { Log[:ai] = Log[:default] }
 
   subject { decorator }
 
   describe '#initialize' do
-    context 'attributes nil' do
-      let(:attributes) { nil }
-
-      it 'should raise ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, 'attributes must be Hash')
-      end
+    it 'decorator is ready' do
+      expect(subject.ready?).to eq(true)
     end
 
-    context 'attributes of invalid type' do
-      let(:attributes) { [] }
-
-      it 'should raise ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, 'attributes must be Hash')
-      end
+    it 'child is ready' do
+      expect(subject.child.ready?).to eq(true)
     end
 
-    context 'with attributes empty' do
-      let(:attributes) { {} }
-
-      it 'decorating node should be set' do
-        expect { subject }.to raise_error(ArgumentError, 'invalid decorating node')
-      end
-    end
-
-    context 'invalid identifier' do
-      let(:identifier) { AI::Node.new({}) }
-
-      before { attributes[:identifier] = identifier }
-
-      it 'raise ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, "invalid identifier: #{identifier}")
-      end
-    end
-
-    context 'with attributes' do
-      it 'decorator should be ready' do
-        expect(subject.ready?).to eq(true)
-      end
-
-      it 'decorating node should be ready' do
-        expect(subject.node.ready?).to eq(true)
-      end
+    it 'response is :unknown' do
+      expect(subject.child.response).to eq(:unknown)
     end
   end
 
-  describe '#node=' do
-    let(:new_node) { AI::Node.new({}) }
+  describe '#child=' do
+    let(:new_child) { Fabricate(:ai_node) }
 
-    context 'without decorating node' do
-      it 'should raise ArgumentError new decorating node must be AI::Node' do
-        expect { subject.node = nil }.to raise_error(ArgumentError, 'invalid decorating node')
+    context 'without decorating child' do
+      it 'raises ArgumentError new decorating node must be AI::Node' do
+        expect { subject.child = nil }.to raise_error(ArgumentError, 'invalid decorating child')
       end
     end
 
-    context 'with decorating node' do
+    context 'with decorating child' do
       context 'decorator is running' do
         before { subject.start! }
 
-        context 'decorating node running' do
+        context 'decorating child running' do
           before { allow(decorating).to receive(:can_stop?).and_return(true) }
-          before { subject.node = new_node }
+          before { subject.child = new_child }
 
-          it 'decorating node should be stopped' do
+          it 'decorating child is stopped' do
             expect(decorating).to have_received(:can_stop?)
             expect(decorating.stopped?).to eq(true)
           end
 
-          it 'new decorating node should be set' do
-            expect(subject.node).to eq(new_node)
+          it 'new decorating child is set' do
+            expect(subject.child).to eq(new_child)
           end
 
-          it 'new decorating node should be running' do
-            expect(new_node.running?).to eq(true)
+          it 'new decorating child is running' do
+            expect(new_child.running?).to eq(true)
           end
         end
 
-        context 'decorating node paused' do
+        context 'decorating child is paused' do
           before { decorating.pause! }
-          before { subject.node = new_node }
+          before { subject.child = new_child }
 
-          it 'decorating node should be stopped' do
+          it 'decorating child is stopped' do
             expect(decorating.stopped?).to eq(true)
           end
 
-          it 'new decorating node should be set' do
-            expect(subject.node).to eq(new_node)
+          it 'new decorating child is set' do
+            expect(subject.child).to eq(new_child)
           end
 
-          it 'new decorating node should be running' do
-            expect(new_node.running?).to eq(true)
+          it 'new decorating node is running' do
+            expect(new_child.running?).to eq(true)
           end
         end
       end
 
       context 'decorator is not running' do
-        before { subject.node = new_node }
+        before { subject.child = new_child }
 
-        it 'decorating node should not be running' do
+        it 'decorating child is not running' do
           expect(decorating.running?).to eq(false)
         end
 
-        context 'changing decorating node' do
-          it 'decorating node should not be stopped' do
+        context 'changing decorating child' do
+          it 'decorating child is stopped' do
             expect(decorating.stopped?).to eq(false)
           end
 
-          it 'new decorating node should be set' do
-            expect(subject.node).to eq(new_node)
+          it 'new decorating child is set' do
+            expect(subject.child).to eq(new_child)
           end
 
-          it 'new decorating node should not be running' do
-            expect(subject.node.running?).to eq(false)
+          it 'new decorating child is not running' do
+            expect(subject.child.running?).to eq(false)
           end
         end
       end
@@ -133,32 +99,58 @@ RSpec.describe AI::Decorator do
   end
 
   describe '#node_starting' do
+    it 'calls Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Starting: #{subject.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Starting: #{subject.child.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.child.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.inspect}") }
+
+      subject.start!
+    end
+
     context 'with decorating node' do
+      before { allow(subject.child).to receive(:validate_attributes) }
       before { subject.start! }
 
-      it 'decorator should be running' do
+      it 'decorator is running' do
         expect(subject.running?).to eq(true)
       end
 
-      it 'decorating node should be running and call Log[:ai].debug' do
-        expect(subject.node.running?).to eq(true)
-        expect(Log[:ai]).to have_received(:debug).exactly(4).times
+      it 'validates attributes' do
+        expect(subject.child).to have_received(:validate_attributes)
+      end
+    end
+
+    context 'without decorating node' do
+      let(:decorator) { Fabricate(:ai_decorator, child: nil) }
+
+      it 'raises ArgumentError' do
+        expect { subject.start! }.to raise_error(ArgumentError, 'invalid decorating child')
       end
     end
   end
 
   describe '#node_stopping' do
+    before { subject.start! }
+
+    it 'calls Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopping: #{subject.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopping: #{subject.child.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopped: #{subject.child.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopped: #{subject.inspect}") }
+
+      subject.stop!
+    end
+
     context 'child node set' do
-      before { subject.start! }
       before { subject.stop! }
 
-      it 'decorator should be stopped and call Log[:ai].debug' do
+      it 'decorator is stopped' do
         expect(subject.stopped?).to eq(true)
-        expect(Log[:ai]).to have_received(:debug).exactly(8).times
       end
 
-      it 'decorating node should be stopped' do
-        expect(subject.node.stopped?).to eq(true)
+      it 'decorating node is stopped' do
+        expect(subject.child.stopped?).to eq(true)
       end
     end
   end
