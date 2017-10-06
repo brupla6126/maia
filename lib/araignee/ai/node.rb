@@ -51,7 +51,6 @@ module AI
 
     def initialize
       super()
-
       # need to initialize identifier here instead of
       # attribute default value since Virtus seems to cache
       # SecureRandom.hex and identifier is not unique across
@@ -59,8 +58,6 @@ module AI
 
       # do not overwrite identifier if was set from attributes
       @identifier ||= SecureRandom.hex
-
-      validate_attributes
     end
 
     def can_stop?
@@ -121,6 +118,8 @@ module AI
       Log[:ai].debug { "Starting: #{inspect}" }
 
       reset_node
+
+      validate_attributes
 
       nil
     end

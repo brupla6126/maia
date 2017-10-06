@@ -2,12 +2,10 @@ require 'timecop'
 require 'araignee/ai/fabricators/ai_node_fabricator'
 
 RSpec.describe AI::Node do
-  let(:world) { double('[world]') }
+  let(:world) { {}  }
   let(:entity) { {} }
 
-  before { allow(world).to receive(:delta) { 1 } }
-
-  before { Log[:ai] = double('Log[:ai] stop!') }
+  before { Log[:ai] = double('Log[:ai]') }
   before { allow(Log[:ai]).to receive(:debug) }
   after { Log[:ai] = Log[:default] }
 
@@ -27,39 +25,42 @@ RSpec.describe AI::Node do
   subject { node }
 
   describe '#initialize' do
+    let(:secure_random_hex) { 'abcdef' }
+    before { allow(SecureRandom).to receive(:hex) { secure_random_hex } }
+
     it 'node is ready' do
       expect(node.ready?).to eq(true)
     end
 
-    it 'response is set to :unknown' do
+    it 'sets response to :unknown' do
       expect(node.response).to eq(:unknown)
     end
 
-    it 'recorder is set to nil' do
+    it 'sets recorder to nil' do
       expect(node.recorder).to eq(nil)
     end
 
-    it 'start_time is set to nil' do
+    it 'sets start_time to nil' do
       expect(node.start_time).to eq(nil)
     end
 
-    it 'stop_time is set to nil' do
+    it 'sets stop_time to nil' do
       expect(node.stop_time).to eq(nil)
+    end
+
+    it 'sets identifier from SecureRandom.hex' do
+      expect(SecureRandom).to receive(:hex)
+      expect(node.identifier).to eq(secure_random_hex)
     end
 
     context 'with attributes' do
       let(:identifier) { 'abcdef' }
       let(:node) { Fabricate(:ai_node, identifier: identifier) }
 
-      before { allow_any_instance_of(AI::Node).to receive(:validate_attributes) }
       before { subject }
 
-      it 'identifier is set' do
+      it 'sets identifier' do
         expect(node.identifier).to eq(identifier)
-      end
-
-      it 'validates attributes' do
-        expect(node).to have_received(:validate_attributes)
       end
     end
   end
@@ -68,7 +69,7 @@ RSpec.describe AI::Node do
     subject { node.validate_attributes }
 
     context 'invalid identifier' do
-      let(:identifier) { AI::Node.new }
+      let(:identifier) { Fabricate(:ai_node) }
       let(:node) { Fabricate(:ai_node, identifier: identifier) }
 
       it 'raises ArgumentError' do
@@ -89,7 +90,7 @@ RSpec.describe AI::Node do
     context 'when state equals running' do
       before { node.start! }
 
-      it 'return true' do
+      it 'returns true' do
         expect(subject).to eq(true)
       end
     end
@@ -98,7 +99,7 @@ RSpec.describe AI::Node do
       before { node.start! }
       before { node.pause! }
 
-      it 'return true' do
+      it 'returns true' do
         expect(subject).to eq(true)
       end
     end
@@ -161,49 +162,70 @@ RSpec.describe AI::Node do
 
     before { allow(node).to receive(:reset_attribute).with(:response) }
 
-    it 'resets response attribute' do
+    it 'resets response to default value' do
       expect(node).to receive(:reset_attribute).with(:response)
       subject
     end
   end
 
   describe '#start!' do
-    before { subject.start! }
+    it 'calls Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Starting: #{subject.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.inspect}") }
 
-    it 'is running and calls Log[:ai].debug twice' do
-      expect(subject.running?).to eq(true)
-      expect(Log[:ai]).to have_received(:debug).twice
+      subject.start!
+    end
+
+    context 'node_starting' do
+      before { allow(subject).to receive(:reset_node) }
+      before { allow(subject).to receive(:validate_attributes) }
+      before { subject.start! }
+
+      it 'is running' do
+        expect(node.running?).to eq(true)
+      end
+
+      it 'resets node' do
+        expect(node).to have_received(:reset_node)
+      end
+
+      it 'validates attributes' do
+        expect(node).to have_received(:validate_attributes)
+      end
     end
   end
 
   describe '#stop!' do
     before { subject.start! }
-    before { subject.stop! }
 
-    it 'is stopped and calls Log[:ai].debug twice' do
-      expect(node.stopped?).to eq(true)
-      expect(Log[:ai]).to have_received(:debug).exactly(4).times
+    it 'calls Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopping: #{subject.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopped: #{subject.inspect}") }
+
+      subject.stop!
     end
   end
 
   describe '#pause!' do
     before { subject.start! }
-    before { subject.pause! }
 
-    it 'is paused and calls Log[:ai].debug twice' do
-      expect(node.paused?).to eq(true)
-      expect(Log[:ai]).to have_received(:debug).exactly(4).times
+    it 'calls Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Pausing: #{subject.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Paused: #{subject.inspect}") }
+
+      subject.pause!
     end
   end
 
   describe '#resume!' do
     before { subject.start! }
     before { subject.pause! }
-    before { subject.resume! }
 
-    it 'is running and calls Log[:ai].debug' do
-      expect(node.running?).to eq(true)
-      expect(Log[:ai]).to have_received(:debug).exactly(6).times
+    it 'calls Log[:ai].debug' do
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Resuming: #{subject.inspect}") }
+      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Resumed: #{subject.inspect}") }
+
+      subject.resume!
     end
   end
 
@@ -219,8 +241,11 @@ RSpec.describe AI::Node do
     end
 
     context 'without recorder' do
-      it do
+      it 'sets start_time to nil' do
         expect(node.start_time).to eq(nil)
+      end
+
+      it 'sets stop_time to nil' do
         expect(node.stop_time).to eq(nil)
       end
     end
@@ -229,8 +254,11 @@ RSpec.describe AI::Node do
       let(:recorder) { double('[recorder]') }
       let(:node) { Fabricate(:ai_node, recorder: recorder) }
 
-      it do
+      it 'sets start_time to Time.now' do
         expect(node.start_time).to eq(Time.now)
+      end
+
+      it 'sets stop_time to nil' do
         expect(node.stop_time).to eq(nil)
       end
     end
@@ -250,8 +278,11 @@ RSpec.describe AI::Node do
     end
 
     context 'without recorder' do
-      it do
+      it 'sets start_time to nil' do
         expect(node.start_time).to eq(nil)
+      end
+
+      it 'sets stop_time to nil' do
         expect(node.stop_time).to eq(nil)
       end
     end
@@ -260,9 +291,15 @@ RSpec.describe AI::Node do
       let(:recorder) { double('[recorder]') }
       let(:node) { Fabricate(:ai_node, recorder: recorder) }
 
-      it do
-        expect(node.stop_time).to eq(Time.now)
+      it 'sets start_time to Time.now' do
+        expect(node.start_time).not_to eq(nil)
+      end
 
+      it 'sets stop_time to Time.now' do
+        expect(node.stop_time).to eq(Time.now)
+      end
+
+      it 'calls recorder#record' do
         duration = (node.stop_time - node.start_time).round(4)
 
         expect(recorder).to have_received(:record).with(:duration, duration)
@@ -270,74 +307,9 @@ RSpec.describe AI::Node do
     end
   end
 
-  describe 'node_starting' do
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Starting: #{subject.inspect}" }
-      subject.send(:node_starting)
-    end
-
-    it 'returns nil' do
-      expect(subject.send(:node_starting)).to eq(nil)
-    end
-
-    it 'resets node' do
-      expect(subject).to receive(:reset_node)
-      subject.send(:node_starting)
-    end
-  end
-
-  describe 'node_started' do
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.inspect}") }
-      subject.send(:node_started)
-    end
-  end
-
-  describe 'node_stopping' do
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Stopping: #{subject.inspect}" }
-      subject.send(:node_stopping)
-    end
-  end
-
-  describe 'node_stopped' do
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Stopped: #{subject.inspect}" }
-      subject.send(:node_stopped)
-    end
-  end
-
-  describe 'node_pausing' do
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Pausing: #{subject.inspect}" }
-      subject.send(:node_pausing)
-    end
-  end
-
-  describe 'node_paused' do
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Paused: #{subject.inspect}" }
-      subject.send(:node_paused)
-    end
-  end
-
-  describe 'node_resuming' do
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Resuming: #{subject.inspect}" }
-      subject.send(:node_resuming)
-    end
-  end
-
-  describe 'node_resumed' do
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq "Resumed: #{subject.inspect}" }
-      subject.send(:node_resumed)
-    end
-  end
-
   describe 'update_response' do
     context 'invalid response' do
-      it 'calls reset_attribute' do
+      it 'raises ArgumentError' do
         expect { subject.send(:update_response, nil) }.to raise_error(ArgumentError, 'invalid response: ')
         expect { subject.send(:update_response, :done) }.to raise_error(ArgumentError, 'invalid response: done')
       end
@@ -346,7 +318,7 @@ RSpec.describe AI::Node do
     context 'valid response' do
       let(:responses) { %i[busy failed succeeded] }
 
-      it 'calls reset_attribute' do
+      it 'updates response' do
         responses.each do |response|
           expect { subject.send(:update_response, response) }.not_to raise_error
           expect(subject.response).to eq(response)
