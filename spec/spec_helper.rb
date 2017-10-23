@@ -25,7 +25,7 @@ require 'simplecov'
 SimpleCov.start
 
 # enable logging
-if ENV['development'] # true #
+if ENV['development']
   stdout = Logger.new(STDOUT)
 
   Log[:default] = stdout

@@ -6,7 +6,7 @@ class Plugin
 
   def self.contract(type)
     case type
-    when :crud then [:exists?, :one, :all, :create, :update, :delete].freeze
+    when :crud then %i[exists? one all create update delete].freeze
     when :plugin then [:configure].freeze
     else []
     end

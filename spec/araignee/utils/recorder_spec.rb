@@ -71,7 +71,6 @@ RSpec.describe Recorder do
     let(:serie) { :duration }
     let(:values) { [10, 2, 30] }
 
-
     context 'serie not configured' do
       let(:attributes) { { series: {} } }
 

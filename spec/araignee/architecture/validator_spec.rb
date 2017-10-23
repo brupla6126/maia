@@ -2,7 +2,7 @@ require 'araignee/architecture/validator'
 
 RSpec.describe Architecture::Validator do
   let(:validator) { Architecture::Validator.instance }
-  let(:errors) { %w(a b) }
+  let(:errors) { %w[a b] }
   let(:no_errors) { [] }
 
   describe '#validate' do
@@ -45,7 +45,7 @@ RSpec.describe Architecture::Validator do
         end
 
         it 'should have 2 messages' do
-          expect(result.messages).to eq(%w(a b))
+          expect(result.messages).to eq(%w[a b])
         end
       end
     end
@@ -75,13 +75,13 @@ RSpec.describe Architecture::Validator::Result do
     end
 
     context 'when messages are set' do
-      before { result_error << %w(a b) }
+      before { result_error << %w[a b] }
 
       it 'successful? should return false' do
         expect(result_error.successful?).to eq(false)
       end
       it 'should have 2 messages' do
-        expect(result_error.messages).to eq(%w(a b))
+        expect(result_error.messages).to eq(%w[a b])
       end
     end
   end
@@ -106,10 +106,10 @@ RSpec.describe Architecture::Validator::Result do
     end
 
     context 'when messages are set' do
-      before { result_error << %w(a b) }
+      before { result_error << %w[a b] }
 
       it 'should have 2 messages' do
-        expect(result_error.messages).to eq(%w(a b))
+        expect(result_error.messages).to eq(%w[a b])
       end
     end
   end

@@ -16,8 +16,7 @@ RSpec.describe Architecture::Interactor do
 
     context 'when class is derived' do
       class InteractorImpl < Architecture::Interactor
-        def interact(request_model, data_model, context)
-        end
+        def interact(request_model, data_model, context); end
       end
 
       before do

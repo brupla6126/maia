@@ -10,7 +10,7 @@ RSpec.describe Architecture::Client do
         expect(client1.name).to eq(:client)
       end
       it 'should have contracts [:plugin, :client]' do
-        expect(client1.contracts).to eq([:plugin, :client])
+        expect(client1.contracts).to eq(%i[plugin client])
       end
       it 'should have no adapters' do
         expect(client1.adapters).to eq([])
@@ -23,7 +23,7 @@ RSpec.describe Architecture::Client do
     let(:client) { Architecture::Client.new([], [adapter]) }
 
     before do
-      Plugger.add_contract(:client, [:initiate, :terminate])
+      Plugger.add_contract(:client, %i[initiate terminate])
     end
 
     context 'when configuring a client with adapters' do
@@ -39,7 +39,7 @@ RSpec.describe Architecture::Client do
     let(:client) { Architecture::Client.new([], [adapter]) }
 
     before do
-      Plugger.add_contract(:client, [:initiate, :terminate])
+      Plugger.add_contract(:client, %i[initiate terminate])
     end
 
     context 'when initiating a client with adapters' do
@@ -55,7 +55,7 @@ RSpec.describe Architecture::Client do
     let(:client) { Architecture::Client.new([], [adapter]) }
 
     before do
-      Plugger.add_contract(:client, [:initiate, :terminate])
+      Plugger.add_contract(:client, %i[initiate terminate])
     end
 
     context 'when terminating a client with adapters' do

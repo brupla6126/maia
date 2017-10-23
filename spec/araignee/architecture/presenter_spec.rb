@@ -16,8 +16,7 @@ RSpec.describe Architecture::Presenter do
 
     context 'when derived' do
       class PresenterImpl < Architecture::Presenter
-        def present(data_model, response_model, context)
-        end
+        def present(data_model, response_model, context); end
       end
 
       before do

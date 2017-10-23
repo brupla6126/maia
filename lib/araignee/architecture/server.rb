@@ -40,8 +40,7 @@ module Architecture
       @adapters.map(&:terminate)
     end
 
-    def serve
-    end
+    def serve; end
 
     def operation_supported?(object, action)
       @controllers.key?(object) && @controllers[object].respond_to?(action)

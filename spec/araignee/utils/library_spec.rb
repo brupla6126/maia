@@ -58,7 +58,7 @@ RSpec.describe Library do
             expect(subdirectories).not_to include("#{library}/a/abc.txt")
           end
 
-          subdirectories.reject { |dir| %w(recursos reportes vinculos).include? dir.split(File::SEPARATOR).last }
+          subdirectories.reject { |dir| %w[recursos reportes vinculos].include? dir.split(File::SEPARATOR).last }
         end
       end
 
@@ -72,7 +72,7 @@ RSpec.describe Library do
             expect(subdirectories).to include("#{library}/a/b/vinculos")
             expect(subdirectories).not_to include("#{library}/a/c")
           end
-          subdirectories.reject { |dir| %w(recursos reportes vinculos).include? dir.split(File::SEPARATOR).last }
+          subdirectories.reject { |dir| %w[recursos reportes vinculos].include? dir.split(File::SEPARATOR).last }
         end
       end
 
@@ -83,7 +83,7 @@ RSpec.describe Library do
             expect(directory).not_to eq("#{library}/a/b/reportes")
             expect(directory).not_to eq("#{library}/a/b/vinculos")
           end
-          subdirectories.reject { |dir| %w(recursos reportes vinculos).include? dir.split(File::SEPARATOR).last }
+          subdirectories.reject { |dir| %w[recursos reportes vinculos].include? dir.split(File::SEPARATOR).last }
         end
       end
     end

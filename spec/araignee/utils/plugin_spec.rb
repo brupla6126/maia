@@ -10,8 +10,7 @@ class Actions < Plugin
 end
 
 class ActionsAdapter < Actions
-  def find
-  end
+  def find; end
 end
 
 class ModelFake < Plugin
@@ -31,7 +30,7 @@ RSpec.describe Plugin do
         expect(plugin.name).to eq(:plugin)
       end
       it 'should have contract [:plugin]' do
-        expect(plugin.contracts).to eq([:plugin, :one])
+        expect(plugin.contracts).to eq(%i[plugin one])
       end
       it 'should have no adapters' do
         expect(plugin.adapters).to eq([])
@@ -40,7 +39,7 @@ RSpec.describe Plugin do
 
     context 'initializes a plugin with contract :crud and no adapters' do
       it 'should have two contracts [:plugin, :crud]' do
-        expect(plugin_1c_0a.contracts).to eq([:plugin, :crud])
+        expect(plugin_1c_0a.contracts).to eq(%i[plugin crud])
       end
       it 'should have adapters' do
         expect(plugin_1c_0a.adapters.length).to eq(0)
@@ -49,7 +48,7 @@ RSpec.describe Plugin do
 
     context 'initializes a plugin with contract :crud and one adapter' do
       it 'should have two contracts [:plugin, :crud]' do
-        expect(plugin_1c_1a.contracts).to eq([:plugin, :crud])
+        expect(plugin_1c_1a.contracts).to eq(%i[plugin crud])
       end
       it 'should not have adapters' do
         expect(plugin_1c_1a.adapters.length).to eq(1)
@@ -111,7 +110,7 @@ RSpec.describe Plugin do
   describe '#contract' do
     context 'when asking :crud contract' do
       it 'returns [:exists?, :one, :all, :create, :update, :delete]' do
-        expect(Plugin.contract(:crud)).to eq([:exists?, :one, :all, :create, :update, :delete])
+        expect(Plugin.contract(:crud)).to eq(%i[exists? one all create update delete])
       end
     end
 

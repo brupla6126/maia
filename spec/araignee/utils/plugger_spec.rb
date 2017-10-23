@@ -10,8 +10,7 @@ class ActionsModel < EntityModel
     super
   end
 
-  def find
-  end
+  def find; end
 end
 
 RSpec.describe Plugger do

@@ -3,11 +3,9 @@ require 'araignee/utils/plugger'
 
 RSpec.describe Architecture::Server do
   class ControllerTest
-    def configure(config)
-    end
+    def configure(config); end
 
-    def action
-    end
+    def action; end
   end
 
   describe '#initialize' do
@@ -18,7 +16,7 @@ RSpec.describe Architecture::Server do
         expect(server1.name).to eq(:server)
       end
       it 'should have contracts [:plugin, :server]' do
-        expect(server1.contracts).to eq([:plugin, :server])
+        expect(server1.contracts).to eq(%i[plugin server])
       end
       it 'should have no adapters' do
         expect(server1.adapters).to eq([])
@@ -31,7 +29,7 @@ RSpec.describe Architecture::Server do
     let(:server) { Architecture::Server.new([], [adapter]) }
 
     before do
-      Plugger.add_contract(:server, [:initiate, :terminate])
+      Plugger.add_contract(:server, %i[initiate terminate])
     end
 
     context 'when configuring a server with adapters' do
@@ -63,7 +61,7 @@ RSpec.describe Architecture::Server do
     let(:server) { Architecture::Server.new([], [adapter]) }
 
     before do
-      Plugger.add_contract(:server, [:initiate, :terminate])
+      Plugger.add_contract(:server, %i[initiate terminate])
     end
 
     context 'when initiating a server with adapters' do
@@ -79,7 +77,7 @@ RSpec.describe Architecture::Server do
     let(:server) { Architecture::Server.new([], [adapter]) }
 
     before do
-      Plugger.add_contract(:server, [:initiate, :terminate])
+      Plugger.add_contract(:server, %i[initiate terminate])
     end
 
     context 'when terminating a server with adapters' do
@@ -94,7 +92,7 @@ RSpec.describe Architecture::Server do
     let(:server) { Architecture::Server.new }
 
     before do
-      Plugger.add_contract(:server, [:initiate, :terminate])
+      Plugger.add_contract(:server, %i[initiate terminate])
       server.controllers[:object] = ControllerTest.new
     end
 
@@ -110,7 +108,7 @@ RSpec.describe Architecture::Server do
     let(:server) { Architecture::Server.new }
 
     before do
-      Plugger.add_contract(:server, [:initiate, :terminate])
+      Plugger.add_contract(:server, %i[initiate terminate])
       server.controllers[:object] = controller
     end
 
