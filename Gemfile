@@ -1,4 +1,4 @@
-# ruby ‘2.3.1’
+# ruby '2.3.1'
 
 source 'https://rubygems.org' do
   group :development, :test do
@@ -20,7 +20,6 @@ source 'https://rubygems.org' do
     gem 'rack-test'
     gem 'rack-contrib'
     gem 'rubocop'
-    gem 'turbulence'
     gem 'yard'
   end
 
