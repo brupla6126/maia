@@ -1,21 +1,21 @@
 require 'timecop'
 require 'araignee/utils/repository'
 
-RSpec.describe RepositoryInstance do
-  let(:storage) { {} }
-  let(:repository) { RepositoryInstance.new(storage) }
+RSpec.describe Repository do
+  let(:repository) { Repository.new }
 
   let(:key) { 'abc' }
   let(:value) { 123 }
+  let(:default) { nil }
   let(:expiration) { Time.now + 3 }
 
   describe '#get' do
-    subject { repository.get(key) }
+    subject { repository.get(key, default) }
 
     context 'valid key' do
-      before { storage[key] = { value: value } }
+      before { repository.set(key, value) }
 
-      it 'should return the value' do
+      it 'returns the value' do
         expect(subject).to eq(value)
       end
     end
@@ -23,21 +23,31 @@ RSpec.describe RepositoryInstance do
     context 'invalid key' do
       let(:key) { nil }
 
-      it 'should return nil' do
+      it 'returns nil' do
         expect(subject).to eq(nil)
       end
     end
 
     context 'unknown key' do
-      it 'should return nil' do
-        expect(subject).to eq(nil)
+      context 'without default value' do
+        it 'returns nil' do
+          expect(subject).to eq(nil)
+        end
+      end
+
+      context 'with default value' do
+        let(:default) { 3 }
+
+        it 'returns default value' do
+          expect(subject).to eq(default)
+        end
       end
     end
 
     context 'expired key' do
-      before { storage[key] = { value: value, expiration: expiration } }
+      before { repository.set(key, value, expiration) }
 
-      it 'should return nil' do
+      it 'returns nil' do
         Timecop.travel(Time.now + 5)
 
         expect(subject).to eq(nil)
@@ -48,11 +58,15 @@ RSpec.describe RepositoryInstance do
   end
 
   describe '#set' do
-    it 'should have set value and expiration' do
-      repository.set(key, value, expiration)
+    subject { repository.set(key, value, expiration) }
 
-      expect(storage[key][:value]).to eq(value)
-      expect(storage[key][:expiration]).to eq(expiration)
+    it 'has set value and expiration' do
+      Timecop.travel(Time.now - 5)
+
+      subject
+      expect(repository.get(key)).to eq(value)
+
+      Timecop.return
     end
   end
 
@@ -60,119 +74,47 @@ RSpec.describe RepositoryInstance do
     subject { repository.delete(key) }
 
     context 'valid key' do
-      before { storage[key] = { value: value } }
+      before { repository.set(key, value) }
 
-      it 'should return the value' do
+      it 'returns the value' do
         expect(subject).to eq(value)
       end
     end
 
     context 'invalid key' do
-      it 'should return nil' do
+      it 'returns nil' do
         expect(subject).to eq(nil)
       end
     end
   end
 
+  describe '#expire' do
+    subject { repository.send(:expire) }
+
+    before do
+      repository.set('abc', 1, 2)
+      repository.set('def', 2)
+    end
+
+    it 'removed expired keys' do
+      Timecop.travel(Time.now + 5)
+
+      expect(subject.count).to eq(1)
+      expect(repository.get('def')).to eq(2)
+
+      Timecop.return
+    end
+  end
+
   describe '#clear' do
+    subject { repository.clear }
+
     before do
       repository.set('abc', 1)
       repository.set('def', 2)
     end
 
-    subject { repository.clear }
-
-    it 'should be empty' do
-      expect(subject.count).to eq(0)
-      expect(subject.empty?).to eq(true)
-    end
-  end
-end
-
-RSpec.describe RepositoryStatic do
-  let(:storage) { {} }
-  let(:repository) { RepositoryStatic }
-
-  let(:key) { 'abc' }
-  let(:value) { 123 }
-  let(:expiration) { Time.now + 3 }
-
-  before { RepositoryStatic.storage = storage }
-
-  describe '#get' do
-    subject { repository.get(key) }
-
-    context 'valid key' do
-      before { storage[key] = { value: value } }
-
-      it 'should return the value' do
-        expect(subject).to eq(value)
-      end
-    end
-
-    context 'invalid key' do
-      let(:key) { nil }
-
-      it 'should return nil' do
-        expect(subject).to eq(nil)
-      end
-    end
-
-    context 'unknown key' do
-      it 'should return nil' do
-        expect(subject).to eq(nil)
-      end
-    end
-
-    context 'expired key' do
-      before { storage[key] = { value: value, expiration: expiration } }
-
-      it 'should return nil' do
-        Timecop.travel(Time.now + 5)
-
-        expect(subject).to eq(nil)
-
-        Timecop.return
-      end
-    end
-  end
-
-  describe '#set' do
-    it 'should have set value and expiration' do
-      repository.set(key, value, expiration)
-
-      expect(storage[key][:value]).to eq(value)
-      expect(storage[key][:expiration]).to eq(expiration)
-    end
-  end
-
-  describe '#delete' do
-    subject { repository.delete(key) }
-
-    context 'valid key' do
-      before { storage[key] = { value: value } }
-
-      it 'should return the value' do
-        expect(subject).to eq(value)
-      end
-    end
-
-    context 'invalid key' do
-      it 'should return nil' do
-        expect(subject).to eq(nil)
-      end
-    end
-  end
-
-  describe '#clear' do
-    before do
-      repository.set('abc', 1)
-      repository.set('def', 2)
-    end
-
-    subject { repository.clear }
-
-    it 'should be empty' do
+    it 'is empty' do
       expect(subject.count).to eq(0)
       expect(subject.empty?).to eq(true)
     end

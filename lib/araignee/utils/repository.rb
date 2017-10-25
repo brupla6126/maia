@@ -2,47 +2,40 @@ require 'forwardable'
 
 # A Repository is simply a container that we can put/get/delete
 # stuff using a key that may expire.
-module Repository
+class Repository
   extend Forwardable
 
   def_delegators :@storage, :clear, :empty?, :count
 
-  def get(key)
-    delete(key) if expired?(key)
+  def initialize
+    @storage = {}
+  end
 
-    @storage[key] ? @storage[key][:value] : nil
+  def get(key, default = nil)
+    expire
+
+    @storage.key?(key) ? @storage.fetch(key).fetch(:value) : default
   end
 
   def set(key, value, expiration = nil)
     @storage[key] ||= {}
     @storage[key][:value] = value
-    @storage[key][:expiration] = expiration
+    @storage[key][:expiration] = expiration if expiration
+
+    true
   end
 
   def delete(key)
     data = @storage.delete(key)
-    data[:value] if data
+
+    data.fetch(:value) if data
   end
 
   private
 
-  def expired?(key)
-    @storage[key] && @storage[key][:expiration] && @storage[key][:expiration] < Time.now
-  end
-end
-
-class RepositoryInstance
-  include Repository
-
-  def initialize(storage)
-    @storage = storage
-  end
-end
-
-class RepositoryStatic
-  extend Repository
-
-  class << self
-    attr_accessor :storage
+  def expire
+    @storage.delete_if do |_key, value|
+      value[:expiration] && value[:expiration].to_i < Time.now.to_i
+    end
   end
 end
