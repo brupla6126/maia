@@ -2,7 +2,6 @@
 
 source 'https://rubygems.org' do
   group :development, :test do
-    gem 'parallel_tests'
     gem 'pry-byebug', '~> 3.5'
     gem 'rspec'
     gem 'rspec-mocks'
@@ -10,17 +9,11 @@ source 'https://rubygems.org' do
   end
 
   group :development do
-    gem 'flay'
-    gem 'flog'
     gem 'listen', '~> 3.0'
-    gem 'guard', '~> 2.14'
-    gem 'guard-rubocop', '~> 1.2'
-    gem 'guard-rspec', '~> 4.7'
     gem 'mutant-rspec'
-    gem 'rack-test'
     gem 'rack-contrib'
+    gem 'rack-test'
     gem 'rubocop'
-    gem 'yard'
   end
 
   group :test do
