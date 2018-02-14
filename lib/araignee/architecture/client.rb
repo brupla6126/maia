@@ -1,26 +1,14 @@
-require 'araignee/utils/plugin'
+require 'araignee/utils/state_stack'
 
 module Architecture
-  # Class for service client
-  class Client < Plugin
-    def initialize(_contracts = [], adapters = [])
-      super([:client], adapters)
+  # Class for sending requests
+  # The States implement config, setup and serve behaviors.
+  class Client
+    attr_accessor :states
 
-      Log[:architecture].debug { "initialize: #{self.class}" }
-    end
-
-    # called per request
-    def initiate
-      Log[:architecture].info { "#{@name}::initiate()" }
-
-      @adapters.map(&:initiate)
-    end
-
-    # called per request
-    def terminate
-      Log[:architecture].info { "#{@name}::terminate()" }
-
-      @adapters.map(&:terminate)
+    # states instance of StateStack
+    def initialize(states)
+      @states = states
     end
   end
 end
