@@ -1,14 +1,14 @@
 AllCops:
-  # Include:
   Exclude:
-    - '**/*~'
-    - '*.gemspec'
-    - 'Gemfile'
-    - 'Guardfile'
+    - 'coverage'
+    - 'doc'
+    - 'metrics'
     - 'spec/spec_helper.rb'
-    - 'tmp/**/*'
 
 Bundler:
+  Enabled: true
+
+Gemspec:
   Enabled: true
 
 Layout:
@@ -19,6 +19,16 @@ Layout/EndOfLine:
 
 Lint:
   Enabled: true
+
+Lint/UselessAccessModifier:
+  Enabled: true
+  AutoCorrect: true
+
+Lint/EndAlignment:
+  AutoCorrect: true
+
+Lint/DefEndAlignment:
+  AutoCorrect: true
 
 Metrics:
   Enabled: false
@@ -31,14 +41,12 @@ Metrics/AbcSize:
 Metrics/LineLength:
   Enabled: false
 
-# Naming:
-  # Enabled: true
+Naming:
+  Enabled: true
 
 Performance:
   Enabled: true
-
-Security:
-  Enabled: true
+  Rails: false
 
 Security:
   Enabled: true
@@ -48,4 +56,3 @@ Style:
 
 Style/Documentation:
   Enabled: false
-
