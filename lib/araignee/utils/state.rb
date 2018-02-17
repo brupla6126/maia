@@ -1,8 +1,8 @@
 require 'araignee/utils/log'
 
 class State
-  # A state can use a board to get/set data.
-  # board Instance of Repository
+  attr_reader :context
+
   def initialize(context)
     @context = context
   end

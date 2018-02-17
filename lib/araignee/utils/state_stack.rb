@@ -32,16 +32,9 @@ class StateStack
     return unless states.include?(state)
 
     loop do
+      break if current.equal?(state)
+
       pop
-      break if [nil, state].include?(current)
     end
-  end
-
-  def count
-    states.count
-  end
-
-  def clear
-    states.clear
   end
 end

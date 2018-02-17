@@ -14,8 +14,14 @@ RSpec.describe State do
 
   let(:log_level) { :info }
 
+  describe '#initialize' do
+    it 'context is set' do
+      expect(state.context).to eq(context)
+    end
+  end
+
   describe '#enter' do
-    subject { state.enter }
+    subject { super().enter }
 
     it 'calls Log::info' do
       expect(state).to receive(:inspect)
@@ -27,7 +33,7 @@ RSpec.describe State do
   end
 
   describe '#leave' do
-    subject { state.leave }
+    subject { super().leave }
 
     it 'calls Log::info' do
       expect(state).to receive(:inspect)
@@ -39,7 +45,7 @@ RSpec.describe State do
   end
 
   describe '#pause' do
-    subject { state.pause }
+    subject { super().pause }
 
     it 'calls Log::info' do
       expect(state).to receive(:inspect)
@@ -51,7 +57,7 @@ RSpec.describe State do
   end
 
   describe '#resume' do
-    subject { state.resume }
+    subject { super().resume }
 
     it 'calls Log::info' do
       expect(state).to receive(:inspect)
