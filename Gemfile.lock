@@ -6,17 +6,12 @@ PATH
       hooks (~> 0.4)
       logger (~> 1.2)
       state_machines (~> 0.5)
-      supermodel (~> 0.1)
       virtus (~> 1.0)
 
 GEM
   remote: https://rubygems.org/
   specs:
     abstract_type (0.0.7)
-    activemodel (3.0.20)
-      activesupport (= 3.0.20)
-      builder (~> 2.1.2)
-      i18n (~> 0.5.0)
     activesupport (3.0.20)
     adamantium (0.2.0)
       ice_nine (~> 0.11.0)
@@ -30,7 +25,6 @@ GEM
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
       thread_safe (~> 0.3, >= 0.3.1)
-    builder (2.1.2)
     byebug (10.0.0)
     coderay (1.1.2)
     coercible (1.0.0)
@@ -47,7 +41,6 @@ GEM
     ffi (1.9.21)
     hooks (0.4.1)
       uber (~> 0.0.14)
-    i18n (0.5.4)
     ice_nine (0.11.2)
     json (2.1.0)
     listen (3.1.5)
@@ -139,8 +132,6 @@ GEM
       activesupport
       rspec (~> 3.3)
       state_machines
-    supermodel (0.1.6)
-      activemodel (~> 3.0.0)
     thread_safe (0.3.6)
     timecop (0.9.1)
     uber (0.0.15)
