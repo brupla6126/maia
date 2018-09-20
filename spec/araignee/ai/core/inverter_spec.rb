@@ -44,7 +44,7 @@ RSpec.describe Ai::Core::Inverter do
     context 'when inverter processes a node that failed' do
       let(:child) { Fabricate(:ai_node_failed) }
 
-      it 'has failed' do
+      it 'has not failed' do
         expect(subject.failed?).to eq(false)
       end
     end

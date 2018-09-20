@@ -21,9 +21,13 @@ require 'timeout'
 
 require 'araignee/utils/log'
 require 'pry-byebug'
+require 'simplecov'
 require 'state_machines-rspec'
 
-require 'simplecov'
+
+lib = File.expand_path('../lib', __dir__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
 SimpleCov.start
 
 # enable logging

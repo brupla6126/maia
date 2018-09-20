@@ -69,7 +69,7 @@ RSpec.describe Recorder do
 
   describe '#min' do
     let(:serie) { :duration }
-    let(:values) { [10, 2, 30] }
+    let(:data) { [10, 2, 30] }
 
     context 'serie not configured' do
       let(:attributes) { { series: {} } }
@@ -84,7 +84,7 @@ RSpec.describe Recorder do
 
       let(:attributes) { { series: { duration: {} } } }
 
-      before { values.each { |value| recorder.record(serie, value) } }
+      before { data.each { |value| recorder.record(serie, value) } }
 
       it 'should return min value' do
         expect(subject).to eq(2)
@@ -94,7 +94,7 @@ RSpec.describe Recorder do
 
   describe '#max' do
     let(:serie) { :duration }
-    let(:values) { [10, 2, 30] }
+    let(:data) { [10, 2, 30] }
 
     context 'serie not configured' do
       let(:attributes) { { series: {} } }
@@ -109,7 +109,7 @@ RSpec.describe Recorder do
 
       let(:attributes) { { series: { duration: {} } } }
 
-      before { values.each { |value| recorder.record(serie, value) } }
+      before { data.each { |value| recorder.record(serie, value) } }
 
       it 'should return max value' do
         expect(subject).to eq(30)
@@ -119,7 +119,7 @@ RSpec.describe Recorder do
 
   describe '#avg' do
     let(:serie) { :duration }
-    let(:values) { [10, 2, 30] }
+    let(:data) { [10, 2, 30] }
 
     context 'serie not configured' do
       let(:attributes) { { series: {} } }
@@ -134,7 +134,7 @@ RSpec.describe Recorder do
 
       let(:attributes) { { series: { duration: {} } } }
 
-      before { values.each { |value| recorder.record(serie, value) } }
+      before { data.each { |value| recorder.record(serie, value) } }
 
       it 'should return avg value' do
         expect(subject).to eq(14)
@@ -144,7 +144,7 @@ RSpec.describe Recorder do
 
   describe '#total' do
     let(:serie) { :duration }
-    let(:values) { [10, 2, 30] }
+    let(:data) { [10, 2, 30] }
 
     context 'serie not configured' do
       let(:attributes) { { series: {} } }
@@ -159,7 +159,7 @@ RSpec.describe Recorder do
 
       let(:attributes) { { series: { duration: {} } } }
 
-      before { values.each { |value| recorder.record(serie, value) } }
+      before { data.each { |value| recorder.record(serie, value) } }
 
       it 'should return total' do
         expect(subject).to eq(42)
