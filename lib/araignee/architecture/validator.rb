@@ -1,39 +1,31 @@
-require 'singleton'
+require 'araignee/architecture/result'
 
 module Architecture
-  # Validator helper part of Clean Architecture.
-  # It validates an entity and returns a result object.
-  class Validator
-    include Singleton
+  module Story
+    # Validator helper part of Clean Architecture.
+    # It validates an object and returns a result.
+    class Validator
+      def execute(object, context)
+        result = new_result
 
-    def validate(entity, context = nil)
-      result = Result.new
-      result << validate_entity(entity, context)
-      result
-    end
+        validate(object, context, result)
 
-    protected
-
-    # to be implemented in derived classes
-    def validate_entity(_entity, _context)
-      raise NotImplementedError
-    end
-
-    # Result class for Validator
-    class Result
-      attr_reader :messages
-
-      def initialize
-        @messages = []
+        result
       end
 
-      def successful?
-        @messages.empty?
+      protected
+
+      def new_result
+        Result.new
       end
 
-      def <<(messages)
-        @messages += messages if messages
-      end
+      private
+
+      # to be implemented in derived classes
+      # object to be validated
+      # context Symbol
+      # result to store validation information
+      def validate(_object, _context, _result); end
     end
   end
 end

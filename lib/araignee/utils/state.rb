@@ -1,41 +1,10 @@
 require 'araignee/utils/log'
 
-# To represent a stack of states
 class State
-  def self.states
-    @states ||= []
-    @states
-  end
+  attr_reader :context
 
-  def self.current
-    states.last
-  end
-
-  def self.push(state)
-    current.pause if current
-
-    states.push(state)
-
-    state.enter
-  end
-
-  def self.pop
-    current && current.leave
-    states.pop
-
-    current.resume if current
-  end
-
-  def self.pop_until(state)
-    pop until current == state || states.empty?
-  end
-
-  def self.count
-    states.count
-  end
-
-  def self.clear
-    states.clear
+  def initialize(context)
+    @context = context
   end
 
   # called when entering the state

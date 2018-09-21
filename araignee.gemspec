@@ -23,6 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'hooks', '~> 0.4'
   spec.add_dependency 'logger', '~> 1.2'
   spec.add_dependency 'state_machines', '~> 0.5'
-  spec.add_dependency 'supermodel', '~> 0.1'
   spec.add_dependency 'virtus', '~> 1.0'
 end
