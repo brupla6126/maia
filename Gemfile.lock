@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    araignee (2.0.0)
+    araignee (0.1.0)
       fabrication (~> 2.16)
       hooks (~> 0.4)
       logger (~> 1.2)
