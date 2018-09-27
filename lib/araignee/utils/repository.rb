@@ -28,7 +28,7 @@ class Repository
   def delete(key)
     data = @storage.delete(key)
 
-    data.fetch(:value) if data
+    data&.fetch(:value)
   end
 
   private

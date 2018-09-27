@@ -42,8 +42,8 @@ module Ai
         # reset children children
         children.each(&:reset_node)
 
-        picker.reset if picker
-        sorter.reset if sorter
+        picker&.reset
+        sorter&.reset
 
         nil
       end

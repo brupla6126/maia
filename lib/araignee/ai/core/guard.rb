@@ -18,9 +18,7 @@ module Ai
       def execute(entity, world)
         responded = :failed
 
-        if interrogator.process(entity, world).succeeded?
-          responded = child.process(entity, world).response
-        end
+        responded = child.process(entity, world).response if interrogator.process(entity, world).succeeded?
 
         update_response(handle_response(responded))
       end

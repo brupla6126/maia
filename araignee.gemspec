@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Bruno Plamondon']
   spec.email         = ['bplamondon66@gmail.com']
 
-  spec.summary       = ' Araignee Library '
-  spec.description   = ' Araignee Library: Core classes for creating great Ruby apps.'
+  spec.summary       = 'Araignee Library'
+  spec.description   = 'Araignee Library: Core classes for creating great Ruby apps.'
   spec.homepage      = 'https://github.com/brupla6126/araignee'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
@@ -17,7 +17,9 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'bundler', '~> 1.11'
+  spec.add_development_dependency 'bundler', '~> 1.16'
+  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'rspec', '~> 3.0'
 
   spec.add_dependency 'fabrication', '~> 2.16'
   spec.add_dependency 'hooks', '~> 0.4'

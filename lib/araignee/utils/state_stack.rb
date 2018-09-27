@@ -13,7 +13,7 @@ class StateStack
   end
 
   def push(state)
-    current.pause if current
+    current&.pause
 
     states.push(state)
 
@@ -21,11 +21,11 @@ class StateStack
   end
 
   def pop
-    current && current.leave
+    current&.leave
 
     states.pop
 
-    current.resume if current
+    current&.resume
   end
 
   def pop_until(state)
