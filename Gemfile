@@ -4,6 +4,8 @@ source 'https://rubygems.org'
 
 git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
+# gem 'araignee', path: '../araignee'
+# gem 'artemisia', path: '../artemisia'
 gem 'araignee', git: 'git@github.com:brupla6126/araignee', branch: 'master'
 gem 'artemisia', git: 'git@github.com:brupla6126/artemisia', branch: 'master'
 
