@@ -4,6 +4,10 @@
 /doc/
 /pkg/
 /tmp/
+/vendor/
+*.bundle
+*.gem
+Gemfile.lock
 
 .DS_Store
 
