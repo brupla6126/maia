@@ -20,8 +20,9 @@ RSpec.describe Artemisia::Emitter do
 
     it 'adds a subscription to an event type' do
       subject
-      expect(emitter.subscribed.count).to eq(2)
-      expect(emitter.subscribed[:create].count).to eq(1)
+      expect(emitter.subscribed.size).to eq(2)
+      expect(emitter.subscribed[:create].size).to eq(1)
+      expect(emitter.subscribed[:moved].size).to eq(1)
     end
 
     it 'returns itself' do
@@ -39,8 +40,8 @@ RSpec.describe Artemisia::Emitter do
     subject { super().emit(:create, params) }
 
     it 'subscribers gets notified' do
-      expect(emitter.subscribed[:create][0]).to receive(:call)
-      expect(emitter.subscribed[:create][1]).to receive(:call)
+      expect(emitter.subscribed[:create][0]).to receive(:call).with([{ a: 1 }])
+      expect(emitter.subscribed[:create][1]).to receive(:call).with([{ a: 1 }])
       expect(emitter.subscribed[:moved][0]).not_to receive(:call)
       subject
     end

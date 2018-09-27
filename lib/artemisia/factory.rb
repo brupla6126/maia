@@ -16,11 +16,11 @@ module World
 
           json = File.read(file)
 
-          if file =~ /entity/
+          if /entity/.match?(file)
             load_entity(json)
-          elsif file =~ /component/
+          elsif /component/.match?(file)
             load_component(json)
-          elsif file =~ /system/
+          elsif /system/.match?(file)
             load_system(json)
           end
         end

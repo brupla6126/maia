@@ -1,12 +1,16 @@
-.DS_Store
 /.bundle/
 /.yardoc
 /_yardoc/
-/coverage/
 /doc/
 /pkg/
-/spec/reports/
 /tmp/
+
+.DS_Store
+
+.ruby-version
 
 # rspec failure tracking
 .rspec_status
+
+# simplecov
+/coverage/
