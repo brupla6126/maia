@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
 gem 'araignee', git: 'git@github.com:brupla6126/araignee', branch: 'master'
-gem 'artemisia', git: 'git@github.com:brupla6126/artemisia-ruby', branch: 'master'
+gem 'artemisia', git: 'git@github.com:brupla6126/artemisia', branch: 'master'
 
 group :development do
   gem 'mutant-rspec', '~> 0.8', require: false
