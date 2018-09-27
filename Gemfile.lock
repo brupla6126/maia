@@ -11,12 +11,13 @@ GIT
       virtus (~> 1.0)
 
 GIT
-  remote: git@github.com:brupla6126/artemisia-ruby
-  revision: 39846122c54efe10d31f6129b0c27d54e6f47e07
+  remote: git@github.com:brupla6126/artemisia
+  revision: 58b3279d018c21b8b5b6fc6d9db33eed1c4f1c59
   branch: master
   specs:
     artemisia (0.1.0)
-      fabrication (= 2.20.1)
+      araignee (~> 0.1)
+      fabrication (~> 2.20)
 
 PATH
   remote: .
