@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Artemisia, an Entity-Component-System framework based on Artemis.'
   spec.description   = 'Artemisia, an Entity-Component-System framework based on Artemis.'
-  spec.homepage      = 'https://github.com/brupla6126/artemisia-ruby'
+  spec.homepage      = 'https://github.com/brupla6126/artemisia'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
