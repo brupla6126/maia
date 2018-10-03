@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Business logic following Clean Architecture principals.'
   spec.description   = 'Business logic following Clean Architecture principals.'
-  spec.homepage      = ''
+  spec.homepage      = 'https://github.com/brupla6126/caiman'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
