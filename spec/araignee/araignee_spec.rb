@@ -1,4 +1,4 @@
-describe Araignee do
+RSpec.describe Araignee do
   describe 'require araignee.rb' do
     it 'should not raise error' do
       expect { require 'araignee' }.not_to raise_error
