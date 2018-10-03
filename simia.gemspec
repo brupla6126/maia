@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Simulation framework'
   spec.description   = 'Simulation framework'
-  spec.homepage      = ''
+  spec.homepage      = 'https://github.com/brupla6126/simia'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
