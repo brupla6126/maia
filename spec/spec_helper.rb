@@ -18,18 +18,22 @@
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
 require 'bundler/setup'
-require 'timeout'
 
-require 'araignee'
 require 'araignee/utils/log'
 require 'pry-byebug'
 require 'simplecov'
 require 'state_machines-rspec'
+require 'timeout'
 
 lib = File.expand_path('../lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
-SimpleCov.start
+SimpleCov.start do
+  add_group 'AI', 'araignee/ai'
+  add_group 'Architecture', 'araignee/architecture'
+  add_group 'Utilities', 'araignee/utils'
+  add_filter '/spec/'
+end
 
 # enable logging
 if ENV['development']

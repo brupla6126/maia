@@ -10,14 +10,14 @@ end
 
 group :test do
   gem 'simplecov', '~> 0.16', require: false
-  gem 'state_machines-rspec', '~> 0.5'
+  gem 'state_machines-rspec', '~> 0.5', require: false
 end
 
 group :development, :test do
-  gem 'pry-byebug', '~> 3.6'
-  gem 'rspec', '~> 3.6'
-  gem 'rspec-mocks', '~> 3.6'
-  gem 'timecop', '~> 0.9'
+  gem 'pry-byebug', '~> 3.6', require: false
+  gem 'rspec', '~> 3.6', require: false
+  gem 'rspec-mocks', '~> 3.6', require: false
+  gem 'timecop', '~> 0.9', require: false
 end
 
 # Specify your gem's dependencies in araignee.gemspec
