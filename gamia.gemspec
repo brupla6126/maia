@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Bruno Plamondon']
   spec.email         = ['bplamondon66@gmail.com']
 
-  spec.summary       = 'Business logic following Clean Architecture principles.'
-  spec.description   = 'Business logic following Clean Architecture principles.'
+  spec.summary       = 'Game framework'
+  spec.description   = 'Game framework based on Artemisia'
   spec.homepage      = 'https://github.com/brupla6126/gamia'
   spec.license       = 'MIT'
 

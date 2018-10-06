@@ -1,10 +1,11 @@
 require 'bundler/setup'
-require 'gamia'
 
 require 'pry-byebug'
 require 'simplecov'
 
 SimpleCov.start do
+  add_group 'Managers', 'gamia/managers'
+  add_group 'Systems', 'gamia/systems'
   add_filter '/spec/'
 end
 

@@ -20,9 +20,9 @@ group :test do
 end
 
 group :development, :test do
-  gem 'pry-byebug', '~> 3.6'
-  gem 'rspec', '~> 3.6'
-  gem 'rspec-mocks', '~> 3.6'
+  gem 'pry-byebug', '~> 3.6', require: false
+  gem 'rspec', '~> 3.6', require: false
+  gem 'rspec-mocks', '~> 3.6', require: false
 end
 
 # Specify your gem's dependencies in gamia.gemspec
