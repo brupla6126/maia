@@ -4,8 +4,10 @@ require 'artemisia/version'
 require 'artemisia/engine'
 
 module Artemisia
-  def self.root
-    @root ||= Dir.pwd
+  class << self
+    def root
+      @root ||= Dir.pwd
+    end
   end
 
   def self.boot

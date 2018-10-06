@@ -1,10 +1,11 @@
 require 'bundler/setup'
-require 'artemisia'
 
 require 'pry-byebug'
 require 'simplecov'
 
 SimpleCov.start do
+  add_group 'Managers', 'artemisia/managers'
+  add_group 'Systems', 'artemisia/systems'
   add_filter '/spec/'
 end
 

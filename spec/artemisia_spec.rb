@@ -1,15 +1,21 @@
-RSpec.describe Artemisia::VERSION do
-  it 'has a version number' do
-    expect(Artemisia::VERSION).not_to be_nil
-  end
-end
+require 'artemisia'
 
 RSpec.describe Artemisia do
-  describe '::boot' do
-    subject { described_class.boot }
+  describe '::VERSION' do
+    it 'is set' do
+      expect(Artemisia::VERSION).not_to be_nil
+    end
+  end
 
-    it 'has a version number' do
-      # expect(Artemisia.engine).not_to be_nil
+  describe '::root' do
+    subject { described_class.root }
+
+    let(:dir) { 'dir' }
+
+    before { allow(Dir).to receive(:pwd) { dir } }
+
+    it 'returns current directory' do
+      expect(subject).to eq(dir)
     end
   end
 
