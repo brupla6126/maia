@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['bplamondon66@gmail.com']
 
   spec.summary       = 'Simulation framework'
-  spec.description   = 'Simulation framework'
+  spec.description   = 'Simulation framework based on Artemisia'
   spec.homepage      = 'https://github.com/brupla6126/simia'
   spec.license       = 'MIT'
 
