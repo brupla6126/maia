@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Araignee Library'
   spec.description   = 'Araignee Library: Core classes for creating great Ruby apps.'
-  spec.homepage      = 'https://github.com/brupla6126/araignee'
+  spec.homepage      = 'https://github.com/brupla6126/maia/araignee'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = 'exe'

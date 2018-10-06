@@ -56,5 +56,5 @@ araignee/ai/memorizing
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/brupla6126/araignee.
+Bug reports and pull requests are welcome on GitHub at https://github.com/brupla6126/maia/araignee.
 

@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = 'Game framework'
   spec.description   = 'Game framework based on Artemisia'
-  spec.homepage      = 'https://github.com/brupla6126/gamia'
+  spec.homepage      = 'https://github.com/brupla6126/maia/gamia'
   spec.license       = 'MIT'
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
