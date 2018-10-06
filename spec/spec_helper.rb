@@ -1,10 +1,12 @@
 require 'bundler/setup'
-require 'caiman'
 
 require 'pry-byebug'
 require 'simplecov'
 
 SimpleCov.start do
+  add_group 'Data Sources', 'caiman/data_sources'
+  add_group 'Entities', 'caiman/entities'
+  add_group 'Stories', 'caiman/stories'
   add_filter '/spec/'
 end
 
