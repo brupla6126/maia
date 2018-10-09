@@ -1,14 +1,23 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_inverter_fabricator'
+require 'araignee/ai/core/inverter'
+require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Inverter do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:inverter) { Fabricate(:ai_inverter, child: child) }
-  let(:child) { Fabricate(:ai_node_succeeded) }
+  let(:inverter) { described_class.new(child: child) }
+  let(:child) { Ai::Core::Node.new }
+
+  let(:node_busy) { Ai::Core::Node.new }
+  let(:node_failed) { Ai::Core::Node.new }
+  let(:node_succeeded) { Ai::Core::Node.new }
 
   subject { inverter }
+
+  before { allow(child).to receive(:response) { :succeeded } }
+  before { allow(node_busy).to receive(:response) { :busy } }
+  before { allow(node_failed).to receive(:response) { :failed } }
+  before { allow(node_succeeded).to receive(:response) { :succeeded } }
 
   describe '#initialize' do
     it 'is ready' do
@@ -42,7 +51,7 @@ RSpec.describe Ai::Core::Inverter do
     end
 
     context 'when inverter processes a node that failed' do
-      let(:child) { Fabricate(:ai_node_failed) }
+      let(:child) { node_failed }
 
       it 'has not failed' do
         expect(subject.failed?).to eq(false)
@@ -50,7 +59,7 @@ RSpec.describe Ai::Core::Inverter do
     end
 
     context 'when inverter processes a node that is busy' do
-      let(:child) { Fabricate(:ai_node_busy) }
+      let(:child) { node_busy }
 
       it 'is busy' do
         expect(subject.busy?).to eq(true)

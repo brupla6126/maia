@@ -1,5 +1,5 @@
 require 'timecop'
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
+require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Node do
   let(:world) { {}  }
@@ -20,7 +20,7 @@ RSpec.describe Ai::Core::Node do
 
   let(:series) { {} }
   let(:recorder) { Recorder.new(series: series) }
-  let(:node) { Fabricate(:ai_node) }
+  let(:node) { described_class.new }
 
   subject { node }
 
@@ -53,9 +53,9 @@ RSpec.describe Ai::Core::Node do
       expect(node.identifier).to eq(secure_random_hex)
     end
 
-    context 'with Fabrication attributes' do
+    context 'with attributes' do
       let(:identifier) { 'abcdef' }
-      let(:node) { Fabricate(:ai_node, identifier: identifier) }
+      let(:node) { Ai::Core::Node.new(identifier: identifier) }
 
       before { subject }
 
@@ -65,14 +65,6 @@ RSpec.describe Ai::Core::Node do
     end
 
     context 'with Virtus attributes' do
-      context 'invalid attributes' do
-        let(:node) { Ai::Core::Node.new(1) }
-
-        it 'raises ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError, 'attributes must be Hash')
-        end
-      end
-
       context 'valid attributes' do
         let(:identifier) { 'abcdefg' }
         let(:node) { Ai::Core::Node.new(identifier: identifier) }
@@ -90,8 +82,8 @@ RSpec.describe Ai::Core::Node do
     subject { node.validate_attributes }
 
     context 'invalid identifier' do
-      let(:identifier) { Fabricate(:ai_node) }
-      let(:node) { Fabricate(:ai_node, identifier: identifier) }
+      let(:identifier) { Ai::Core::Node.new }
+      let(:node) { Ai::Core::Node.new(identifier: identifier) }
 
       it 'raises ArgumentError' do
         expect { subject }.to raise_error(ArgumentError, 'invalid identifier')
@@ -141,7 +133,7 @@ RSpec.describe Ai::Core::Node do
     end
 
     context 'with a recorder' do
-      let(:node) { Fabricate(:ai_node, recorder: recorder) }
+      let(:node) { Ai::Core::Node.new(recorder: recorder) }
 
       before { allow(node).to receive(:start_recording) }
       before { allow(node).to receive(:stop_recording) }
@@ -181,11 +173,13 @@ RSpec.describe Ai::Core::Node do
   describe '#reset_node' do
     subject { node.reset_node }
 
-    before { allow(node).to receive(:reset_attribute).with(:response) }
+    before { node.start! }
 
     it 'resets response to default value' do
-      expect(node).to receive(:reset_attribute).with(:response)
       subject
+
+      expect(node.state).to eq('running')
+      expect(node.response).to eq(:unknown)
     end
   end
 
@@ -256,6 +250,12 @@ RSpec.describe Ai::Core::Node do
 
       subject.stop!
     end
+
+    #    it 'is stopped' do
+    #      subject
+    #      expect(node.running?).to eq(false)
+    #      expect(node.stopped?).to eq(true)
+    #    end
   end
 
   describe '#pause!' do
@@ -304,7 +304,7 @@ RSpec.describe Ai::Core::Node do
 
     context 'with recorder' do
       let(:recorder) { double('[recorder]') }
-      let(:node) { Fabricate(:ai_node, recorder: recorder) }
+      let(:node) { Ai::Core::Node.new(recorder: recorder) }
 
       it 'sets start_time to Time.now' do
         expect(node.start_time).to eq(Time.now)
@@ -341,7 +341,7 @@ RSpec.describe Ai::Core::Node do
 
     context 'with recorder' do
       let(:recorder) { double('[recorder]') }
-      let(:node) { Fabricate(:ai_node, recorder: recorder) }
+      let(:node) { Ai::Core::Node.new(recorder: recorder) }
 
       it 'sets start_time to Time.now' do
         expect(node.start_time).not_to eq(nil)

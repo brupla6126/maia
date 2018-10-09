@@ -53,8 +53,6 @@ module Ai
       after_execute :stop_recording
 
       def initialize(attributes = {})
-        raise ArgumentError, 'attributes must be Hash' unless attributes.instance_of?(Hash)
-
         super(attributes)
       end
 
@@ -82,7 +80,9 @@ module Ai
         response.equal?(:succeeded)
       end
 
+      # TODO: does not work!
       def reset_node
+        reset_attribute(:state)
         reset_attribute(:response)
       end
 

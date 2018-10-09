@@ -35,6 +35,8 @@ SimpleCov.start do
   add_filter '/spec/'
 end
 
+Dir.glob(File.join(__dir__, 'spec_support', '*.rb')).each { |file| require file.to_s }
+
 # enable logging
 if ENV['development']
   stdout = Logger.new(STDOUT)

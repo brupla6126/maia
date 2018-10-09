@@ -1,9 +1,9 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
+require 'araignee/ai/core/node'
 require 'araignee/ai/core/pickers/picker'
 
 RSpec.describe Ai::Core::Pickers::Picker do
-  let(:node1) { Fabricate(:ai_node) }
-  let(:node2) { Fabricate(:ai_node) }
+  let(:node1) { Ai::Core::Node.new }
+  let(:node2) { Ai::Core::Node.new }
   let(:nodes) { [node1, node2] }
   let(:picker) { described_class.new }
 

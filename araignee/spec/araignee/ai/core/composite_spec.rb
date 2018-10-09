@@ -1,21 +1,20 @@
-require 'araignee/ai/core/fabricators/ai_composite_fabricator'
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
+require 'araignee/ai/core/composite'
 require 'araignee/ai/core/filters/filter_running'
+require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Composite do
-  let(:child1) { Fabricate(:ai_node) }
-  let(:child2) { Fabricate(:ai_node) }
-  let(:children) { [child1, child2] }
+  let(:children) { (1..2).map { Ai::Core::Node.new } }
   let(:filters) { [] }
   let(:picker) { nil }
   let(:sorter) { nil }
-  let(:composite) { Fabricate(:ai_composite, children: children, filters: filters, picker: picker, sorter: sorter) }
+
+  let(:composite) { described_class.new(children: children, filters: filters, picker: picker, sorter: sorter) }
+
+  subject { composite }
 
   before { Log[:ai] = double('Log[:ai]') }
   before { allow(Log[:ai]).to receive(:debug) }
   after { Log[:ai] = Log[:default] }
-
-  subject { composite }
 
   describe '#initialize' do
     it 'composite is ready' do
@@ -60,9 +59,9 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe '#child' do
-    let(:child1) { Fabricate(:ai_node) }
-    let(:child2) { Fabricate(:ai_node) }
-    let(:child3) { Fabricate(:ai_node, identifier: child1.identifier) }
+    let(:child1) { Ai::Core::Node.new }
+    let(:child2) { Ai::Core::Node.new }
+    let(:child3) { Ai::Core::Node.new(identifier: child1.identifier) }
     let(:children) { [child1, child2, child3] }
 
     let(:child_identifier) { child1.identifier }
@@ -85,7 +84,7 @@ RSpec.describe Ai::Core::Composite do
   describe '#add_child' do
     subject { super().add_child(added_child, index) }
 
-    let(:added_child) { Fabricate(:ai_node) }
+    let(:added_child) { Ai::Core::Node.new }
     let(:index) { :last }
 
     it 'should have all children' do
@@ -145,7 +144,7 @@ RSpec.describe Ai::Core::Composite do
     subject { composite.remove_child(removed_child) }
 
     context 'known child' do
-      let(:child) { Fabricate(:ai_node) }
+      let(:child) { Ai::Core::Node.new }
       let(:children) { [child] }
 
       let(:removed_child) { child }
@@ -156,8 +155,8 @@ RSpec.describe Ai::Core::Composite do
     end
 
     context 'unknown child' do
-      let(:child) { Fabricate(:ai_node) }
-      let(:unknown) { Fabricate(:ai_node) }
+      let(:child) { Ai::Core::Node.new }
+      let(:unknown) { Ai::Core::Node.new }
       let(:children) { [child] }
 
       let(:removed_child) { unknown }
@@ -180,6 +179,7 @@ RSpec.describe Ai::Core::Composite do
     end
 
     it 'reset response attribute' do
+      expect(composite).to receive(:reset_attribute).with(:state)
       expect(composite).to receive(:reset_attribute).with(:response)
     end
 
@@ -235,7 +235,7 @@ RSpec.describe Ai::Core::Composite do
     end
 
     context 'with children' do
-      let(:children) { [Fabricate(:ai_node)] }
+      let(:children) { [Ai::Core::Node.new] }
 
       before do
         children.each { |child| allow(child).to receive(:validate_attributes) }
@@ -272,7 +272,7 @@ RSpec.describe Ai::Core::Composite do
     end
 
     context 'children set' do
-      let(:children) { [Fabricate(:ai_node)] }
+      let(:children) { [Ai::Core::Node.new] }
 
       before { subject.stop! }
 
@@ -287,12 +287,14 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe 'filter' do
-    let(:node_running) { Fabricate(:ai_node_running) }
-    let(:nodes) { [Fabricate(:ai_node), node_running] }
+    let(:node_running) { Ai::Core::Node.new }
+    let(:nodes) { [Ai::Core::Node.new, node_running] }
     let(:filter_running) { Ai::Core::Filters::FilterRunning.new }
     let(:filters) { [] }
 
     subject { super().send(:filter, nodes) }
+
+    before { allow(node_running).to receive(:state) { :running } }
 
     context 'without filters' do
       it 'returns passed nodes' do
@@ -353,7 +355,7 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe 'pick_one' do
-    let(:nodes) { [Fabricate(:ai_node), Fabricate(:ai_node)] }
+    let(:nodes) { [Ai::Core::Node.new, Ai::Core::Node.new] }
 
     subject { super().send(:pick_one, nodes) }
 
@@ -382,7 +384,7 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe 'pick_many' do
-    let(:nodes) { [Fabricate(:ai_node), Fabricate(:ai_node)] }
+    let(:nodes) { [Ai::Core::Node.new, Ai::Core::Node.new] }
 
     subject { super().send(:pick_many, nodes) }
 
@@ -411,7 +413,7 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe 'sort' do
-    let(:nodes) { [Fabricate(:ai_node), Fabricate(:ai_node)] }
+    let(:nodes) { [Ai::Core::Node.new, Ai::Core::Node.new] }
     let(:sort_reverse) { false }
 
     subject { super().send(:sort, nodes, sort_reverse) }

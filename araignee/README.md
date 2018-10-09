@@ -23,9 +23,6 @@ You can require 'araignee' to load all gem's files or require specific part of i
 
 ```ruby
 require 'araignee'
-require 'araignee/ai'
-require 'araignee/arquitecture'
-require 'araignee/utils'
 ```
 
 ## Development

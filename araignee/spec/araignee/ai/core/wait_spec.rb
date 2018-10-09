@@ -1,12 +1,12 @@
 require 'timecop'
-require 'araignee/ai/core/fabricators/ai_wait_fabricator'
+require 'araignee/ai/core/wait'
 
 RSpec.describe Ai::Core::Wait do
   let(:world) { {} }
   let(:entity) { {} }
 
   let(:delay) { 3 }
-  let(:wait) { Fabricate(:ai_wait, delay: delay) }
+  let(:wait) { described_class.new(delay: delay) }
 
   subject { wait }
 
@@ -20,7 +20,7 @@ RSpec.describe Ai::Core::Wait do
     end
 
     context 'with Fabrication attributes' do
-      let(:node) { Fabricate(:ai_wait, delay: delay) }
+      let(:node) { described_class(delay: delay) }
 
       it 'sets delay' do
         expect(subject.delay).to eq(delay)
@@ -28,7 +28,7 @@ RSpec.describe Ai::Core::Wait do
     end
 
     context 'with Virtus attributes' do
-      let(:node) { Ai::Core::Wait.new(delay: delay) }
+      let(:node) { described_class(delay: delay) }
 
       it 'sets delay' do
         expect(subject.delay).to eq(delay)
@@ -90,8 +90,8 @@ RSpec.describe Ai::Core::Wait do
     subject { wait.send(:validate_attributes) }
 
     context 'invalid identifier' do
-      let(:identifier) { Fabricate(:ai_node) }
-      let(:wait) { Fabricate(:ai_wait, identifier: identifier, delay: delay) }
+      let(:identifier) { Ai::Core::Node.new }
+      let(:wait) { described_class.new(identifier: identifier, delay: delay) }
 
       it 'raises ArgumentError' do
         expect { subject }.to raise_error(ArgumentError, 'invalid identifier')

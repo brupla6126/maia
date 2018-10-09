@@ -1,10 +1,10 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
+require 'araignee/ai/core/node'
 require 'araignee/ai/core/filters/filter_running'
 
 RSpec.describe Ai::Core::Filters::FilterRunning do
-  let(:node1) { Fabricate(:ai_node) }
-  let(:node2) { Fabricate(:ai_node) }
-  let(:node3) { Fabricate(:ai_node) }
+  let(:node1) { Ai::Core::Node.new }
+  let(:node2) { Ai::Core::Node.new }
+  let(:node3) { Ai::Core::Node.new }
   let(:nodes) { [node1, node2] }
   let(:filter) { described_class.new }
 

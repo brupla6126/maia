@@ -1,17 +1,19 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_interrogator_fabricator'
-require 'araignee/ai/core/fabricators/ai_guard_fabricator'
+require 'araignee/ai/core/guard'
+require 'araignee/ai/core/failer'
+require 'araignee/ai/core/interrogator'
+require 'araignee/ai/core/node'
+require 'araignee/ai/core/succeeder'
 
 RSpec.describe Ai::Core::Guard do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:interrogator_succeeded) { Fabricate(:ai_interrogator_succeeded) }
-  let(:interrogator_failed) { Fabricate(:ai_interrogator_failed) }
+  let(:interrogator_succeeded) { Ai::Core::InterrogatorSucceeded.new }
+  let(:interrogator_failed) { Ai::Core::InterrogatorFAiled.new }
   let(:interrogator) { interrogator_succeeded }
-  let(:guarded) { Fabricate(:ai_node_succeeded) }
+  let(:guarded) { Ai::Core::Node.new }
 
-  let(:guard) { Fabricate(:ai_guard, interrogator: interrogator, child: guarded) }
+  let(:guard) { described_class.new(interrogator: interrogator, child: guarded) }
 
   subject { guard }
 
@@ -95,7 +97,7 @@ RSpec.describe Ai::Core::Guard do
     end
 
     context 'when child interrogator returns :succeeded' do
-      let(:interrogator) { Fabricate(:ai_interrogator, child: Fabricate(:ai_node_succeeded)) }
+      let(:interrogator) { Ai::Core::Interrogator.new(child: Ai::Core::NodeSucceeded.new) }
 
       context 'calling interrogator#process' do
         before { allow(guard.interrogator).to receive(:process) { guard.child } }
@@ -107,7 +109,7 @@ RSpec.describe Ai::Core::Guard do
       end
 
       context 'when guarded returns :succeeded' do
-        let(:guarded) { Fabricate(:ai_node_succeeded) }
+        let(:guarded) { Ai::Core::NodeSucceeded.new }
 
         it 'has succeeded' do
           expect(subject.succeeded?).to eq(true)
@@ -115,7 +117,7 @@ RSpec.describe Ai::Core::Guard do
       end
 
       context 'when guarded returns :failed' do
-        let(:guarded) { Fabricate(:ai_node_failed) }
+        let(:guarded) { Ai::Core::NodeFailed.new }
 
         it 'has failed' do
           expect(subject.failed?).to eq(true)
@@ -124,38 +126,10 @@ RSpec.describe Ai::Core::Guard do
     end
 
     context 'when child interrogator returns :busy' do
-      let(:interrogator) { Fabricate(:ai_interrogator, child: Fabricate(:ai_node_busy)) }
+      let(:interrogator) { Ai::Core::Interrogator.new(child: Ai::Core::NodeBusy.new) }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)
-      end
-    end
-  end
-
-  describe 'handle_response' do
-    subject { guard.send(:handle_response, response) }
-
-    context 'busy' do
-      let(:response) { :busy }
-
-      it 'returns :busy' do
-        expect(subject).to eq(:busy)
-      end
-    end
-
-    context 'failed' do
-      let(:response) { :failed }
-
-      it 'returns :failed' do
-        expect(subject).to eq(:failed)
-      end
-    end
-
-    context 'unknown' do
-      let(:response) { :unknown }
-
-      it 'returns :succeeded' do
-        expect(subject).to eq(:succeeded)
       end
     end
   end

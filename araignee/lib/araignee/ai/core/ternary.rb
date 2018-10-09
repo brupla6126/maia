@@ -53,14 +53,6 @@ module Ai
 
         :succeeded
       end
-
-      def validate_attributes
-        super()
-
-        raise ArgumentError, 'interrogator node nil' unless interrogator
-        raise ArgumentError, 'yes node nil' unless yes
-        raise ArgumentError, 'no node nil' unless no
-      end
     end
   end
 end

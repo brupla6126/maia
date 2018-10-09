@@ -1,5 +1,5 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_selector_fabricator'
+require 'araignee/ai/core/node'
+require 'araignee/ai/core/selector'
 require 'araignee/ai/core/filters/filter_running'
 
 RSpec.describe Ai::Core::Selector do
@@ -8,17 +8,13 @@ RSpec.describe Ai::Core::Selector do
 
   let(:filter) { Ai::Core::Filters::FilterRunning.new }
   let(:children) { [] }
-  let(:selector) { Fabricate(:ai_selector, children: children, filters: [filter]) }
-
-  let(:node_succeeded) { Fabricate(:ai_node_succeeded) }
-  let(:node_failed) { Fabricate(:ai_node_failed) }
-  let(:node_busy) { Fabricate(:ai_node_busy) }
+  let(:selector) { described_class.new(children: children, filters: [filter]) }
 
   subject { selector }
 
   describe '#initialize' do
     context 'when children is not set' do
-      let(:selector) { Fabricate(:ai_selector) }
+      let(:selector) { described_class.new }
 
       it 'children set to default value' do
         expect(subject.children).to eq([])
@@ -41,26 +37,8 @@ RSpec.describe Ai::Core::Selector do
       end
     end
 
-    context 'calling each child#process' do
-      let(:children) { [Fabricate(:ai_node_succeeded)] }
-
-      before do
-        children.each do |child|
-          allow(child).to receive(:process).with(entity, world) { child }
-        end
-      end
-
-      it 'calls each child#process' do
-        children.each do |child|
-          expect(child).to receive(:process).with(entity, world)
-        end
-
-        expect(subject.succeeded?).to eq(true)
-      end
-    end
-
     context 'when :succeeded' do
-      let(:children) { [Fabricate(:ai_node_succeeded)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new] }
 
       it 'has succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -68,7 +46,7 @@ RSpec.describe Ai::Core::Selector do
     end
 
     context 'when :failed, :failed, :succeeded' do
-      let(:children) { [Fabricate(:ai_node_failed), Fabricate(:ai_node_failed), Fabricate(:ai_node_succeeded)] }
+      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeSucceeded.new] }
 
       it 'has succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -76,7 +54,7 @@ RSpec.describe Ai::Core::Selector do
     end
 
     context 'when :failed, :busy' do
-      let(:children) { [Fabricate(:ai_node_failed), Fabricate(:ai_node_busy)] }
+      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeBusy.new] }
 
       it 'is busy' do
         expect(subject.busy?).to eq(true)
@@ -84,19 +62,11 @@ RSpec.describe Ai::Core::Selector do
     end
 
     context 'when :failed, :failed' do
-      let(:children) { [Fabricate(:ai_node_failed), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)
       end
-    end
-  end
-
-  describe 'initialize_responses' do
-    subject { super().send(:initialize_responses) }
-
-    it 'returns initialized responses' do
-      expect(subject).to eq(busy: 0, failed: 0, succeeded: 0)
     end
   end
 
@@ -121,19 +91,6 @@ RSpec.describe Ai::Core::Selector do
 
     it '' do
       expect(subject).to eq(nodes)
-    end
-  end
-
-  describe 'respond' do
-    subject { super().send(:respond, responses, response) }
-
-    before { subject }
-
-    let(:responses) { { busy: 0 } }
-    let(:response) { :busy }
-
-    it 'busy responses count equals 1' do
-      expect(responses[response] == 1)
     end
   end
 end

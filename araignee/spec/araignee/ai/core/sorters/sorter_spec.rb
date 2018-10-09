@@ -1,9 +1,9 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
+require 'araignee/ai/core/node'
 require 'araignee/ai/core/sorters/sorter'
 
 RSpec.describe Ai::Core::Sorters::Sorter do
-  let(:node1) { Fabricate(:ai_node) }
-  let(:node2) { Fabricate(:ai_node) }
+  let(:node1) { Ai::Core::Node.new }
+  let(:node2) { Ai::Core::Node.new }
   let(:nodes) { [node1, node2] }
   let(:sorter) { described_class.new }
 

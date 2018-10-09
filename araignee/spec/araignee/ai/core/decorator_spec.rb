@@ -1,17 +1,17 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_decorator_fabricator'
+require 'araignee/ai/core/decorator'
+require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Decorator do
   let(:start_child) { true }
   let(:stop_child) { true }
-  let(:decorating) { Fabricate(:ai_node) }
-  let(:decorator) { Fabricate(:ai_decorator, child: decorating, start_child: start_child, stop_child: stop_child) }
+  let(:decorating) { Ai::Core::Node.new }
+  let(:decorator) { described_class.new(child: decorating, start_child: start_child, stop_child: stop_child) }
+
+  subject { decorator }
 
   before { Log[:ai] = double('Log[:ai]') }
   before { allow(Log[:ai]).to receive(:debug) }
   after { Log[:ai] = Log[:default] }
-
-  subject { decorator }
 
   describe '#initialize' do
     it 'decorator is ready' do

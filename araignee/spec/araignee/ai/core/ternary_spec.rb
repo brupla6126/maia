@@ -1,21 +1,25 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_interrogator_fabricator'
-require 'araignee/ai/core/fabricators/ai_ternary_fabricator'
+require 'araignee/ai/core/node'
+require 'araignee/ai/core/interrogator'
+require 'araignee/ai/core/ternary'
 
 RSpec.describe Ai::Core::Ternary do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:interrogator_failed) { Fabricate(:ai_interrogator_failed) }
-  let(:interrogator_succeeded) { Fabricate(:ai_interrogator_failed) }
+  let(:child) { Ai::Core::Node.new }
+  let(:interrogator) { Ai::Core::Interrogator.new(child: child) }
+  let(:yes) { Ai::Core::Node.new }
+  let(:no) { Ai::Core::Node.new  }
 
-  let(:interrogator) { interrogator_failed }
-  let(:yes) { Fabricate(:ai_node_succeeded) }
-  let(:no) { Fabricate(:ai_node_failed) }
-
-  let(:ternary) { Fabricate(:ai_ternary, interrogator: interrogator, yes: yes, no: no) }
+  let(:ternary) { described_class.new(interrogator: interrogator, yes: yes, no: no) }
 
   subject { ternary }
+
+  before { allow(child).to receive(:process) { child } }
+  before { allow(yes).to receive(:response) { :succeeded } }
+  before { allow(yes).to receive(:process) { yes } }
+  before { allow(no).to receive(:process) { no } }
+  before { allow(no).to receive(:response) { :failed } }
 
   describe '#initialize' do
     it 'sets interrogator node' do
@@ -59,6 +63,7 @@ RSpec.describe Ai::Core::Ternary do
 
   describe '#node_stopping' do
     subject { super().stop! }
+
     before { ternary.start! }
 
     context 'stopping interrogator, yes and no nodes' do
@@ -76,16 +81,17 @@ RSpec.describe Ai::Core::Ternary do
   end
 
   describe '#stop!' do
-    subject { ternary }
+    subject { ternary.stop! }
 
     before { ternary.start! }
-    before { ternary.stop! }
 
     it 'ternary should be stopped' do
-      expect(subject.stopped?).to eq(true)
+      subject
+      expect(ternary.stopped?).to eq(true)
     end
 
     it 'interrogator, yes, no should be stopped' do
+      subject
       expect(interrogator.stopped?).to eq(true)
       expect(yes.stopped?).to eq(true)
       expect(no.stopped?).to eq(true)
@@ -100,133 +106,37 @@ RSpec.describe Ai::Core::Ternary do
     context 'when child interrogator returns :succeeded' do
       after { subject }
 
-      context 'when interrogator returns :succeeded' do
-        let(:interrogator) { Fabricate(:ai_node_succeeded) }
+      before { allow(interrogator).to receive(:response) { :succeeded } }
 
-        context 'ternary process yes node' do
-          before { allow(ternary.yes).to receive(:process) { ternary.yes } }
-
-          it 'has called yes#process' do
-            expect(ternary.yes).to receive(:process).with(entity, world)
-          end
-        end
-
-        context 'ternary returns' do
-          it 'has succeeded' do
-            expect(subject.succeeded?).to eq(true)
-          end
-        end
+      it 'calls yes#process' do
+        expect(ternary.yes).to receive(:process).with(entity, world)
       end
 
-      context 'when interrogator returns :failed' do
-        let(:interrogator) { Fabricate(:ai_node_failed) }
+      it 'ternary has succeeded' do
+        expect(subject.succeeded?).to eq(true)
+      end
+    end
 
-        context 'ternary process no node' do
-          before { allow(ternary.no).to receive(:process) { ternary.no } }
+    context 'when interrogator returns :failed' do
+      after { subject }
+      before { allow(interrogator).to receive(:response) { :failed } }
 
-          it 'has called no#process' do
-            expect(ternary.no).to receive(:process).with(entity, world)
-          end
-        end
+      it 'has called no#process' do
+        expect(ternary.no).to receive(:process).with(entity, world)
+      end
 
-        context 'ternary returns' do
-          it 'has failed' do
-            expect(subject.failed?).to eq(true)
-          end
-        end
+      it 'ternary has failed' do
+        expect(subject.failed?).to eq(true)
       end
     end
 
     context 'when interrogator returns unsupported response' do
-      let(:interrogator) { Fabricate(:ai_node_succeeded) }
       let(:unsupported_response) { :unsupported }
 
       before { allow(interrogator).to receive(:response) { unsupported_response } }
 
       it 'raises ArgumentError invalid response' do
         expect { subject }.to raise_error(ArgumentError, "invalid response: #{unsupported_response}")
-      end
-    end
-
-    context 'calling handle_response' do
-      before { allow(ternary).to receive(:handle_response) { :succeeded } }
-
-      it 'calls handle_response' do
-        expect(ternary).to receive(:handle_response)
-        subject
-      end
-    end
-  end
-
-  describe 'handle_response' do
-    subject { super().send(:handle_response, response) }
-
-    context 'busy' do
-      let(:response) { :busy }
-
-      it 'returns :busy' do
-        expect(subject).to eq(:busy)
-      end
-    end
-
-    context 'failed' do
-      let(:response) { :failed }
-
-      it 'returns :failed' do
-        expect(subject).to eq(:failed)
-      end
-    end
-
-    context 'succeeded' do
-      let(:response) { :succeeded }
-
-      it 'returns :succeeded' do
-        expect(subject).to eq(:succeeded)
-      end
-    end
-
-    context 'unknown' do
-      let(:response) { :unknown }
-
-      it 'returns :succeeded' do
-        expect(subject).to eq(:succeeded)
-      end
-    end
-  end
-
-  describe 'validates attributes' do
-    subject { ternary.send(:validate_attributes) }
-
-    context 'invalid identifier' do
-      let(:identifier) { Fabricate(:ai_node) }
-      let(:ternary) { Fabricate(:ai_ternary, identifier: identifier, interrogator: interrogator, yes: yes, no: no) }
-
-      it 'raises ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, 'invalid identifier')
-      end
-    end
-
-    context 'invalid interrogator node' do
-      let(:interrogator) { nil }
-
-      it 'raises ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, 'interrogator node nil')
-      end
-    end
-
-    context 'invalid yes node' do
-      let(:yes) { nil }
-
-      it 'raises ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, 'yes node nil')
-      end
-    end
-
-    context 'invalid no node' do
-      let(:no) { nil }
-
-      it 'raises ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, 'no node nil')
       end
     end
   end

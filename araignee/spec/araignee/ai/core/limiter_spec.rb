@@ -1,24 +1,28 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_limiter_fabricator'
+require 'araignee/ai/core/limiter'
+require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Limiter do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:limit) { 1 }
-  let(:limiter) { Fabricate(:ai_limiter, child: child, limit: limit) }
+  let(:limit) { nil }
+  let(:limiter) { described_class.new(child: child, limit: limit) }
 
-  let(:node_success) { Fabricate(:ai_node_succeeded) }
-  let(:node_failure) { Fabricate(:ai_node_failed) }
-  let(:node_busy) { Fabricate(:ai_node_busy) }
+  let(:node_busy) { Ai::Core::Node.new }
+  let(:node_failed) { Ai::Core::Node.new }
+  let(:node_succeeded) { Ai::Core::Node.new }
 
-  let(:child) { node_success }
+  let(:child) { node_succeeded }
 
   subject { limiter }
 
+  before { allow(node_busy).to receive(:response) { :busy } }
+  before { allow(node_failed).to receive(:response) { :failed } }
+  before { allow(node_succeeded).to receive(:response) { :succeeded } }
+
   describe '#initialize' do
     context 'when limit is not set' do
-      let(:limiter) { Fabricate(:ai_limiter, child: child) }
+      let(:limiter) { described_class.new(child: child) }
 
       it 'limit set to default value' do
         expect(subject.limit).to eq(1)
@@ -26,7 +30,7 @@ RSpec.describe Ai::Core::Limiter do
     end
 
     context 'with Fabrication attributes' do
-      let(:node) { Fabricate(:ai_wait, limit: limit) }
+      let(:limit) { 2 }
 
       it 'sets limit' do
         expect(subject.limit).to eq(limit)
@@ -124,7 +128,7 @@ RSpec.describe Ai::Core::Limiter do
 
     context 'invalid limit' do
       let(:limit) { 0 }
-      let(:limiter) { Fabricate(:ai_limiter, child: child, limit: limit) }
+      let(:limiter) { described_class.new(child: child, limit: limit) }
 
       it 'raises ArgumentError, limit must be > 0' do
         expect { subject }.to raise_error(ArgumentError, 'limit must be > 0')

@@ -1,5 +1,5 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_xor_fabricator'
+require 'araignee/ai/core/node'
+require 'araignee/ai/core/xor'
 require 'araignee/ai/core/filters/filter_running'
 
 RSpec.describe Ai::Core::Xor do
@@ -9,13 +9,13 @@ RSpec.describe Ai::Core::Xor do
   let(:filter) { Ai::Core::Filters::FilterRunning.new }
 
   let(:children) { [] }
-  let(:xor) { Fabricate(:ai_xor, children: children, filters: [filter]) }
+  let(:xor) { described_class.new(children: children, filters: [filter]) }
 
   subject { xor }
 
   describe '#initialize' do
     context 'when children is not set' do
-      let(:xor) { Fabricate(:ai_xor) }
+      let(:xor) { described_class.new }
 
       it 'children set to default value' do
         expect(subject.children).to eq([])
@@ -29,7 +29,7 @@ RSpec.describe Ai::Core::Xor do
     before { xor.start! }
 
     context 'when responses = [:succeeded]' do
-      let(:children) { [Fabricate(:ai_node_succeeded)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new] }
 
       it 'has succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -37,7 +37,7 @@ RSpec.describe Ai::Core::Xor do
     end
 
     context 'when responses = [:succeeded, :succeeded]' do
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_succeeded)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeSucceeded.new] }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)
@@ -45,7 +45,7 @@ RSpec.describe Ai::Core::Xor do
     end
 
     context 'when responses = [:failed]' do
-      let(:children) { [Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeFailed.new] }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)
@@ -53,19 +53,11 @@ RSpec.describe Ai::Core::Xor do
     end
 
     context 'when responses = [:failed, :succeeded, :busy]' do
-      let(:children) { [Fabricate(:ai_node_failed), Fabricate(:ai_node_succeeded), Fabricate(:ai_node_busy)] }
+      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeSucceeded.new, Ai::Core::NodeBusy.new] }
 
       it 'is busy' do
         expect(subject.busy?).to eq(true)
       end
-    end
-  end
-
-  describe 'initialize_responses' do
-    subject { super().send(:initialize_responses) }
-
-    it 'returns initialized responses' do
-      expect(subject).to eq(busy: 0, failed: 0, succeeded: 0)
     end
   end
 
@@ -88,19 +80,6 @@ RSpec.describe Ai::Core::Xor do
 
     it '' do
       expect(subject).to eq(nodes)
-    end
-  end
-
-  describe 'respond' do
-    subject { super().send(:respond, responses, response) }
-
-    before { subject }
-
-    let(:responses) { { busy: 0 } }
-    let(:response) { :busy }
-
-    it 'busy responses count equals 1' do
-      expect(responses[response] == 1)
     end
   end
 end

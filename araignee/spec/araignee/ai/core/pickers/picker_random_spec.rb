@@ -1,10 +1,10 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
+require 'araignee/ai/core/node'
 require 'araignee/ai/core/pickers/picker_random'
 
 RSpec.describe Ai::Core::Pickers::PickerRandom do
   let(:picker) { described_class.new }
 
-  let(:nodes) { [Fabricate(:ai_node), Fabricate(:ai_node), Fabricate(:ai_node)] }
+  let(:nodes) { [Ai::Core::Node.new, Ai::Core::Node.new, Ai::Core::Node.new] }
 
   describe '#pick_one' do
     subject { picker.pick_one(nodes) }

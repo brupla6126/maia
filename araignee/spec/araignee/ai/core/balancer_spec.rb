@@ -1,5 +1,6 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_balancer_fabricator'
+require 'araignee/ai/core/balancer'
+require 'araignee/ai/core/filters/filter_running'
+require 'araignee/ai/core/node'
 require 'araignee/ai/core/pickers/picker_random'
 
 RSpec.describe Ai::Core::Balancer do
@@ -7,10 +8,19 @@ RSpec.describe Ai::Core::Balancer do
   let(:entity) { {} }
 
   let(:picker) { nil }
+  let(:picker_random) { Ai::Core::Pickers::PickerRandom.new }
   let(:filter) { Ai::Core::Filters::FilterRunning.new }
 
-  let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed), Fabricate(:ai_node_busy)] }
-  let(:balancer) { Fabricate(:ai_balancer, children: children, picker: picker, filters: [filter]) }
+  let(:children) { (1..3).map { Ai::Core::Node.new } }
+  let(:balancer) { Ai::Core::Balancer.new(children: children, picker: picker, filters: [filter]) }
+
+  subject { balancer }
+
+  before do
+    allow(children[0]).to receive(:response) { :succeeded }
+    allow(children[1]).to receive(:response) { :failed }
+    allow(children[2]).to receive(:response) { :busy }
+  end
 
   describe '#initialize' do
     it 'sets children' do
@@ -22,7 +32,7 @@ RSpec.describe Ai::Core::Balancer do
     end
 
     context 'valid picker' do
-      let(:picker) { Ai::Core::Pickers::PickerRandom.new }
+      let(:picker) { picker_random }
 
       it 'sets picker' do
         expect(balancer.picker).to eq(picker)
@@ -31,7 +41,7 @@ RSpec.describe Ai::Core::Balancer do
   end
 
   describe '#process' do
-    let(:picker) { Ai::Core::Pickers::PickerRandom.new }
+    let(:picker) { picker_random }
 
     subject { balancer.process(entity, world) }
 

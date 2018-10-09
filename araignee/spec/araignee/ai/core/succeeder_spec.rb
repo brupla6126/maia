@@ -1,14 +1,21 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_succeeder_fabricator'
+require 'araignee/ai/core/node'
+require 'araignee/ai/core/succeeder'
 
 RSpec.describe Ai::Core::Succeeder do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:succeeder) { Fabricate(:ai_succeeder, child: child) }
-  let(:child) { Fabricate(:ai_node_succeeded) }
+  let(:succeeder) { described_class.new(child: child) }
+
+  let(:node_failed) { Ai::Core::Node.new }
+  let(:node_succeeded) { Ai::Core::Node.new }
+
+  let(:child) { node_succeeded }
 
   subject { succeeder }
+
+  before { allow(node_failed).to receive(:response) { :failed } }
+  before { allow(node_succeeded).to receive(:response) { :succeeded } }
 
   describe '#initialize' do
     it 'is ready' do
@@ -38,7 +45,7 @@ RSpec.describe Ai::Core::Succeeder do
     end
 
     context 'when action :failed' do
-      let(:child) { Fabricate(:ai_node_failed) }
+      let(:child) { node_failed }
 
       it 'child is processed' do
         expect(child).to receive(:execute).with(entity, world)

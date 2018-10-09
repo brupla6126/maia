@@ -1,14 +1,16 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_failer_fabricator'
+require 'araignee/ai/core/failer'
+require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Failer do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:failer) { Fabricate(:ai_failer, child: child) }
-  let(:child) { Fabricate(:ai_node_succeeded) }
+  let(:failer) { described_class.new(child: child) }
+  let(:child) { Ai::Core::Node.new }
 
   subject { failer }
+
+  before { allow(child).to receive(:response) { :succeeded } }
 
   describe '#initialize' do
     it 'is ready' do
@@ -38,7 +40,9 @@ RSpec.describe Ai::Core::Failer do
     end
 
     context 'when action :failed' do
-      let(:child) { Fabricate(:ai_node_failed) }
+      let(:child) { Ai::Core::Node.new }
+
+      before { allow(child).to receive(:response) { :failed } }
 
       it 'child is processed' do
         expect(child).to receive(:execute).with(entity, world)

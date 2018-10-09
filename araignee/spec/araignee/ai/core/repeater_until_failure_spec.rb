@@ -1,12 +1,12 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_repeater_fabricator'
+require 'araignee/ai/core/node'
+require 'araignee/ai/core/repeater_until_failure'
 
 RSpec.describe Ai::Core::RepeaterUntilFailure do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:child) { Fabricate(:ai_node_failed) }
-  let(:repeater) { Fabricate(:ai_repeater_until_failure, child: child) }
+  let(:child) { Ai::Core::NodeFailed.new }
+  let(:repeater) { described_class.new(child: child) }
 
   subject { repeater }
 

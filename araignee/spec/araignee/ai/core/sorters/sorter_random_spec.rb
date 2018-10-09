@@ -1,10 +1,10 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
+require 'araignee/ai/core/node'
 require 'araignee/ai/core/sorters/sorter_random'
 
 RSpec.describe Ai::Core::Sorters::SorterRandom do
   let(:sorter) { described_class.new }
 
-  let(:nodes) { [Fabricate(:ai_node), Fabricate(:ai_node), Fabricate(:ai_node)] }
+  let(:nodes) { [Ai::Core::Node.new, Ai::Core::Node.new, Ai::Core::Node.new] }
 
   describe '#sort' do
     subject { sorter.sort(nodes) }

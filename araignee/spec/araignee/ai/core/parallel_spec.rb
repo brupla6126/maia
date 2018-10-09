@@ -1,5 +1,5 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_parallel_fabricator'
+require 'araignee/ai/core/node'
+require 'araignee/ai/core/parallel'
 require 'araignee/ai/core/filters/filter_running'
 
 RSpec.describe Ai::Core::Parallel do
@@ -9,18 +9,19 @@ RSpec.describe Ai::Core::Parallel do
   let(:completion) { 0 }
   let(:failures) { 0 }
   let(:filter) { Ai::Core::Filters::FilterRunning.new }
-  let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed)] }
-  let(:parallel) { Fabricate(:ai_parallel, children: children, completion: completion, failures: failures, filters: []) }
+  let(:children) { [] }
+  let(:parallel) { described_class.new(children: children, completion: completion, failures: failures, filters: []) }
 
   subject { parallel }
 
   describe '#initialize' do
     context 'when attributes :completion and failures are not set' do
-      it ':completion and failures should default to 0' do
-        parallel = Fabricate(:ai_parallel, children: children)
+      it 'completion and failures should default to 0' do
+        parallel = described_class.new
 
-        expect(parallel.completion).to eq(0)
-        expect(parallel.failures).to eq(0)
+        expect(parallel.children).to eq([])
+        expect(parallel.completion).to eq(completion)
+        expect(parallel.failures).to eq(failures)
       end
     end
   end
@@ -37,17 +38,21 @@ RSpec.describe Ai::Core::Parallel do
 
     before { parallel.start! }
 
-    context 'when actions :succeeded, :failed, :failed, :stopped and :completion, :failures are not set' do
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed), Fabricate(:ai_node_stopped)] }
+    after do
+      parallel.stop!
+    end
 
-      it 'should stay running' do
+    context 'when actions :succeeded, :failed, :failed and :completion, :failures are not set' do
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
+
+      it 'stays running' do
         expect(subject.running?).to eq(true)
       end
     end
 
     context 'when actions :succeeded, :failed, :failed and :completion = 1' do
       let(:completion) { 1 }
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
       it 'should have succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -56,9 +61,9 @@ RSpec.describe Ai::Core::Parallel do
 
     context 'when actions :succeeded, :failed, :failed and :completion = 2' do
       let(:completion) { 2 }
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
-      it 'should be running' do
+      it 'stays running' do
         expect(subject.running?).to eq(true)
       end
     end
@@ -67,18 +72,18 @@ RSpec.describe Ai::Core::Parallel do
       let(:completion) { 0 }
       let(:failures) { Integer::MAX }
 
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
-      it 'should stay running' do
+      it 'stays running' do
         expect(subject.running?).to eq(true)
       end
     end
 
     context 'when actions :succeeded, :failed and :completion = Integer::MAX' do
       let(:completion) { Integer::MAX }
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new] }
 
-      it 'should stay running' do
+      it 'stays running' do
         expect(subject.running?).to eq(true)
       end
     end
@@ -86,7 +91,7 @@ RSpec.describe Ai::Core::Parallel do
     context 'when actions :succeeded, :failed, :succeeded and :failures = 1' do
       let(:failures) { 1 }
 
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed), Fabricate(:ai_node_succeeded)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeSucceeded.new] }
 
       it 'should have failed' do
         expect(subject.failed?).to eq(true)
@@ -96,7 +101,7 @@ RSpec.describe Ai::Core::Parallel do
     context 'when actions :succeeded, :failed, :failed and :failures = 2' do
       let(:failures) { 2 }
 
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)
@@ -106,7 +111,7 @@ RSpec.describe Ai::Core::Parallel do
     context 'when :succeeded, :failed, :failed and :failures = Integer::MAX' do
       let(:failures) { Integer::MAX }
 
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
       it 'should stay running' do
         expect(subject.running?).to eq(true)
@@ -116,9 +121,9 @@ RSpec.describe Ai::Core::Parallel do
     context 'when :failed, :failed, :failed and :failures = Integer::MAX' do
       let(:failures) { Integer::MAX }
 
-      let(:children) { [Fabricate(:ai_node_failed), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
-      it 'should have failed' do
+      it 'has failed' do
         expect(subject.failed?).to eq(true)
       end
     end
@@ -127,9 +132,9 @@ RSpec.describe Ai::Core::Parallel do
       let(:completion) { 3 }
       let(:failures) { 2 }
 
-      let(:children) { [Fabricate(:ai_node_succeeded), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
-      it 'should have failed' do
+      it 'has failed' do
         expect(subject.failed?).to eq(true)
       end
     end
@@ -138,7 +143,7 @@ RSpec.describe Ai::Core::Parallel do
       let(:completion) { 3 }
       let(:failures) { Integer::MAX }
 
-      let(:children) { [Fabricate(:ai_node_failed), Fabricate(:ai_node_failed), Fabricate(:ai_node_failed)] }
+      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
       it 'should have failed' do
         expect(subject.failed?).to eq(true)

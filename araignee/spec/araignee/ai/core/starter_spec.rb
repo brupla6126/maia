@@ -1,12 +1,17 @@
-require 'araignee/ai/core/fabricators/ai_node_fabricator'
-require 'araignee/ai/core/fabricators/ai_starter_fabricator'
+require 'araignee/ai/core/node'
+require 'araignee/ai/core/starter'
 
 RSpec.describe Ai::Core::Starter do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:child) { Fabricate(:ai_node_succeeded) }
-  let(:starter) { Fabricate(:ai_starter, child: child) }
+  let(:node_succeeded) { Ai::Core::Node.new }
+  let(:child) { node_succeeded }
+  let(:starter) { described_class.new(child: child) }
+
+  subject { stopper }
+
+  before { allow(node_succeeded).to receive(:response) { :succeeded } }
 
   subject { starter }
 
@@ -25,7 +30,7 @@ RSpec.describe Ai::Core::Starter do
 
     before { starter.start! }
 
-    let(:child) { Fabricate(:ai_node) }
+    let(:child) { Ai::Core::Node.new }
 
     context 'when starter processes a child node already running' do
       context 'calling child#resume!' do
