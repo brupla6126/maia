@@ -1,22 +1,16 @@
-require 'hooks'
 require 'securerandom'
 require 'state_machines'
 require 'virtus'
 require 'araignee/utils/log'
-require 'araignee/utils/recorder'
 
 module Ai
   module Core
     # Node Class, base class for all nodes in the behavior tree
     class Node
-      include Hooks
       include Virtus.model
 
       attribute :identifier, String, default: ->(_node, _attribute) { SecureRandom.hex }
       attribute :response, Symbol, default: :unknown
-      attribute :recorder, Recorder, default: nil
-      attribute :start_time, Time, default: nil, writer: :private
-      attribute :stop_time, Time, default: nil, writer: :private
 
       state_machine :state, initial: :ready do
         event :start do
@@ -47,11 +41,6 @@ module Ai
         after_transition %i[paused] => :running, do: :node_resumed
       end
 
-      define_hook :before_execute, :after_execute
-
-      before_execute :start_recording
-      after_execute :stop_recording
-
       def initialize(attributes = {})
         super(attributes)
       end
@@ -61,9 +50,7 @@ module Ai
       end
 
       def process(entity, world)
-        run_hook :before_execute
         execute(entity, world)
-        run_hook :after_execute
 
         self
       end
@@ -91,26 +78,6 @@ module Ai
       end
 
       protected
-
-      def start_recording
-        return unless recorder
-
-        @start_time = Time.now
-
-        nil
-      end
-
-      def stop_recording
-        return unless recorder
-
-        @stop_time = Time.now
-        duration = (stop_time - start_time).round(4)
-
-        recorder.record(:duration, duration)
-        # recorder.record(response, 1)
-
-        nil
-      end
 
       def node_starting
         Log[:ai].debug { "Starting: #{inspect}" }

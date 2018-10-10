@@ -18,8 +18,6 @@ RSpec.describe Ai::Core::Node do
   it { is_expected.to handle_events :pause, when: :running, on: :state }
   it { is_expected.to handle_events :resume, when: :paused, on: :state }
 
-  let(:series) { {} }
-  let(:recorder) { Recorder.new(series: series) }
   let(:node) { described_class.new }
 
   subject { node }
@@ -34,18 +32,6 @@ RSpec.describe Ai::Core::Node do
 
     it 'sets response to :unknown' do
       expect(node.response).to eq(:unknown)
-    end
-
-    it 'sets recorder to nil' do
-      expect(node.recorder).to eq(nil)
-    end
-
-    it 'sets start_time to nil' do
-      expect(node.start_time).to eq(nil)
-    end
-
-    it 'sets stop_time to nil' do
-      expect(node.stop_time).to eq(nil)
     end
 
     it 'sets identifier from SecureRandom.hex' do
@@ -130,19 +116,6 @@ RSpec.describe Ai::Core::Node do
     it 'calls execute with entity and world' do
       expect(node).to receive(:execute).with(entity, world)
       subject
-    end
-
-    context 'with a recorder' do
-      let(:node) { Ai::Core::Node.new(recorder: recorder) }
-
-      before { allow(node).to receive(:start_recording) }
-      before { allow(node).to receive(:stop_recording) }
-
-      it 'calls before_execute and after_execute hooks' do
-        expect(node).to receive(:start_recording)
-        expect(node).to receive(:stop_recording)
-        expect(subject.recorder.data[:values]).not_to eq([])
-      end
     end
   end
 
@@ -278,84 +251,6 @@ RSpec.describe Ai::Core::Node do
       expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Resumed: #{subject.inspect}") }
 
       subject.resume!
-    end
-  end
-
-  describe 'start_recording' do
-    before { Timecop.freeze(Time.local(1990)) }
-
-    after { Timecop.return }
-
-    subject! { node.send(:start_recording) }
-
-    it 'returns nil' do
-      expect(subject).to eq(nil)
-    end
-
-    context 'without recorder' do
-      it 'sets start_time to nil' do
-        expect(node.start_time).to eq(nil)
-      end
-
-      it 'sets stop_time to nil' do
-        expect(node.stop_time).to eq(nil)
-      end
-    end
-
-    context 'with recorder' do
-      let(:recorder) { double('[recorder]') }
-      let(:node) { Ai::Core::Node.new(recorder: recorder) }
-
-      it 'sets start_time to Time.now' do
-        expect(node.start_time).to eq(Time.now)
-      end
-
-      it 'sets stop_time to nil' do
-        expect(node.stop_time).to eq(nil)
-      end
-    end
-  end
-
-  describe 'stop_recording' do
-    before { node.send(:start_recording) }
-    before { Timecop.freeze(Time.now + 2.123456) }
-    before { allow(recorder).to receive(:record) }
-
-    after { Timecop.return }
-
-    subject! { node.send(:stop_recording) }
-
-    it 'returns nil' do
-      expect(subject).to eq(nil)
-    end
-
-    context 'without recorder' do
-      it 'sets start_time to nil' do
-        expect(node.start_time).to eq(nil)
-      end
-
-      it 'sets stop_time to nil' do
-        expect(node.stop_time).to eq(nil)
-      end
-    end
-
-    context 'with recorder' do
-      let(:recorder) { double('[recorder]') }
-      let(:node) { Ai::Core::Node.new(recorder: recorder) }
-
-      it 'sets start_time to Time.now' do
-        expect(node.start_time).not_to eq(nil)
-      end
-
-      it 'sets stop_time to Time.now' do
-        expect(node.stop_time).to eq(Time.now)
-      end
-
-      it 'calls recorder#record' do
-        duration = (node.stop_time - node.start_time).round(4)
-
-        expect(recorder).to have_received(:record).with(:duration, duration)
-      end
     end
   end
 
