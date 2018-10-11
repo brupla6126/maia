@@ -12,10 +12,6 @@ RSpec.describe Ai::Core::Composite do
 
   subject { composite }
 
-  before { Log[:ai] = double('Log[:ai]') }
-  before { allow(Log[:ai]).to receive(:debug) }
-  after { Log[:ai] = Log[:default] }
-
   describe '#initialize' do
     it 'composite is ready' do
       expect(subject.ready?).to eq(true)
@@ -217,17 +213,6 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe 'node_starting' do
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Starting: #{subject.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Starting: #{subject.children[0].inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.children[0].inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Starting: #{subject.children[1].inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.children[1].inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.inspect}") }
-
-      subject.start!
-    end
-
     context 'without children' do
       let(:children) { [] }
 
@@ -259,17 +244,6 @@ RSpec.describe Ai::Core::Composite do
 
   describe 'node_stopping' do
     before { subject.start! }
-
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopping: #{subject.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopping: #{subject.children[0].inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopped: #{subject.children[0].inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopping: #{subject.children[1].inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopped: #{subject.children[1].inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopped: #{subject.inspect}") }
-
-      subject.stop!
-    end
 
     context 'children set' do
       let(:children) { [Ai::Core::Node.new] }

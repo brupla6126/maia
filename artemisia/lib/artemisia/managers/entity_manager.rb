@@ -1,10 +1,10 @@
-require 'artemisia/emitter'
+require 'araignee/utils/emitter'
 require 'artemisia/manager'
 
 module Artemisia
   module Managers
     class EntityManager < Manager
-      include Emitter
+      include Araignee::Utils::Emitter
 
       def initialize(attributes)
         attributes.type = :entity_manager

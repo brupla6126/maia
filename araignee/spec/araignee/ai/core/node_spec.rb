@@ -27,7 +27,7 @@ RSpec.describe Ai::Core::Node do
     before { allow(SecureRandom).to receive(:hex) { secure_random_hex } }
 
     it 'node is ready' do
-      expect(node.ready?).to eq(true)
+      expect(node.ready?).to be_truthy
     end
 
     it 'sets response to :unknown' do
@@ -82,7 +82,7 @@ RSpec.describe Ai::Core::Node do
 
     context 'when state equals ready' do
       it 'returns false' do
-        expect(subject).to eq(false)
+        expect(subject).to be_falsey
       end
     end
 
@@ -90,7 +90,7 @@ RSpec.describe Ai::Core::Node do
       before { node.start! }
 
       it 'returns true' do
-        expect(subject).to eq(true)
+        expect(subject).to be_truthy
       end
     end
 
@@ -99,7 +99,7 @@ RSpec.describe Ai::Core::Node do
       before { node.pause! }
 
       it 'returns true' do
-        expect(subject).to eq(true)
+        expect(subject).to be_truthy
       end
     end
   end
@@ -120,10 +120,12 @@ RSpec.describe Ai::Core::Node do
   end
 
   describe 'busy?' do
-    before { subject.response = :busy }
+    subject { super().busy? }
+
+    before { node.response = :busy }
 
     it 'returns true' do
-      expect(subject.busy?).to eq(true)
+      expect(subject).to be_truthy
     end
   end
 
@@ -131,7 +133,7 @@ RSpec.describe Ai::Core::Node do
     before { subject.response = :failed }
 
     it 'returns true' do
-      expect(subject.failed?).to eq(true)
+      expect(subject.failed?).to be_truthy
     end
   end
 
@@ -139,7 +141,7 @@ RSpec.describe Ai::Core::Node do
     before { subject.response = :succeeded }
 
     it 'returns true' do
-      expect(subject.succeeded?).to eq(true)
+      expect(subject.succeeded?).to be_truthy
     end
   end
 
@@ -159,13 +161,6 @@ RSpec.describe Ai::Core::Node do
   describe '#start!' do
     subject { super().start! }
 
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Starting: #{subject.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.inspect}") }
-
-      subject
-    end
-
     context 'node_starting' do
       context 'calling validate_attributes' do
         before { allow(node).to receive(:validate_attributes) }
@@ -178,7 +173,13 @@ RSpec.describe Ai::Core::Node do
 
       it 'is running' do
         subject
-        expect(node.running?).to eq(true)
+        expect(node.running?).to be_truthy
+      end
+
+      it 'emits :ai_node_starting, :ai_node_started events' do
+        expect(node).to receive(:emit).with(:ai_node_starting, node)
+        expect(node).to receive(:emit).with(:ai_node_started, node)
+        subject
       end
     end
 
@@ -186,16 +187,9 @@ RSpec.describe Ai::Core::Node do
       before { node.start! }
       before { node.stop! }
 
-      it 'calls Log[:ai].debug' do
-        expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Restarting: #{subject.inspect}") }
-        expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Restarted: #{subject.inspect}") }
-
-        subject
-      end
-
       it 'is running' do
         subject
-        expect(node.running?).to eq(true)
+        expect(node.running?).to be_truthy
       end
 
       context do
@@ -204,7 +198,8 @@ RSpec.describe Ai::Core::Node do
         after { subject }
 
         it 'resets node' do
-          expect(node).to receive(:reset_node)
+          # expect(node.state).to eq(:unknown)
+          expect(node.response).to eq(:unknown)
         end
 
         it 'validates attributes' do
@@ -215,42 +210,45 @@ RSpec.describe Ai::Core::Node do
   end
 
   describe '#stop!' do
-    before { subject.start! }
+    subject { super().stop! }
 
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopping: #{subject.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopped: #{subject.inspect}") }
+    before { node.start! }
 
-      subject.stop!
+    it 'emits :ai_node_stopping, :ai_node_stopped events' do
+      expect(node).to receive(:emit).with(:ai_node_stopping, node)
+      expect(node).to receive(:emit).with(:ai_node_stopped, node)
+      subject
     end
 
-    #    it 'is stopped' do
-    #      subject
-    #      expect(node.running?).to eq(false)
-    #      expect(node.stopped?).to eq(true)
-    #    end
+    it 'is stopped' do
+      subject
+      expect(node.running?).to be_falsey
+      expect(node.stopped?).to be_truthy
+    end
   end
 
   describe '#pause!' do
-    before { subject.start! }
+    subject { super().pause! }
 
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Pausing: #{subject.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Paused: #{subject.inspect}") }
+    before { node.start! }
 
-      subject.pause!
+    it 'emits :ai_node_pausing, :ai_node_paused events' do
+      expect(node).to receive(:emit).with(:ai_node_pausing, node)
+      expect(node).to receive(:emit).with(:ai_node_paused, node)
+      subject
     end
   end
 
   describe '#resume!' do
-    before { subject.start! }
-    before { subject.pause! }
+    subject { super().resume! }
 
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Resuming: #{subject.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Resumed: #{subject.inspect}") }
+    before { node.start! }
+    before { node.pause! }
 
-      subject.resume!
+    it 'emits :ai_node_resuming, :ai_node_resumed events' do
+      expect(node).to receive(:emit).with(:ai_node_resuming, node)
+      expect(node).to receive(:emit).with(:ai_node_resumed, node)
+      subject
     end
   end
 

@@ -1,12 +1,13 @@
 require 'securerandom'
 require 'state_machines'
 require 'virtus'
-require 'araignee/utils/log'
+require 'araignee/utils/emitter'
 
 module Ai
   module Core
-    # Node Class, base class for all nodes in the behavior tree
+    # Node Class, base class for all nodes in a tree
     class Node
+      include Araignee::Utils::Emitter
       include Virtus.model
 
       attribute :identifier, String, default: ->(_node, _attribute) { SecureRandom.hex }
@@ -80,7 +81,7 @@ module Ai
       protected
 
       def node_starting
-        Log[:ai].debug { "Starting: #{inspect}" }
+        emit(:ai_node_starting, self)
 
         validate_attributes
 
@@ -88,11 +89,11 @@ module Ai
       end
 
       def node_started
-        Log[:ai].debug { "Started: #{inspect}" }
+        emit(:ai_node_started, self)
       end
 
       def node_restarting
-        Log[:ai].debug { "Restarting: #{inspect}" }
+        emit(:ai_node_restarting, self)
 
         reset_node
 
@@ -102,31 +103,31 @@ module Ai
       end
 
       def node_restarted
-        Log[:ai].debug { "Restarted: #{inspect}" }
+        emit(:ai_node_restarting, self)
       end
 
       def node_stopping
-        Log[:ai].debug { "Stopping: #{inspect}" }
+        emit(:ai_node_stopping, self)
       end
 
       def node_stopped
-        Log[:ai].debug { "Stopped: #{inspect}" }
+        emit(:ai_node_stopped, self)
       end
 
       def node_pausing
-        Log[:ai].debug { "Pausing: #{inspect}" }
+        emit(:ai_node_pausing, self)
       end
 
       def node_paused
-        Log[:ai].debug { "Paused: #{inspect}" }
+        emit(:ai_node_paused, self)
       end
 
       def node_resuming
-        Log[:ai].debug { "Resuming: #{inspect}" }
+        emit(:ai_node_resuming, self)
       end
 
       def node_resumed
-        Log[:ai].debug { "Resumed: #{inspect}" }
+        emit(:ai_node_resumed, self)
       end
 
       def update_response(response)

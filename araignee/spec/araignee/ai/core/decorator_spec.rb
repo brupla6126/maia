@@ -9,10 +9,6 @@ RSpec.describe Ai::Core::Decorator do
 
   subject { decorator }
 
-  before { Log[:ai] = double('Log[:ai]') }
-  before { allow(Log[:ai]).to receive(:debug) }
-  after { Log[:ai] = Log[:default] }
-
   describe '#initialize' do
     it 'decorator is ready' do
       expect(subject.ready?).to eq(true)
@@ -29,15 +25,6 @@ RSpec.describe Ai::Core::Decorator do
 
   describe '#node_starting' do
     subject { super().start! }
-
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Starting: #{subject.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Starting: #{subject.child.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.child.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Started: #{subject.inspect}") }
-
-      subject
-    end
 
     context 'with decorating node' do
       context 'attribute start_child set to false' do
@@ -101,15 +88,6 @@ RSpec.describe Ai::Core::Decorator do
     subject { super().stop! }
 
     before { decorator.start! }
-
-    it 'calls Log[:ai].debug' do
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopping: #{subject.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopping: #{subject.child.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopped: #{subject.child.inspect}") }
-      expect(Log[:ai]).to receive(:debug) { |&block| expect(block.call).to eq("Stopped: #{subject.inspect}") }
-
-      subject
-    end
 
     context 'child node set' do
       context 'attribute stop_child set to false' do

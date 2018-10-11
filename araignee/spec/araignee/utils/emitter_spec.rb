@@ -1,8 +1,8 @@
-require 'artemisia/emitter'
+require 'araignee/utils/emitter'
 
-RSpec.describe Artemisia::Emitter do
+RSpec.describe Araignee::Utils::Emitter do
   class MyEmitter
-    include Artemisia::Emitter
+    include Araignee::Utils::Emitter
 
     def subscribed
       @subscriptions

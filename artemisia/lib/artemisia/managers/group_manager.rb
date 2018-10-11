@@ -1,4 +1,4 @@
-require 'artemisia/emitter'
+require 'araignee/utils/emitter'
 require 'artemisia/manager'
 
 module Artemisia
@@ -7,7 +7,7 @@ module Artemisia
     # An entity can be assigned to more than one group.
     # A group can be assigned to more than one entity.
     class GroupManager < Manager
-      include Emitter
+      include Araignee::Utils::Emitter
 
       def initialize(attributes)
         attributes.type = :group_manager

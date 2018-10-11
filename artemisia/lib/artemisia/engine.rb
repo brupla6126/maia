@@ -1,9 +1,8 @@
-require 'artemisia/context'
-require 'artemisia/emitter'
+require 'araignee/utils/emitter'
 
 module Artemisia
   class Engine
-    include Emitter
+    include Araignee::Utils::Emitter
 
     attr_reader :context, :worlds
 

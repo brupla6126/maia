@@ -1,12 +1,13 @@
+require 'ostruct'
 require 'artemisia/engine'
 
 RSpec.describe Artemisia::Engine do
-  let(:engine) { described_class.new(context) }
-
-  let(:context) { Artemisia::Context.new(config) }
-  let(:config) { OpenStruct.new(config_params) }
-
   let(:config_params) { {} }
+
+  let(:config) { OpenStruct.new(config_params) }
+  let(:context) { OpenStruct.new(config: config) }
+
+  let(:engine) { described_class.new(context) }
 
   subject { engine }
 
@@ -22,14 +23,15 @@ RSpec.describe Artemisia::Engine do
   describe '#boot' do
     subject { super().boot }
 
+    let(:initializers_path) { 'abc' }
+    let(:factories_paths) { ['def'] }
+    let(:templates_paths) { ['ghi'] }
+
     let(:config_params) do
       { initializers_path: initializers_path,
         factories_paths: factories_paths,
         templates_paths: templates_paths }
     end
-    let(:initializers_path) { 'abc' }
-    let(:factories_paths) { ['def'] }
-    let(:templates_paths) { ['ghi'] }
 
     it 'load initializers' do
       expect(engine).to receive(:load_initializers).with(config.initializers_path)
