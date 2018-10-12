@@ -7,8 +7,6 @@ module Ai
     # Defines attributes and methods to repeat node
     # processing n times
     class RepeaterNumberTimes < Repeater
-      attribute :times, Integer, default: 1
-
       def repeat(child, entity, world)
         raise ArgumentError, 'times must be > 0' unless times > 0
 
@@ -17,6 +15,14 @@ module Ai
         (1..times).each do
           child.process(entity, world)
         end
+      end
+
+      protected
+
+      def default_attributes
+        super().merge(
+          times: 1
+        )
       end
     end
   end

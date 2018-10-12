@@ -6,12 +6,6 @@ module Ai
   module Core
     # A Composite Node Class, based on the Composite Design Pattern
     class Composite < Node
-      attribute :children, Array, default: []
-      attribute :filters, Array, default: []
-      attribute :picker, Object, default: nil # Ai::Core::Pickers::Picker
-      attribute :sorter, Object, default: nil # Ai::Core::Sorters::Sorter
-      attribute :sort_reverse, Boolean, default: false
-
       def child(identifier)
         children.detect { |child| child.identifier.equal?(identifier) }
       end
@@ -49,6 +43,16 @@ module Ai
       end
 
       protected
+
+      def default_attributes
+        super().merge(
+          children: [], # Ai::Core::Node
+          filters: [],
+          picker: nil, # Ai::Core::Pickers::Picker
+          sorter: nil, # Ai::Core::Sorters::Sorter
+          sort_reverse: false
+        )
+      end
 
       def node_starting
         super()

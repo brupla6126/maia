@@ -8,10 +8,6 @@ module Ai
     # the no node. It will return the response from the yes or
     # no node.
     class Ternary < Node
-      attribute :interrogator, Node, default: nil
-      attribute :yes, Node, default: nil
-      attribute :no, Node, default: nil
-
       def execute(entity, world)
         executing_node = execute_node(interrogator.process(entity, world).response)
 
@@ -21,6 +17,14 @@ module Ai
       end
 
       protected
+
+      def default_attributes
+        super().merge(
+          interrogator: nil, # Ai::Core::Node
+          yes: nil, # Ai::Core::Node
+          no: nil # Ai::Core::Node
+        )
+      end
 
       # starts the interrogator, yes and no nodes.
       def node_starting

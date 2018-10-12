@@ -6,14 +6,18 @@ module Ai
     # The Timeout node return a response :failed after a certain
     # amount of time has passed.
     class Timeout < Node
-      attribute :delay, Integer, default: 0
-      attribute :start_time, Time, default: ->(_node, _attribute) { Time.now }
-
       def execute(_entity, _world)
         update_response(handle_response)
       end
 
       protected
+
+      def default_attributes
+        super().merge(
+          delay: 0,
+          start_time: Time.now
+        )
+      end
 
       def reset_node
         super()

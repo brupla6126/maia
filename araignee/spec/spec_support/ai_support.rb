@@ -3,7 +3,7 @@ require 'araignee/ai/core/node'
 module Ai
   module Core
     class NodeBusy < Node
-      def process(_entity, _world)
+      def execute(_entity, _world)
         update_response(:busy)
 
         self
@@ -11,7 +11,7 @@ module Ai
     end
 
     class NodeFailed < Node
-      def process(_entity, _world)
+      def execute(_entity, _world)
         update_response(:failed)
 
         self
@@ -19,7 +19,7 @@ module Ai
     end
 
     class NodeSucceeded < Node
-      def process(_entity, _world)
+      def execute(_entity, _world)
         update_response(:succeeded)
 
         self
@@ -27,7 +27,7 @@ module Ai
     end
 
     class InterrogatorFailed < Node
-      def process(_entity, _world)
+      def execute(_entity, _world)
         update_response(:failed)
 
         self
@@ -35,7 +35,7 @@ module Ai
     end
 
     class InterrogatorSucceeded < Node
-      def process(_entity, _world)
+      def execute(_entity, _world)
         update_response(:succeeded)
 
         self

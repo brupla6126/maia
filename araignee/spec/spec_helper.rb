@@ -87,7 +87,7 @@ RSpec.configure do |config|
   config.include StateMachinesRspec::Matchers
 
   # Added timeout of 2 seconds because of Mutant Testing infinite loops
-  config.around do |example|
-    Timeout.timeout(2, &example)
-  end
+  # config.around do |example|
+  #   Timeout.timeout(2, &example)
+  # end
 end

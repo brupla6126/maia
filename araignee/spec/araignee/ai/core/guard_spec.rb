@@ -52,7 +52,7 @@ RSpec.describe Ai::Core::Guard do
         let(:guarded) { nil }
 
         it 'raises ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError, 'invalid decorating child')
+          expect { subject }.to raise_error(ArgumentError, 'invalid decorated child')
         end
       end
     end

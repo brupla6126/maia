@@ -1,17 +1,13 @@
+require 'ostruct'
 require 'securerandom'
 require 'state_machines'
-require 'virtus'
 require 'araignee/utils/emitter'
 
 module Ai
   module Core
     # Node Class, base class for all nodes in a tree
-    class Node
+    class Node < OpenStruct
       include Araignee::Utils::Emitter
-      include Virtus.model
-
-      attribute :identifier, String, default: ->(_node, _attribute) { SecureRandom.hex }
-      attribute :response, Symbol, default: :unknown
 
       state_machine :state, initial: :ready do
         event :start do
@@ -42,8 +38,14 @@ module Ai
         after_transition %i[paused] => :running, do: :node_resumed
       end
 
-      def initialize(attributes = {})
-        super(attributes)
+      def initialize(state = {})
+        super(default_attributes.merge(state))
+
+        self.identifier ||= SecureRandom.hex
+      end
+
+      def can_start?
+        %i[ready stopped].include?(state_name)
       end
 
       def can_stop?
@@ -79,6 +81,14 @@ module Ai
       end
 
       protected
+
+      def default_attributes
+        { response: :unknown }
+      end
+
+      def reset_attribute(attribute)
+        self.attribute = default_attributes[attribute]
+      end
 
       def node_starting
         emit(:ai_node_starting, self)

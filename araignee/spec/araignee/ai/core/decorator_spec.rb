@@ -2,10 +2,8 @@ require 'araignee/ai/core/decorator'
 require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Decorator do
-  let(:start_child) { true }
-  let(:stop_child) { true }
-  let(:decorating) { Ai::Core::Node.new }
-  let(:decorator) { described_class.new(child: decorating, start_child: start_child, stop_child: stop_child) }
+  let(:decorated) { Ai::Core::Node.new }
+  let(:decorator) { described_class.new(child: decorated) }
 
   subject { decorator }
 
@@ -26,60 +24,28 @@ RSpec.describe Ai::Core::Decorator do
   describe '#node_starting' do
     subject { super().start! }
 
-    context 'with decorating node' do
-      context 'attribute start_child set to false' do
-        let(:start_child) { false }
-
-        context 'child starting' do
-          before { allow(decorator.child).to receive(:start!) }
-
-          it 'does not call child#stop!' do
-            expect(decorator.child).not_to receive(:start!)
-            subject
-          end
-        end
-
-        it 'decorating node is still ready' do
-          expect(decorator.ready?).to eq(true)
-        end
-      end
-
-      context 'attribute start_child set to true' do
-        context 'child starting' do
-          before { allow(decorator.child).to receive(:start!) }
-
-          it 'does call child#stop!' do
-            expect(decorator.child).to receive(:start!)
-            subject
-          end
-        end
-
-        it 'decorating node is running' do
-          subject
-          expect(decorator.child.running?).to eq(true)
-        end
-      end
-
-      context 'validate_attributes' do
-        before { allow(decorator.child).to receive(:validate_attributes) }
-
-        it 'validates attributes' do
-          expect(decorator.child).to receive(:validate_attributes)
-          subject
-        end
-      end
-
-      it 'decorator is running' do
+    context 'with decorated node able to start' do
+      it 'decorated is running' do
         subject
-        expect(decorator.running?).to eq(true)
+        expect(decorated.running?).to eq(true)
+      end
+
+      it 'validates attributes' do
+        expect(decorated).to receive(:validate_attributes)
+        subject
       end
     end
 
-    context 'without decorating node' do
-      let(:decorating) { nil }
+    it 'decorator is running' do
+      subject
+      expect(decorator.running?).to eq(true)
+    end
+
+    context 'without decorated node' do
+      let(:decorated) { nil }
 
       it 'raises ArgumentError' do
-        expect { subject.start! }.to raise_error(ArgumentError, 'invalid decorating child')
+        expect { subject.start! }.to raise_error(ArgumentError, 'invalid decorated child')
       end
     end
   end
@@ -87,43 +53,20 @@ RSpec.describe Ai::Core::Decorator do
   describe '#node_stopping' do
     subject { super().stop! }
 
-    before { decorator.start! }
+    context 'with decorated node able to stop' do
+      before { decorator.start! }
 
-    context 'child node set' do
-      context 'attribute stop_child set to false' do
-        let(:stop_child) { false }
-
-        context 'child stopping' do
-          before { allow(decorator.child).to receive(:stop!) }
-
-          it 'does not call child#stop!' do
-            expect(decorator.child).not_to receive(:stop!)
-            subject
-          end
-        end
-
-        it 'decorating node is still running' do
-          expect(decorator.running?).to eq(true)
-        end
+      it 'does call child#stop!' do
+        expect(decorated).to receive(:stop!)
+        subject
       end
 
-      context 'attribute stop_child set to true' do
-        context 'child stopping' do
-          before { allow(decorator.child).to receive(:stop!) }
-
-          it 'does call child#stop!' do
-            expect(decorator.child).to receive(:stop!)
-            subject
-          end
-        end
-
-        it 'decorating node is stopped' do
-          subject
-          expect(decorator.child.stopped?).to eq(true)
-        end
+      it 'decorated node is stopped' do
+        subject
+        expect(decorated.stopped?).to eq(true)
       end
 
-      it 'decorator is stopped' do
+      it 'decorator node is stopped' do
         subject
         expect(decorator.stopped?).to eq(true)
       end

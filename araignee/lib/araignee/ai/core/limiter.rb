@@ -8,11 +8,8 @@ module Ai
     # i.e., after a certain number of calls, its child will never
     # be called again unless the Limiter is restarted.
     class Limiter < Decorator
-      attribute :times, Integer, default: 0, writer: :protected
-      attribute :limit, Integer, default: 1
-
       def execute(entity, world)
-        @times = times + 1
+        self.times += 1
 
         responded =
           if times <= limit
@@ -25,6 +22,13 @@ module Ai
       end
 
       protected
+
+      def default_attributes
+        super().merge(
+          times: 0,
+          limit: 1
+        )
+      end
 
       def handle_response(responded)
         return responded if %i[busy failed].include?(responded)

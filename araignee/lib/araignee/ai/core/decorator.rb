@@ -5,26 +5,28 @@ module Ai
   module Core
     # A Decorator Node Class, based on the Decorator Design Pattern
     class Decorator < Node
-      attribute :child, Node, default: nil
-      attribute :start_child, Boolean, default: true
-      attribute :stop_child, Boolean, default: true
-
       protected
+
+      def default_attributes
+        super().merge(
+          child: nil
+        )
+      end
 
       def node_starting
         super()
 
-        child.start! if start_child
+        child.start! if child.can_start?
       end
 
       def node_stopping
         super()
 
-        child.stop! if stop_child
+        child.stop! if child.can_stop?
       end
 
       def validate_attributes
-        raise ArgumentError, 'invalid decorating child' unless child
+        raise ArgumentError, 'invalid decorated child' unless child
       end
     end
   end

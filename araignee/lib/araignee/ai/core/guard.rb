@@ -6,11 +6,14 @@ module Ai
     # A Guard Node will evaluate an interrogator node and if it returns
     # :succeeded the guard will process the guarded node.
     class Guard < Decorator
-      # the interrogator node, see Ai::Core::Interrogator
-      attribute :interrogator, Node, default: nil
-      # child is the guarded node
-
       protected
+
+      def default_attributes
+        super().merge(
+          interrogator: nil # the interrogator node, see Ai::Core::Interrogator
+          # child is the guarded node
+        )
+      end
 
       # If the interrogator node evaluates to :succeeded, the guard
       # will return the processed guarded node state, otherwise

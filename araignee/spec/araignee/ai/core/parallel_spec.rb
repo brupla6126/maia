@@ -6,21 +6,21 @@ RSpec.describe Ai::Core::Parallel do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:completion) { 0 }
+  let(:completions) { 0 }
   let(:failures) { 0 }
   let(:filter) { Ai::Core::Filters::FilterRunning.new }
   let(:children) { [] }
-  let(:parallel) { described_class.new(children: children, completion: completion, failures: failures, filters: []) }
+  let(:parallel) { described_class.new(children: children, completions: completions, failures: failures, filters: []) }
 
   subject { parallel }
 
   describe '#initialize' do
-    context 'when attributes :completion and failures are not set' do
-      it 'completion and failures should default to 0' do
+    context 'when attributes :completions and failures are not set' do
+      it 'completions and failures should default to 0' do
         parallel = described_class.new
 
         expect(parallel.children).to eq([])
-        expect(parallel.completion).to eq(completion)
+        expect(parallel.completions).to eq(completions)
         expect(parallel.failures).to eq(failures)
       end
     end
@@ -42,7 +42,7 @@ RSpec.describe Ai::Core::Parallel do
       parallel.stop!
     end
 
-    context 'when actions :succeeded, :failed, :failed and :completion, :failures are not set' do
+    context 'when actions :succeeded, :failed, :failed and :completions, :failures are not set' do
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
       it 'stays running' do
@@ -50,8 +50,8 @@ RSpec.describe Ai::Core::Parallel do
       end
     end
 
-    context 'when actions :succeeded, :failed, :failed and :completion = 1' do
-      let(:completion) { 1 }
+    context 'when actions :succeeded, :failed, :failed and :completions = 1' do
+      let(:completions) { 1 }
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
       it 'should have succeeded' do
@@ -59,8 +59,8 @@ RSpec.describe Ai::Core::Parallel do
       end
     end
 
-    context 'when actions :succeeded, :failed, :failed and :completion = 2' do
-      let(:completion) { 2 }
+    context 'when actions :succeeded, :failed, :failed and :completions = 2' do
+      let(:completions) { 2 }
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
       it 'stays running' do
@@ -69,7 +69,7 @@ RSpec.describe Ai::Core::Parallel do
     end
 
     context 'when actions :succeeded, :failed, :failed and :failures = Integer::MAX' do
-      let(:completion) { 0 }
+      let(:completions) { 0 }
       let(:failures) { Integer::MAX }
 
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
@@ -79,8 +79,8 @@ RSpec.describe Ai::Core::Parallel do
       end
     end
 
-    context 'when actions :succeeded, :failed and :completion = Integer::MAX' do
-      let(:completion) { Integer::MAX }
+    context 'when actions :succeeded, :failed and :completions = Integer::MAX' do
+      let(:completions) { Integer::MAX }
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new] }
 
       it 'stays running' do
@@ -128,8 +128,8 @@ RSpec.describe Ai::Core::Parallel do
       end
     end
 
-    context 'when :succeeded, :failed, :failed, :failed and :completion = 3, :failures = 2' do
-      let(:completion) { 3 }
+    context 'when :succeeded, :failed, :failed, :failed and :completions = 3, :failures = 2' do
+      let(:completions) { 3 }
       let(:failures) { 2 }
 
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
@@ -139,8 +139,8 @@ RSpec.describe Ai::Core::Parallel do
       end
     end
 
-    context 'when :failed, :failed, :failed and :completion = 3' do
-      let(:completion) { 3 }
+    context 'when :failed, :failed, :failed and :completions = 3' do
+      let(:completions) { 3 }
       let(:failures) { Integer::MAX }
 
       let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
@@ -154,16 +154,16 @@ RSpec.describe Ai::Core::Parallel do
   describe 'validates attributes' do
     subject { super().send(:validate_attributes) }
 
-    context 'when completion is invalid' do
-      let(:completion) { -2 }
+    context 'when completions is invalid' do
+      let(:completions) { -2 }
 
-      it 'raises ArgumentError, completion must be >= 0' do
-        expect { subject }.to raise_error(ArgumentError, 'completion must be >= 0')
+      it 'raises ArgumentError, completions must be >= 0' do
+        expect { subject }.to raise_error(ArgumentError, 'completions must be >= 0')
       end
     end
 
-    context 'when completion is valid' do
-      let(:completion) { 3 }
+    context 'when completions is valid' do
+      let(:completions) { 3 }
 
       it 'does not raise' do
         expect { subject }.not_to raise_error
@@ -186,12 +186,12 @@ RSpec.describe Ai::Core::Parallel do
       end
     end
 
-    context 'when completion and failures are equal' do
-      let(:completion) { 1 }
+    context 'when completions and failures are equal' do
+      let(:completions) { 1 }
       let(:failures) { 1 }
 
-      it 'should raise ArgumentError, completion and failures must not equal' do
-        expect { subject }.to raise_error(ArgumentError, 'completion and failures must not equal')
+      it 'should raise ArgumentError, completions and failures must not equal' do
+        expect { subject }.to raise_error(ArgumentError, 'completions and failures must not equal')
       end
     end
   end

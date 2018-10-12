@@ -8,17 +8,13 @@ RSpec.describe Ai::Core::Limiter do
   let(:limit) { nil }
   let(:limiter) { described_class.new(child: child, limit: limit) }
 
-  let(:node_busy) { Ai::Core::Node.new }
-  let(:node_failed) { Ai::Core::Node.new }
-  let(:node_succeeded) { Ai::Core::Node.new }
+  let(:node_busy) { Ai::Core::NodeBusy.new }
+  let(:node_failed) { Ai::Core::NodeFailed.new }
+  let(:node_succeeded) { Ai::Core::NodeSucceeded.new }
 
   let(:child) { node_succeeded }
 
   subject { limiter }
-
-  before { allow(node_busy).to receive(:response) { :busy } }
-  before { allow(node_failed).to receive(:response) { :failed } }
-  before { allow(node_succeeded).to receive(:response) { :succeeded } }
 
   describe '#initialize' do
     context 'when limit is not set' do
@@ -29,7 +25,7 @@ RSpec.describe Ai::Core::Limiter do
       end
     end
 
-    context 'with Fabrication attributes' do
+    context 'with limit set' do
       let(:limit) { 2 }
 
       it 'sets limit' do
@@ -64,15 +60,11 @@ RSpec.describe Ai::Core::Limiter do
       end
     end
 
-    context 'when doing 5 loops of :succeeded and :limit equals to 3' do
+    context 'when doing 5 loops of :busy and :limit equals to 3' do
       let(:child) { node_busy }
 
       context 'calling child#process' do
-        before { allow(limiter.child).to receive(:process).with(entity, world) { limiter.child } }
-
         it 'calls child#process 3 times' do
-          expect(limiter.child).to receive(:process).with(entity, world).exactly(3).times
-
           1.upto(5) do
             limiter.process(entity, world)
           end
@@ -121,8 +113,8 @@ RSpec.describe Ai::Core::Limiter do
     context 'invalid child' do
       let(:child) { nil }
 
-      it 'raises ArgumentError, invalid decorating child' do
-        expect { subject }.to raise_error(ArgumentError, 'invalid decorating child')
+      it 'raises ArgumentError, invalid decorated child' do
+        expect { subject }.to raise_error(ArgumentError, 'invalid decorated child')
       end
     end
 

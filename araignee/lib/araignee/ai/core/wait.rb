@@ -6,10 +6,14 @@ module Ai
     # The Wait node response is set to :succeeded after a certain
     # amount of time has passed. Meanwhile it is set to :busy
     class Wait < Node
-      attribute :delay, Integer, default: 0 # milliseconds
-      attribute :start_time, Time, default: ->(_node, _attribute) { Time.now }
-
       protected
+
+      def default_attributes
+        super().merge(
+          delay: 0,
+          start_time: Time.now
+        )
+      end
 
       def execute(_entity, _world)
         update_response(handle_response)

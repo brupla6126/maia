@@ -5,10 +5,6 @@ RSpec.describe Ai::Core::Node do
   let(:world) { {}  }
   let(:entity) { {} }
 
-  before { Log[:ai] = double('Log[:ai]') }
-  before { allow(Log[:ai]).to receive(:debug) }
-  after { Log[:ai] = Log[:default] }
-
   it { is_expected.to have_states(:ready, :running, :paused, :stopped, on: :state) }
 
   it { is_expected.to handle_events :start, when: :ready, on: :state }
