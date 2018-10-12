@@ -8,19 +8,25 @@ module Ai
     module Pickers
       # Picks node(s) in round robin fashion
       class PickerRoundRobin < Picker
-        attribute :current, Integer, default: 0, writer: :private
-
         # pick a node round robin fashion
         def pick_one(nodes)
-          node = nodes[current]
+          node = nodes[self.current]
 
-          @current = @current == nodes.count - 1 ? 0 : @current + 1
+          self.current = self.current == nodes.count - 1 ? 0 : self.current + 1
 
           node
         end
 
         def reset
           reset_attribute(:current)
+        end
+
+        protected
+
+        def default_attributes
+          super().merge(
+            current: 0
+          )
         end
       end
     end

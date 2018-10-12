@@ -27,7 +27,7 @@ RSpec.describe Ai::Core::Wait do
       end
     end
 
-    context 'with Virtus attributes' do
+    context 'with attributes' do
       let(:node) { described_class(delay: delay) }
 
       it 'sets delay' do

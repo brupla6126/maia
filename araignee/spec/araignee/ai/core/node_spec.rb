@@ -5,15 +5,6 @@ RSpec.describe Ai::Core::Node do
   let(:world) { {}  }
   let(:entity) { {} }
 
-  it { is_expected.to have_states(:ready, :running, :paused, :stopped, on: :state) }
-
-  it { is_expected.to handle_events :start, when: :ready, on: :state }
-  it { is_expected.to handle_events :start, when: :stopped, on: :state }
-  it { is_expected.to handle_events :stop, when: :paused, on: :state }
-  it { is_expected.to handle_events :stop, when: :running, on: :state }
-  it { is_expected.to handle_events :pause, when: :running, on: :state }
-  it { is_expected.to handle_events :resume, when: :paused, on: :state }
-
   let(:node) { described_class.new }
 
   subject { node }
@@ -21,10 +12,6 @@ RSpec.describe Ai::Core::Node do
   describe '#initialize' do
     let(:secure_random_hex) { 'abcdef' }
     before { allow(SecureRandom).to receive(:hex) { secure_random_hex } }
-
-    it 'node is ready' do
-      expect(node.ready?).to be_truthy
-    end
 
     it 'sets response to :unknown' do
       expect(node.response).to eq(:unknown)
@@ -46,7 +33,7 @@ RSpec.describe Ai::Core::Node do
       end
     end
 
-    context 'with Virtus attributes' do
+    context 'with attributes' do
       context 'valid attributes' do
         let(:identifier) { 'abcdefg' }
         let(:node) { Ai::Core::Node.new(identifier: identifier) }

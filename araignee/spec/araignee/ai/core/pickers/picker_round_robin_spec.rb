@@ -1,6 +1,7 @@
 require 'araignee/ai/core/pickers/picker_round_robin'
 
 RSpec.describe Ai::Core::Pickers::PickerRoundRobin do
+
   let(:picker) { described_class.new }
   subject { picker }
 
@@ -26,9 +27,9 @@ RSpec.describe Ai::Core::Pickers::PickerRoundRobin do
     subject { super().reset }
 
     before { picker.pick_one(nodes) }
-    before { subject }
 
     it 'resets current to 0' do
+      subject
       expect(picker.current).to eq(0)
     end
   end

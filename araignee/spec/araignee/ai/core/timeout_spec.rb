@@ -29,7 +29,7 @@ RSpec.describe Ai::Core::Timeout do
       end
     end
 
-    context 'with Virtus attributes' do
+    context 'with attributes' do
       let(:node) { described_class.new(delay: delay) }
 
       it 'sets delay' do

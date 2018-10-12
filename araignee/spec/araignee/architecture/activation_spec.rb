@@ -1,13 +1,9 @@
-require 'virtus'
+require 'ostruct'
 require 'araignee/architecture/activation'
 
 RSpec.describe Architecture::Activation do
-  class Entity
-    include Virtus.model
+  class Entity < OpenStruct
     include Architecture::Activation
-
-    attribute :activated_at, Time
-    attribute :deactivated_at, Time
   end
 
   subject { entity }

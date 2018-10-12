@@ -1,4 +1,3 @@
-require 'virtus'
 require 'araignee/ai/core/repeater'
 
 # Module for gathering AI classes

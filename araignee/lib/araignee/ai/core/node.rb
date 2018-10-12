@@ -87,7 +87,7 @@ module Ai
       end
 
       def reset_attribute(attribute)
-        self.attribute = default_attributes[attribute]
+        self[attribute] = default_attributes[attribute]
       end
 
       def node_starting
