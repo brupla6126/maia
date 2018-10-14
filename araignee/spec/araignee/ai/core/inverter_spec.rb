@@ -1,5 +1,4 @@
 require 'araignee/ai/core/inverter'
-require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Inverter do
   let(:world) { {} }
@@ -20,10 +19,6 @@ RSpec.describe Ai::Core::Inverter do
   before { allow(node_succeeded).to receive(:response) { :succeeded } }
 
   describe '#initialize' do
-    it 'is ready' do
-      expect(subject.ready?).to eq(true)
-    end
-
     it 'response is :unknown' do
       expect(subject.response).to eq(:unknown)
     end
@@ -32,7 +27,6 @@ RSpec.describe Ai::Core::Inverter do
   describe '#process' do
     subject { super().process(entity, world) }
 
-    before { inverter.start! }
     after { subject }
 
     context 'child is processed' do

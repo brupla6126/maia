@@ -26,18 +26,6 @@ module Ai
         update_response(handle_response(responded))
       end
 
-      def node_starting
-        super()
-
-        interrogator.start!
-      end
-
-      def node_stopping
-        super()
-
-        interrogator.stop!
-      end
-
       def handle_response(responded)
         return responded if %i[busy failed].include?(responded)
 

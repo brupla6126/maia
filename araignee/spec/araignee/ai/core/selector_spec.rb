@@ -1,14 +1,11 @@
-require 'araignee/ai/core/node'
 require 'araignee/ai/core/selector'
-require 'araignee/ai/core/filters/filter_running'
 
 RSpec.describe Ai::Core::Selector do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:filter) { Ai::Core::Filters::FilterRunning.new }
   let(:children) { [] }
-  let(:selector) { described_class.new(children: children, filters: [filter]) }
+  let(:selector) { described_class.new(children: children, filters: []) }
 
   subject { selector }
 
@@ -24,7 +21,6 @@ RSpec.describe Ai::Core::Selector do
 
   describe '#process' do
     subject { selector.process(entity, world) }
-    before { selector.start! }
 
     context 'calling #prepare_nodes' do
       before { allow(selector).to receive(:prepare_nodes).with(children, sort_reversed) { children } }

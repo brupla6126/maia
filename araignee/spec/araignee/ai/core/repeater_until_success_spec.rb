@@ -19,8 +19,6 @@ RSpec.describe Ai::Core::RepeaterUntilSuccess do
   describe '#process' do
     subject { repeater.process(entity, world) }
 
-    before { repeater.start! }
-
     it 'has succeeded' do
       expect(subject.succeeded?).to eq(true)
     end

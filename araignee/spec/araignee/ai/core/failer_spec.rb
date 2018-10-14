@@ -1,5 +1,4 @@
 require 'araignee/ai/core/failer'
-require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Failer do
   let(:world) { {} }
@@ -13,10 +12,6 @@ RSpec.describe Ai::Core::Failer do
   before { allow(child).to receive(:response) { :succeeded } }
 
   describe '#initialize' do
-    it 'is ready' do
-      expect(subject.ready?).to eq(true)
-    end
-
     it 'response is :unknown' do
       expect(subject.response).to eq(:unknown)
     end
@@ -25,7 +20,6 @@ RSpec.describe Ai::Core::Failer do
   describe '#process' do
     subject { super().process(entity, world) }
 
-    before { failer.start! }
     before { allow(child).to receive(:execute).with(entity, world) { child } }
     after { subject }
 
@@ -40,8 +34,6 @@ RSpec.describe Ai::Core::Failer do
     end
 
     context 'when action :failed' do
-      let(:child) { Ai::Core::Node.new }
-
       before { allow(child).to receive(:response) { :failed } }
 
       it 'child is processed' do

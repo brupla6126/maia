@@ -19,8 +19,6 @@ RSpec.describe Ai::Core::Repeater do
   describe '#process' do
     subject { repeater.process(entity, world) }
 
-    before { repeater.start! }
-
     context 'calling repeater#repeat' do
       before { allow(repeater).to receive(:repeat).with(child, entity, world) { nil } }
 

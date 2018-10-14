@@ -54,22 +54,6 @@ module Ai
         )
       end
 
-      def node_starting
-        super()
-
-        children.each(&:start!)
-
-        nil
-      end
-
-      def node_stopping
-        super()
-
-        children.each(&:stop!)
-
-        nil
-      end
-
       def filter(nodes)
         return nodes if filters.empty? || nodes.empty?
 

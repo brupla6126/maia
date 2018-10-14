@@ -20,8 +20,6 @@ RSpec.describe Ai::Core::RepeaterNumberTimes do
   describe '#process' do
     subject { super().process(entity, world) }
 
-    before { repeater.start! }
-
     context 'number of times negative' do
       let(:times) { -2 }
 

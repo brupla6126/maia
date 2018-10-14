@@ -1,15 +1,11 @@
-require 'araignee/ai/core/node'
 require 'araignee/ai/core/xor'
-require 'araignee/ai/core/filters/filter_running'
 
 RSpec.describe Ai::Core::Xor do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:filter) { Ai::Core::Filters::FilterRunning.new }
-
   let(:children) { [] }
-  let(:xor) { described_class.new(children: children, filters: [filter]) }
+  let(:xor) { described_class.new(children: children, filters: []) }
 
   subject { xor }
 
@@ -25,8 +21,6 @@ RSpec.describe Ai::Core::Xor do
 
   describe 'process' do
     subject { super().process(entity, world) }
-
-    before { xor.start! }
 
     context 'when responses = [:succeeded]' do
       let(:children) { [Ai::Core::NodeSucceeded.new] }

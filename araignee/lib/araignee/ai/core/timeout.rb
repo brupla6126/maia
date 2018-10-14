@@ -10,6 +10,10 @@ module Ai
         update_response(handle_response)
       end
 
+      def reset_node
+        reset_attribute(:start_time)
+      end
+
       protected
 
       def default_attributes
@@ -17,12 +21,6 @@ module Ai
           delay: 0,
           start_time: Time.now
         )
-      end
-
-      def reset_node
-        super()
-
-        reset_attribute(:start_time)
       end
 
       def handle_response

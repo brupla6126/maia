@@ -11,20 +11,8 @@ RSpec.describe Ai::Core::Wait do
   subject { wait }
 
   describe '#initialize' do
-    it 'is ready' do
-      expect(subject.ready?).to eq(true)
-    end
-
     it 'response is :unknown' do
       expect(subject.response).to eq(:unknown)
-    end
-
-    context 'with Fabrication attributes' do
-      let(:node) { described_class(delay: delay) }
-
-      it 'sets delay' do
-        expect(subject.delay).to eq(delay)
-      end
     end
 
     context 'with attributes' do
@@ -38,21 +26,24 @@ RSpec.describe Ai::Core::Wait do
 
   describe '#process' do
     subject { super().process(entity, world) }
-    before { wait.start! }
 
     context 'when wait of 3 seconds' do
       after { Timecop.return }
 
       context 'before wait expires' do
-        it 'is running' do
+        it 'is busy' do
+          wait
+
           Timecop.travel(Time.now + 1)
 
-          expect(subject.running?).to eq(true)
+          expect(subject.busy?).to eq(true)
         end
       end
 
       context 'after wait expires' do
         it 'has succeeded' do
+          wait
+
           Timecop.travel(Time.now + 5)
 
           expect(subject.succeeded?).to eq(true)
@@ -62,14 +53,11 @@ RSpec.describe Ai::Core::Wait do
   end
 
   describe 'reset_node' do
-    subject { wait.send(:reset_node) }
+    subject { wait.reset_node }
 
     context 'reset_attribute' do
-      before { allow(wait).to receive(:reset_attribute) }
-
       it 'calls reset_attribute' do
-        expect(wait).to receive(:reset_attribute).with(:start_time)
-        expect(wait).to receive(:reset_attribute).with(:response)
+        expect(wait.response).to eq(:unknown)
         subject
       end
     end
@@ -82,6 +70,7 @@ RSpec.describe Ai::Core::Wait do
 
       it 'start_time is set to Time.now' do
         expect(wait.start_time).to eq(now)
+        subject
       end
     end
   end

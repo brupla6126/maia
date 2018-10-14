@@ -11,6 +11,7 @@ RSpec.describe Ai::Core::Node do
 
   describe '#initialize' do
     let(:secure_random_hex) { 'abcdef' }
+
     before { allow(SecureRandom).to receive(:hex) { secure_random_hex } }
 
     it 'sets response to :unknown' do
@@ -34,21 +35,19 @@ RSpec.describe Ai::Core::Node do
     end
 
     context 'with attributes' do
-      context 'valid attributes' do
-        let(:identifier) { 'abcdefg' }
-        let(:node) { Ai::Core::Node.new(identifier: identifier) }
+      let(:identifier) { 'abcdefg' }
+      let(:node) { Ai::Core::Node.new(identifier: identifier) }
 
-        before { subject }
+      before { subject }
 
-        it 'sets identifier' do
-          expect(node.identifier).to eq(identifier)
-        end
+      it 'sets identifier' do
+        expect(node.identifier).to eq(identifier)
       end
     end
   end
 
   describe 'validate_attributes' do
-    subject { node.validate_attributes }
+    subject { super().validate_attributes }
 
     context 'invalid identifier' do
       let(:identifier) { Ai::Core::Node.new }
@@ -60,35 +59,8 @@ RSpec.describe Ai::Core::Node do
     end
   end
 
-  describe '#can_stop?' do
-    subject { node.can_stop? }
-
-    context 'when state equals ready' do
-      it 'returns false' do
-        expect(subject).to be_falsey
-      end
-    end
-
-    context 'when state equals running' do
-      before { node.start! }
-
-      it 'returns true' do
-        expect(subject).to be_truthy
-      end
-    end
-
-    context 'when state equals paused' do
-      before { node.start! }
-      before { node.pause! }
-
-      it 'returns true' do
-        expect(subject).to be_truthy
-      end
-    end
-  end
-
   describe '#process' do
-    subject { node.process(entity, world) }
+    subject { super().process(entity, world) }
 
     before { node.start! }
 
@@ -136,102 +108,7 @@ RSpec.describe Ai::Core::Node do
     it 'resets response to default value' do
       subject
 
-      expect(node.state).to eq('running')
       expect(node.response).to eq(:unknown)
-    end
-  end
-
-  describe '#start!' do
-    subject { super().start! }
-
-    context 'node_starting' do
-      context 'calling validate_attributes' do
-        before { allow(node).to receive(:validate_attributes) }
-
-        it 'calls validate_attributes' do
-          expect(node).to receive(:validate_attributes)
-          subject
-        end
-      end
-
-      it 'is running' do
-        subject
-        expect(node.running?).to be_truthy
-      end
-
-      it 'emits :ai_node_starting, :ai_node_started events' do
-        expect(node).to receive(:emit).with(:ai_node_starting, node)
-        expect(node).to receive(:emit).with(:ai_node_started, node)
-        subject
-      end
-    end
-
-    context 'node_restarting' do
-      before { node.start! }
-      before { node.stop! }
-
-      it 'is running' do
-        subject
-        expect(node.running?).to be_truthy
-      end
-
-      context do
-        before { allow(node).to receive(:reset_node) }
-        before { allow(node).to receive(:validate_attributes) }
-        after { subject }
-
-        it 'resets node' do
-          # expect(node.state).to eq(:unknown)
-          expect(node.response).to eq(:unknown)
-        end
-
-        it 'validates attributes' do
-          expect(node).to receive(:validate_attributes)
-        end
-      end
-    end
-  end
-
-  describe '#stop!' do
-    subject { super().stop! }
-
-    before { node.start! }
-
-    it 'emits :ai_node_stopping, :ai_node_stopped events' do
-      expect(node).to receive(:emit).with(:ai_node_stopping, node)
-      expect(node).to receive(:emit).with(:ai_node_stopped, node)
-      subject
-    end
-
-    it 'is stopped' do
-      subject
-      expect(node.running?).to be_falsey
-      expect(node.stopped?).to be_truthy
-    end
-  end
-
-  describe '#pause!' do
-    subject { super().pause! }
-
-    before { node.start! }
-
-    it 'emits :ai_node_pausing, :ai_node_paused events' do
-      expect(node).to receive(:emit).with(:ai_node_pausing, node)
-      expect(node).to receive(:emit).with(:ai_node_paused, node)
-      subject
-    end
-  end
-
-  describe '#resume!' do
-    subject { super().resume! }
-
-    before { node.start! }
-    before { node.pause! }
-
-    it 'emits :ai_node_resuming, :ai_node_resumed events' do
-      expect(node).to receive(:emit).with(:ai_node_resuming, node)
-      expect(node).to receive(:emit).with(:ai_node_resumed, node)
-      subject
     end
   end
 

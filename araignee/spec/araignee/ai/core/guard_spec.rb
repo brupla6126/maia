@@ -1,7 +1,6 @@
 require 'araignee/ai/core/guard'
 require 'araignee/ai/core/failer'
 require 'araignee/ai/core/interrogator'
-require 'araignee/ai/core/node'
 require 'araignee/ai/core/succeeder'
 
 RSpec.describe Ai::Core::Guard do
@@ -26,57 +25,8 @@ RSpec.describe Ai::Core::Guard do
       expect(subject.child).to eq(guarded)
     end
   end
-
-  describe '#node_starting' do
-    subject { super().start! }
-
-    context 'starting interrogator and child' do
-      before { subject }
-
-      it 'interrogator and child are running' do
-        expect(interrogator.running?).to eq(true)
-        expect(guarded.running?).to eq(true)
-      end
-    end
-
-    context 'validates attributes' do
-      context 'invalid interrogator node' do
-        let(:interrogator) { nil }
-
-        it 'raises ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError, 'interrogator node nil')
-        end
-      end
-
-      context 'invalid guarded node' do
-        let(:guarded) { nil }
-
-        it 'raises ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError, 'invalid decorated child')
-        end
-      end
-    end
-  end
-
-  describe '#node_stopping' do
-    before { guard.start! }
-
-    subject { super().stop! }
-
-    before { subject }
-
-    context 'stopping interrogator and child' do
-      it 'interrogator and child are stopped' do
-        expect(interrogator.stopped?).to eq(true)
-        expect(guarded.stopped?).to eq(true)
-      end
-    end
-  end
-
   describe '#process' do
     subject { guard.process(entity, world) }
-
-    before { guard.start! }
 
     context 'calling guard#handle_response' do
       before { allow(guard).to receive(:handle_response) { :succeeded } }
@@ -96,7 +46,7 @@ RSpec.describe Ai::Core::Guard do
       end
     end
 
-    context 'when child interrogator returns :succeeded' do
+    context 'when interrogator returns :succeeded' do
       let(:interrogator) { Ai::Core::Interrogator.new(child: Ai::Core::NodeSucceeded.new) }
 
       context 'calling interrogator#process' do

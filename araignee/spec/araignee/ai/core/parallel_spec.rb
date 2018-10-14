@@ -1,6 +1,4 @@
-require 'araignee/ai/core/node'
 require 'araignee/ai/core/parallel'
-require 'araignee/ai/core/filters/filter_running'
 
 RSpec.describe Ai::Core::Parallel do
   let(:world) { {} }
@@ -26,27 +24,14 @@ RSpec.describe Ai::Core::Parallel do
     end
   end
 
-  describe '#node_starting' do
-    subject { super().start! }
-
-    context 'validates attributes' do
-    end
-  end
-
   describe '#process' do
     subject { parallel.process(entity, world) }
-
-    before { parallel.start! }
-
-    after do
-      parallel.stop!
-    end
 
     context 'when actions :succeeded, :failed, :failed and :completions, :failures are not set' do
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
-      it 'stays running' do
-        expect(subject.running?).to eq(true)
+      it 'stays busy' do
+        expect(subject.busy?).to eq(true)
       end
     end
 
@@ -63,8 +48,8 @@ RSpec.describe Ai::Core::Parallel do
       let(:completions) { 2 }
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
-      it 'stays running' do
-        expect(subject.running?).to eq(true)
+      it 'stays busy' do
+        expect(subject.busy?).to eq(true)
       end
     end
 
@@ -74,8 +59,8 @@ RSpec.describe Ai::Core::Parallel do
 
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
-      it 'stays running' do
-        expect(subject.running?).to eq(true)
+      it 'stays busy' do
+        expect(subject.busy?).to eq(true)
       end
     end
 
@@ -83,8 +68,8 @@ RSpec.describe Ai::Core::Parallel do
       let(:completions) { Integer::MAX }
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new] }
 
-      it 'stays running' do
-        expect(subject.running?).to eq(true)
+      it 'stays busy' do
+        expect(subject.busy?).to eq(true)
       end
     end
 
@@ -113,8 +98,8 @@ RSpec.describe Ai::Core::Parallel do
 
       let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
 
-      it 'should stay running' do
-        expect(subject.running?).to eq(true)
+      it 'should stay busy' do
+        expect(subject.busy?).to eq(true)
       end
     end
 

@@ -1,5 +1,4 @@
 require 'araignee/ai/core/limiter'
-require 'araignee/ai/core/node'
 
 RSpec.describe Ai::Core::Limiter do
   let(:world) { {} }
@@ -44,8 +43,6 @@ RSpec.describe Ai::Core::Limiter do
 
   describe '#process' do
     subject { super().process(entity, world) }
-
-    before { limiter.start! }
 
     let(:limit) { 3 }
 

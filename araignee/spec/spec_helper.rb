@@ -22,7 +22,6 @@ require 'bundler/setup'
 require 'araignee/utils/log'
 require 'pry-byebug'
 require 'simplecov'
-require 'state_machines-rspec'
 require 'timeout'
 
 lib = File.expand_path('../lib', __dir__)
@@ -83,8 +82,6 @@ RSpec.configure do |config|
   # test failures related to randomization by passing the same `--seed` value
   # as the one that triggered the failure.
   Kernel.srand config.seed
-
-  config.include StateMachinesRspec::Matchers
 
   # Added timeout of 2 seconds because of Mutant Testing infinite loops
   # config.around do |example|

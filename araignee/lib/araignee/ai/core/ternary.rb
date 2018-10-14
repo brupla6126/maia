@@ -26,24 +26,6 @@ module Ai
         )
       end
 
-      # starts the interrogator, yes and no nodes.
-      def node_starting
-        super()
-
-        interrogator.start!
-        yes.start!
-        no.start!
-      end
-
-      # stops the interrogator, yes and no nodes.
-      def node_stopping
-        super()
-
-        interrogator.stop!
-        yes.stop!
-        no.stop!
-      end
-
       def execute_node(interrogator_response)
         case interrogator_response
         when :succeeded then yes

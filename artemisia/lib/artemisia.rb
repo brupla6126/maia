@@ -1,6 +1,7 @@
 require 'ostruct'
 
 require 'artemisia/version'
+require 'artemisia/context'
 require 'artemisia/engine'
 
 module Artemisia

@@ -10,9 +10,9 @@ module Ai
       class PickerRoundRobin < Picker
         # pick a node round robin fashion
         def pick_one(nodes)
-          node = nodes[self.current]
+          node = nodes[current]
 
-          self.current = self.current == nodes.count - 1 ? 0 : self.current + 1
+          self.current = current == nodes.count - 1 ? 0 : current + 1
 
           node
         end

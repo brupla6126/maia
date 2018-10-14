@@ -1,16 +1,15 @@
-require 'araignee/ai/core/node'
 require 'araignee/ai/core/succeeder'
 
 RSpec.describe Ai::Core::Succeeder do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:succeeder) { described_class.new(child: child) }
-
   let(:node_failed) { Ai::Core::Node.new }
   let(:node_succeeded) { Ai::Core::Node.new }
 
   let(:child) { node_succeeded }
+
+  let(:succeeder) { described_class.new(child: child) }
 
   subject { succeeder }
 
@@ -18,10 +17,6 @@ RSpec.describe Ai::Core::Succeeder do
   before { allow(node_succeeded).to receive(:response) { :succeeded } }
 
   describe '#initialize' do
-    it 'is ready' do
-      expect(subject.ready?).to eq(true)
-    end
-
     it 'response is :unknown' do
       expect(subject.response).to eq(:unknown)
     end
@@ -30,8 +25,8 @@ RSpec.describe Ai::Core::Succeeder do
   describe '#process' do
     subject { super().process(entity, world) }
 
-    before { succeeder.start! }
     before { allow(child).to receive(:execute).with(entity, world) { child } }
+
     after { subject }
 
     context 'when action :succeeded' do

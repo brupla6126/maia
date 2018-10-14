@@ -11,51 +11,35 @@ RSpec.describe Ai::Core::Timeout do
   subject { timeout }
 
   describe '#initialize' do
-    let(:delay) { 5 }
-
-    it 'is ready' do
-      expect(subject.ready?).to eq(true)
+    it 'sets delay' do
+      expect(subject.delay).to eq(delay)
     end
 
     it 'response is :unknown' do
       expect(subject.response).to eq(:unknown)
-    end
-
-    context 'with Fabrication attributes' do
-      let(:node) { described_class.new(delay: delay) }
-
-      it 'sets identifier' do
-        expect(subject.delay).to eq(delay)
-      end
-    end
-
-    context 'with attributes' do
-      let(:node) { described_class.new(delay: delay) }
-
-      it 'sets delay' do
-        expect(subject.delay).to eq(delay)
-      end
     end
   end
 
   describe '#process' do
     subject { super().process(entity, world) }
 
-    before { timeout.start! }
-
     context 'when delay of 3 seconds' do
       after { Timecop.return }
 
       context 'before timeout expires' do
-        it 'is running' do
+        it 'is busy' do
+          timeout
+
           Timecop.travel(Time.now + 1)
 
-          expect(subject.running?).to eq(true)
+          expect(subject.busy?).to eq(true)
         end
       end
 
       context 'after timeout expires' do
         it 'has failed' do
+          timeout
+
           Timecop.travel(Time.now + 5)
 
           expect(subject.failed?).to eq(true)
@@ -65,17 +49,7 @@ RSpec.describe Ai::Core::Timeout do
   end
 
   describe '#reset_node' do
-    subject { timeout.send(:reset_node) }
-
-    context 'reset_attribute' do
-      before { allow(timeout).to receive(:reset_attribute) }
-
-      it 'calls reset_attribute' do
-        expect(timeout).to receive(:reset_attribute).with(:start_time)
-        expect(timeout).to receive(:reset_attribute).with(:response)
-        subject
-      end
-    end
+    subject { super().reset_node }
 
     context '' do
       let(:now) { Time.local(2017, 5, 12) }
@@ -83,10 +57,10 @@ RSpec.describe Ai::Core::Timeout do
       before { Timecop.freeze(now) }
       after { Timecop.return }
 
-      it 'start_time is set to Time.now' do
+      it 'start_time is reset' do
+        subject
         expect(timeout.start_time).to eq(now)
         expect(timeout.response).to eq(:unknown)
-        subject
       end
     end
   end

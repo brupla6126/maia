@@ -1,14 +1,11 @@
-require 'araignee/ai/core/node'
 require 'araignee/ai/core/sequence'
-require 'araignee/ai/core/filters/filter_running'
 
 RSpec.describe Ai::Core::Sequence do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:filter) { Ai::Core::Filters::FilterRunning.new }
   let(:children) { [] }
-  let(:sequence) { described_class.new(children: children, filters: [filter]) }
+  let(:sequence) { described_class.new(children: children, filters: []) }
 
   subject { sequence }
 
@@ -24,8 +21,6 @@ RSpec.describe Ai::Core::Sequence do
 
   describe '#process' do
     subject { super().process(entity, world) }
-
-    before { sequence.start! }
 
     let(:children) { [Ai::Core::NodeSucceeded.new] }
 
