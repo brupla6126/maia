@@ -1,8 +1,8 @@
 require 'timecop'
 require 'araignee/utils/repository'
 
-RSpec.describe Repository do
-  let(:repository) { Repository.new }
+RSpec.describe Araignee::Utils::Repository do
+  let(:repository) { described_class.new }
 
   let(:key) { 'abc' }
   let(:value) { 123 }

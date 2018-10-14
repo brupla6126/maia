@@ -1,15 +1,15 @@
 require 'araignee/ai/core/inverter'
 
-RSpec.describe Ai::Core::Inverter do
+RSpec.describe Araignee::Ai::Core::Inverter do
   let(:world) { {} }
   let(:entity) { {} }
 
   let(:inverter) { described_class.new(child: child) }
-  let(:child) { Ai::Core::Node.new }
+  let(:child) { Araignee::Ai::Core::Node.new }
 
-  let(:node_busy) { Ai::Core::Node.new }
-  let(:node_failed) { Ai::Core::Node.new }
-  let(:node_succeeded) { Ai::Core::Node.new }
+  let(:node_busy) { Araignee::Ai::Core::Node.new }
+  let(:node_failed) { Araignee::Ai::Core::Node.new }
+  let(:node_succeeded) { Araignee::Ai::Core::Node.new }
 
   subject { inverter }
 

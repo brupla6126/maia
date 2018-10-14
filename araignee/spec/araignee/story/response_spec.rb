@@ -1,6 +1,6 @@
 require 'araignee/story/response'
 
-RSpec.describe Story::Response do
+RSpec.describe Araignee::Story::Response do
   class MyResponse < described_class
     def defaults
       { errors: [] }

@@ -1,11 +1,11 @@
 require 'araignee/ai/core/node'
 require 'araignee/ai/core/repeater_until_failure'
 
-RSpec.describe Ai::Core::RepeaterUntilFailure do
+RSpec.describe Araignee::Ai::Core::RepeaterUntilFailure do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:child) { Ai::Core::NodeFailed.new }
+  let(:child) { Araignee::Ai::Core::NodeFailed.new }
   let(:repeater) { described_class.new(child: child) }
 
   subject { repeater }

@@ -1,6 +1,6 @@
 require 'araignee/ai/core/balancer'
 
-RSpec.describe Ai::Core::Balancer do
+RSpec.describe Araignee::Ai::Core::Balancer do
   let(:world) { {} }
   let(:entity) { {} }
 
@@ -8,8 +8,8 @@ RSpec.describe Ai::Core::Balancer do
   let(:picker) { double('[picker]', pick_one: picked) }
   let(:filters) { [] }
 
-  let(:children) { (1..3).map { Ai::Core::Node.new } }
-  let(:balancer) { Ai::Core::Balancer.new(children: children, picker: picker, filters: filters) }
+  let(:children) { (1..3).map { Araignee::Ai::Core::Node.new } }
+  let(:balancer) { Araignee::Ai::Core::Balancer.new(children: children, picker: picker, filters: filters) }
 
   subject { balancer }
 

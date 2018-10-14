@@ -1,11 +1,11 @@
 require 'araignee/ai/core/node'
 require 'araignee/ai/core/repeater'
 
-RSpec.describe Ai::Core::Repeater do
+RSpec.describe Araignee::Ai::Core::Repeater do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:child) { Ai::Core::Node.new }
+  let(:child) { Araignee::Ai::Core::Node.new }
   let(:repeater) { described_class.new(child: child) }
 
   subject { repeater }

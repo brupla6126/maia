@@ -1,9 +1,9 @@
 require 'araignee/utils/log'
 
-RSpec.describe Log do
+RSpec.describe Araignee::Utils::Log do
   context 'when Log is not configured' do
     it 'should set default logger' do
-      expect(Log[:default]).not_to eq(nil)
+      expect(Araignee::Utils::Log[:default]).not_to eq(nil)
     end
   end
 
@@ -11,7 +11,7 @@ RSpec.describe Log do
     context 'when id is nil' do
       it 'raises ArgumentError id nil' do
         expect do
-          Log[nil] = nil
+          described_class[nil] = nil
         end.to raise_error(ArgumentError, 'id nil')
       end
     end
@@ -19,7 +19,7 @@ RSpec.describe Log do
     context 'when logger is nil' do
       it 'raises ArgumentError logger nil' do
         expect do
-          Log[:logger] = nil
+          described_class[:logger] = nil
         end.to raise_error(ArgumentError, 'logger nil')
       end
     end
@@ -27,13 +27,13 @@ RSpec.describe Log do
 
   describe '#[]' do
     after(:example) do
-      Log.close
+      described_class.close
     end
 
     context 'when id is nil' do
       it 'raises ArgumentError id nil' do
         expect do
-          Log[nil]
+          described_class[nil]
         end.to raise_error(ArgumentError, 'id nil')
       end
     end
@@ -49,123 +49,123 @@ RSpec.describe Log do
 
     context 'when id is not found and default logger is set' do
       before(:example) do
-        Log[:default] = Logger.new(STDOUT)
+        described_class[:default] = Logger.new(STDOUT)
       end
       it 'returns :default logger' do
-        logger = Log[:abc]
-        expect(logger).to eq(Log[:default])
+        logger = described_class[:abc]
+        expect(logger).to eq(described_class[:default])
       end
     end
 
     context 'when id is found' do
       before(:example) do
-        Log[:abc] = Logger.new(STDOUT)
+        described_class[:abc] = Logger.new(STDOUT)
       end
       it 'returns id logger' do
-        logger = Log[:abc]
-        expect(logger).to eq(Log[:abc])
+        logger = described_class[:abc]
+        expect(logger).to eq(described_class[:abc])
       end
     end
   end
 
   describe '#debug' do
     before(:example) do
-      Log.close
+      described_class.close
     end
     after(:example) do
-      Log.close
+      described_class.close
     end
 
     it 'logs at level debug' do
       logger = double('logger')
 
-      Log[:default] = logger
+      described_class[:default] = logger
 
       expect(logger).to receive(:debug)
-      Log.debug { 'test debug' }
+      described_class.debug { 'test debug' }
     end
   end
 
   describe '#info' do
     before(:example) do
-      Log.close
+      described_class.close
     end
     after(:example) do
-      Log.close
+      described_class.close
     end
 
     it 'logs at level info' do
       logger = double('info')
 
-      Log[:default] = logger
+      described_class[:default] = logger
 
       expect(logger).to receive(:info)
-      Log.info { 'test' }
+      described_class.info { 'test' }
     end
   end
 
   describe '#warn' do
     before(:example) do
-      Log.close
+      described_class.close
     end
     after(:example) do
-      Log.close
+      described_class.close
     end
 
     it 'logs at level warn' do
       logger = double('warn')
 
-      Log[:default] = logger
+      described_class[:default] = logger
 
       expect(logger).to receive(:warn)
-      Log.warn { 'test' }
+      described_class.warn { 'test' }
     end
   end
 
   describe '#error' do
     before(:example) do
-      Log.close
+      described_class.close
     end
     after(:example) do
-      Log.close
+      described_class.close
     end
 
     it 'logs at level error' do
       logger = double('error')
 
-      Log[:default] = logger
+      described_class[:default] = logger
 
       expect(logger).to receive(:error)
-      Log.error { 'test' }
+      described_class.error { 'test' }
     end
   end
 
   describe '#fatal' do
     before(:example) do
-      Log.close
+      described_class.close
     end
     after(:example) do
-      Log.close
+      described_class.close
     end
 
     it 'logs at level fatal' do
       logger = double('fatal')
 
-      Log[:default] = logger
+      described_class[:default] = logger
 
       expect(logger).to receive(:fatal)
-      Log.fatal { 'test' }
+      described_class.fatal { 'test' }
     end
   end
 
   describe '#close' do
     before(:example) do
-      Log[:default] = Logger.new(STDOUT)
+      described_class[:default] = Logger.new(STDOUT)
     end
 
     it 'loggers are closed' do
-      Log.close
-      expect(Log.loggers.empty?).to eq(true)
+      described_class.close
+      expect(described_class.loggers.empty?).to eq(true)
     end
   end
 end

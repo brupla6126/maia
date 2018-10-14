@@ -1,10 +1,10 @@
 require 'araignee/ai/core/node'
 require 'araignee/ai/core/sorters/sorter_random'
 
-RSpec.describe Ai::Core::Sorters::SorterRandom do
+RSpec.describe Araignee::Ai::Core::Sorters::SorterRandom do
   let(:sorter) { described_class.new }
 
-  let(:nodes) { [Ai::Core::Node.new, Ai::Core::Node.new, Ai::Core::Node.new] }
+  let(:nodes) { (1..3).map { Araignee::Ai::Core::Node.new } }
 
   describe '#sort' do
     subject { sorter.sort(nodes) }

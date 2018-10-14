@@ -1,6 +1,6 @@
 require 'araignee/utils/recorder'
 
-RSpec.describe Recorder do
+RSpec.describe Araignee::Utils::Recorder do
   let(:attributes) { {} }
   let(:recorder) { described_class.new(attributes) }
 

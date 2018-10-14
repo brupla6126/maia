@@ -2,9 +2,9 @@ require 'timecop'
 require 'araignee/utils/repository'
 require 'araignee/utils/semaphore_repository'
 
-RSpec.describe SemaphoreRepository do
-  let(:repository) { Repository.new }
-  let(:semaphores) { SemaphoreRepository.new(repository) }
+RSpec.describe Araignee::Utils::SemaphoreRepository do
+  let(:repository) { Araignee::Utils::Repository.new }
+  let(:semaphores) { described_class.new(repository) }
 
   let(:semaphore) { 'abc' }
   let(:maximum) { 3 }

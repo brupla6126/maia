@@ -1,10 +1,10 @@
 require 'araignee/ai/core/interrogator'
 
-RSpec.describe Ai::Core::Interrogator do
+RSpec.describe Araignee::Ai::Core::Interrogator do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:child) { Ai::Core::Node.new }
+  let(:child) { Araignee::Ai::Core::Node.new }
   let(:interrogator) { described_class.new(child: child) }
 
   subject { interrogator }

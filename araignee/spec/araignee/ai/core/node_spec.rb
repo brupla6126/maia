@@ -1,7 +1,7 @@
 require 'timecop'
 require 'araignee/ai/core/node'
 
-RSpec.describe Ai::Core::Node do
+RSpec.describe Araignee::Ai::Core::Node do
   let(:world) { {}  }
   let(:entity) { {} }
 
@@ -25,7 +25,7 @@ RSpec.describe Ai::Core::Node do
 
     context 'with attributes' do
       let(:identifier) { 'abcdef' }
-      let(:node) { Ai::Core::Node.new(identifier: identifier) }
+      let(:node) { Araignee::Ai::Core::Node.new(identifier: identifier) }
 
       before { subject }
 
@@ -36,7 +36,7 @@ RSpec.describe Ai::Core::Node do
 
     context 'with attributes' do
       let(:identifier) { 'abcdefg' }
-      let(:node) { Ai::Core::Node.new(identifier: identifier) }
+      let(:node) { Araignee::Ai::Core::Node.new(identifier: identifier) }
 
       before { subject }
 
@@ -50,8 +50,8 @@ RSpec.describe Ai::Core::Node do
     subject { super().validate_attributes }
 
     context 'invalid identifier' do
-      let(:identifier) { Ai::Core::Node.new }
-      let(:node) { Ai::Core::Node.new(identifier: identifier) }
+      let(:identifier) { Araignee::Ai::Core::Node.new }
+      let(:node) { Araignee::Ai::Core::Node.new(identifier: identifier) }
 
       it 'raises ArgumentError' do
         expect { subject }.to raise_error(ArgumentError, 'invalid identifier')

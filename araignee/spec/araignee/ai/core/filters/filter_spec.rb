@@ -1,9 +1,9 @@
 require 'araignee/ai/core/node'
 require 'araignee/ai/core/filters/filter'
 
-RSpec.describe Ai::Core::Filters::Filter do
-  let(:node1) { Ai::Core::Node.new }
-  let(:node2) { Ai::Core::Node.new }
+RSpec.describe Araignee::Ai::Core::Filters::Filter do
+  let(:node1) { Araignee::Ai::Core::Node.new }
+  let(:node2) { Araignee::Ai::Core::Node.new }
   let(:nodes) { [node1, node2] }
   let(:filter) { described_class.new }
 

@@ -1,7 +1,7 @@
 require 'timecop'
 require 'araignee/ai/core/wait'
 
-RSpec.describe Ai::Core::Wait do
+RSpec.describe Araignee::Ai::Core::Wait do
   let(:world) { {} }
   let(:entity) { {} }
 
@@ -79,7 +79,7 @@ RSpec.describe Ai::Core::Wait do
     subject { wait.send(:validate_attributes) }
 
     context 'invalid identifier' do
-      let(:identifier) { Ai::Core::Node.new }
+      let(:identifier) { Araignee::Ai::Core::Node.new }
       let(:wait) { described_class.new(identifier: identifier, delay: delay) }
 
       it 'raises ArgumentError' do

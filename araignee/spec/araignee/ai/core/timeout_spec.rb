@@ -1,7 +1,7 @@
 require 'timecop'
 require 'araignee/ai/core/timeout'
 
-RSpec.describe Ai::Core::Timeout do
+RSpec.describe Araignee::Ai::Core::Timeout do
   let(:world) { {} }
   let(:entity) { {} }
 
@@ -69,7 +69,7 @@ RSpec.describe Ai::Core::Timeout do
     subject { timeout.send(:validate_attributes) }
 
     context 'invalid identifier' do
-      let(:identifier) { Ai::Core::Node.new }
+      let(:identifier) { Araignee::Ai::Core::Node.new }
       let(:timeout) { described_class.new(identifier: identifier, delay: delay) }
 
       it 'raises ArgumentError' do

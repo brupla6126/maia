@@ -1,11 +1,11 @@
 require 'araignee/ai/core/failer'
 
-RSpec.describe Ai::Core::Failer do
+RSpec.describe Araignee::Ai::Core::Failer do
   let(:world) { {} }
   let(:entity) { {} }
 
   let(:failer) { described_class.new(child: child) }
-  let(:child) { Ai::Core::Node.new }
+  let(:child) { Araignee::Ai::Core::Node.new }
 
   subject { failer }
 

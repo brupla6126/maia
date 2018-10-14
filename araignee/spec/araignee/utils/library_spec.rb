@@ -16,11 +16,11 @@ RSpec.configure do |config|
   end
 end
 
-RSpec.describe Library do
+RSpec.describe Araignee::Utils::Library do
   describe '#get_container_path' do
     it 'returns path valid' do
       host = '200/123/123/12'
-      ruta = Library.get_container_path(library, host)
+      ruta = described_class.get_container_path(library, host)
       expect(ruta).to eq("#{library}/200/123/123/12")
     end
   end
@@ -28,7 +28,7 @@ RSpec.describe Library do
   describe '#get_file_path' do
     it 'returns file path valid' do
       host = 've/info/avn/www'
-      path = Library.get_file_path(library, host, 'recursos/651210c3bce306b032752b3841210525.zip')
+      path = described_class.get_file_path(library, host, 'recursos/651210c3bce306b032752b3841210525.zip')
 
       expect(path).to eq("#{library}/ve/info/avn/www/recursos/651210c3bce306b032752b3841210525.zip")
     end
@@ -37,7 +37,7 @@ RSpec.describe Library do
   describe '#search' do
     context 'search files not recursively' do
       it 'returns children directories' do
-        Library.search "#{library}/a", false do |_directory, subdirectories|
+        described_class.search "#{library}/a", false do |_directory, subdirectories|
           expect(subdirectories).to include("#{library}/a/b")
           expect(subdirectories).not_to include("#{library}/a/b/c")
           expect(subdirectories).not_to include("#{library}/a/c")
@@ -50,7 +50,7 @@ RSpec.describe Library do
 
     context 'search files recursively' do
       it 'returns children directories of /a' do
-        Library.search "#{library}/a", true do |directory, subdirectories|
+        described_class.search "#{library}/a", true do |directory, subdirectories|
           if directory == "#{library}/a"
             expect(subdirectories).to include("#{library}/a/b")
             expect(subdirectories).not_to include("#{library}/a/b/c")
@@ -63,7 +63,7 @@ RSpec.describe Library do
       end
 
       it 'should have found children directories' do
-        Library.search "#{library}/a", true do |directory, subdirectories|
+        described_class.search "#{library}/a", true do |directory, subdirectories|
           if directory == "#{library}/a/b"
             expect(subdirectories).not_to include("#{library}/a/b")
             expect(subdirectories).to include("#{library}/a/b/c")
@@ -77,7 +77,7 @@ RSpec.describe Library do
       end
 
       it 'should not search excluded directories' do
-        Library.search "#{library}/a", true do |directory, subdirectories|
+        described_class.search "#{library}/a", true do |directory, subdirectories|
           unless ["#{library}/a", "#{library}/a/b"].include? directory
             expect(directory).not_to eq("#{library}/a/b/recursos")
             expect(directory).not_to eq("#{library}/a/b/reportes")

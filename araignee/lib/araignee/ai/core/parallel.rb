@@ -1,67 +1,69 @@
 require 'core/integer'
 require 'araignee/ai/core/composite'
 
-# Module for gathering AI classes
-module Ai
-  module Core
-    # failure policy: how many need to fail to report failure: Integer >= 0, Integer::MAX means all
-    # completion policy: how many need to succeed to report success: Integer >= 0, Integer::MAX means all
-    class Parallel < Composite
-      protected
+module Araignee
+  # Module for gathering AI classes
+  module Ai
+    module Core
+      # failure policy: how many need to fail to report failure: Integer >= 0, Integer::MAX means all
+      # completion policy: how many need to succeed to report success: Integer >= 0, Integer::MAX means all
+      class Parallel < Composite
+        protected
 
-      def default_attributes
-        super().merge(
-          completions: 0, # Integer::MAX means all
-          failures: 0 # Integer::MAX means all
-        )
-      end
-
-      def execute(entity, world)
-        responses = { busy: 0, succeeded: 0, failed: 0 }
-
-        nodes = sort(filter(children), sort_reverse)
-
-        nodes.each do |child|
-          responded = child.process(entity, world).response
-
-          # count responses
-          responses[responded] ||= 0
-          responses[responded] += 1
+        def default_attributes
+          super().merge(
+            completions: 0, # Integer::MAX means all
+            failures: 0 # Integer::MAX means all
+          )
         end
 
-        succeeding =
-          case completions
-          when 0 then false
-          when Integer::MAX then responses[:succeeded] == nodes.size
-          else responses[:succeeded] >= completions
+        def execute(entity, world)
+          responses = { busy: 0, succeeded: 0, failed: 0 }
+
+          nodes = sort(filter(children), sort_reverse)
+
+          nodes.each do |child|
+            responded = child.process(entity, world).response
+
+            # count responses
+            responses[responded] ||= 0
+            responses[responded] += 1
           end
 
-        failing =
-          case failures
-          when 0 then false
-          when Integer::MAX then responses[:failed] == nodes.size
-          else responses[:failed] >= failures
-          end
+          succeeding =
+            case completions
+            when 0 then false
+            when Integer::MAX then responses[:succeeded] == nodes.size
+            else responses[:succeeded] >= completions
+            end
 
-        responded =
-          if succeeding
-            :succeeded
-          elsif failing
-            :failed
-          else
-            :busy
-          end
+          failing =
+            case failures
+            when 0 then false
+            when Integer::MAX then responses[:failed] == nodes.size
+            else responses[:failed] >= failures
+            end
 
-        update_response(responded)
-      end
+          responded =
+            if succeeding
+              :succeeded
+            elsif failing
+              :failed
+            else
+              :busy
+            end
 
-      def validate_attributes
-        super()
+          update_response(responded)
+        end
 
-        raise ArgumentError, 'completions must be >= 0' unless completions >= 0
-        raise ArgumentError, 'failures must be >= 0' unless failures >= 0
+        def validate_attributes
+          super()
 
-        raise ArgumentError, 'completions and failures must not equal' if completions.positive? && completions.equal?(failures)
+          raise ArgumentError, 'completions must be >= 0' unless completions >= 0
+          raise ArgumentError, 'failures must be >= 0' unless failures >= 0
+
+          raise ArgumentError, 'completions and failures must not equal' if completions.positive? && completions.equal?(failures)
+        end
       end
     end
   end

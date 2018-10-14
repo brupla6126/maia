@@ -1,14 +1,14 @@
 require 'araignee/ai/core/interrogator'
 require 'araignee/ai/core/ternary'
 
-RSpec.describe Ai::Core::Ternary do
+RSpec.describe Araignee::Ai::Core::Ternary do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:child) { Ai::Core::Node.new }
-  let(:interrogator) { Ai::Core::Interrogator.new(child: child) }
-  let(:yes) { Ai::Core::NodeSucceeded.new }
-  let(:no) { Ai::Core::NodeFailed.new }
+  let(:child) { Araignee::Ai::Core::Node.new }
+  let(:interrogator) { Araignee::Ai::Core::Interrogator.new(child: child) }
+  let(:yes) { Araignee::Ai::Core::NodeSucceeded.new }
+  let(:no) { Araignee::Ai::Core::NodeFailed.new }
 
   let(:ternary) { described_class.new(interrogator: interrogator, yes: yes, no: no) }
 

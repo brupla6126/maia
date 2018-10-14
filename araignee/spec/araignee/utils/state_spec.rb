@@ -1,9 +1,9 @@
 require 'araignee/utils/state'
 
-RSpec.describe State do
+RSpec.describe Araignee::Utils::State do
   subject { state }
 
-  before { allow(Log).to receive(log_level) }
+  before { allow(Araignee::Utils::Log).to receive(log_level) }
   before { allow(state).to receive(:inspect) { 'abc' } }
 
   after { subject }
@@ -26,7 +26,7 @@ RSpec.describe State do
     it 'calls Log::info' do
       expect(state).to receive(:inspect)
 
-      expect(Log).to receive(log_level) do |&block|
+      expect(Araignee::Utils::Log).to receive(log_level) do |&block|
         expect(block.call).to eq("Entering state #{state.inspect}")
       end
     end
@@ -38,7 +38,7 @@ RSpec.describe State do
     it 'calls Log::info' do
       expect(state).to receive(:inspect)
 
-      expect(Log).to receive(log_level) do |&block|
+      expect(Araignee::Utils::Log).to receive(log_level) do |&block|
         expect(block.call).to eq("Leaving state #{state.inspect}")
       end
     end
@@ -50,7 +50,7 @@ RSpec.describe State do
     it 'calls Log::info' do
       expect(state).to receive(:inspect)
 
-      expect(Log).to receive(log_level) do |&block|
+      expect(Araignee::Utils::Log).to receive(log_level) do |&block|
         expect(block.call).to eq("Pausing state #{state.inspect}")
       end
     end
@@ -62,7 +62,7 @@ RSpec.describe State do
     it 'calls Log::info' do
       expect(state).to receive(:inspect)
 
-      expect(Log).to receive(log_level) do |&block|
+      expect(Araignee::Utils::Log).to receive(log_level) do |&block|
         expect(block.call).to eq("Resuming state #{state.inspect}")
       end
     end

@@ -1,7 +1,7 @@
 require 'araignee/ai/core/composite'
 
-RSpec.describe Ai::Core::Composite do
-  let(:children) { (1..2).map { Ai::Core::Node.new } }
+RSpec.describe Araignee::Ai::Core::Composite do
+  let(:children) { (1..2).map { Araignee::Ai::Core::Node.new } }
   let(:filters) { [] }
   let(:picker) { nil }
   let(:sorter) { nil }
@@ -28,7 +28,7 @@ RSpec.describe Ai::Core::Composite do
     end
 
     context 'with picker' do
-      let(:picker) { Ai::Core::Pickers::Picker.new }
+      let(:picker) { Araignee::Ai::Core::Pickers::Picker.new }
 
       it 'picker is set' do
         expect(subject.picker).to eq(picker)
@@ -36,7 +36,7 @@ RSpec.describe Ai::Core::Composite do
     end
 
     context 'with sorter' do
-      let(:sorter) { Ai::Core::Sorters::Sorter.new }
+      let(:sorter) { Araignee::Ai::Core::Sorters::Sorter.new }
 
       it 'sorter is set' do
         expect(subject.sorter).to eq(sorter)
@@ -45,9 +45,9 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe '#child' do
-    let(:child1) { Ai::Core::Node.new }
-    let(:child2) { Ai::Core::Node.new }
-    let(:child3) { Ai::Core::Node.new(identifier: child1.identifier) }
+    let(:child1) { Araignee::Ai::Core::Node.new }
+    let(:child2) { Araignee::Ai::Core::Node.new }
+    let(:child3) { Araignee::Ai::Core::Node.new(identifier: child1.identifier) }
     let(:children) { [child1, child2, child3] }
 
     let(:child_identifier) { child1.identifier }
@@ -70,7 +70,7 @@ RSpec.describe Ai::Core::Composite do
   describe '#add_child' do
     subject { super().add_child(added_child, index) }
 
-    let(:added_child) { Ai::Core::Node.new }
+    let(:added_child) { Araignee::Ai::Core::Node.new }
     let(:index) { :last }
 
     it 'should have all children' do
@@ -130,7 +130,7 @@ RSpec.describe Ai::Core::Composite do
     subject { composite.remove_child(removed_child) }
 
     context 'known child' do
-      let(:child) { Ai::Core::Node.new }
+      let(:child) { Araignee::Ai::Core::Node.new }
       let(:children) { [child] }
 
       let(:removed_child) { child }
@@ -141,8 +141,8 @@ RSpec.describe Ai::Core::Composite do
     end
 
     context 'unknown child' do
-      let(:child) { Ai::Core::Node.new }
-      let(:unknown) { Ai::Core::Node.new }
+      let(:child) { Araignee::Ai::Core::Node.new }
+      let(:unknown) { Araignee::Ai::Core::Node.new }
       let(:children) { [child] }
 
       let(:removed_child) { unknown }
@@ -202,8 +202,8 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe 'filter' do
-    let(:node_running) { Ai::Core::Node.new }
-    let(:nodes) { [Ai::Core::Node.new, node_running] }
+    let(:node_running) { Araignee::Ai::Core::Node.new }
+    let(:nodes) { [Araignee::Ai::Core::Node.new, node_running] }
     let(:filters) { [] }
 
     subject { super().send(:filter, nodes) }
@@ -216,7 +216,7 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe 'pick_one' do
-    let(:nodes) { [Ai::Core::Node.new, Ai::Core::Node.new] }
+    let(:nodes) { [Araignee::Ai::Core::Node.new, Araignee::Ai::Core::Node.new] }
 
     subject { super().send(:pick_one, nodes) }
 
@@ -227,7 +227,7 @@ RSpec.describe Ai::Core::Composite do
     end
 
     context 'with picker' do
-      let(:picker) { Ai::Core::Pickers::Picker.new }
+      let(:picker) { Araignee::Ai::Core::Pickers::Picker.new }
 
       before { allow(picker).to receive(:pick_one).with(nodes) { nodes[1] } }
 
@@ -245,7 +245,7 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe 'pick_many' do
-    let(:nodes) { [Ai::Core::Node.new, Ai::Core::Node.new] }
+    let(:nodes) { [Araignee::Ai::Core::Node.new, Araignee::Ai::Core::Node.new] }
 
     subject { super().send(:pick_many, nodes) }
 
@@ -256,7 +256,7 @@ RSpec.describe Ai::Core::Composite do
     end
 
     context 'with picker' do
-      let(:picker) { Ai::Core::Pickers::Picker.new }
+      let(:picker) { Araignee::Ai::Core::Pickers::Picker.new }
 
       before { allow(picker).to receive(:pick_many).with(nodes) { nodes.first } }
 
@@ -274,7 +274,7 @@ RSpec.describe Ai::Core::Composite do
   end
 
   describe 'sort' do
-    let(:nodes) { [Ai::Core::Node.new, Ai::Core::Node.new] }
+    let(:nodes) { [Araignee::Ai::Core::Node.new, Araignee::Ai::Core::Node.new] }
     let(:sort_reverse) { false }
 
     subject { super().send(:sort, nodes, sort_reverse) }
@@ -286,7 +286,7 @@ RSpec.describe Ai::Core::Composite do
     end
 
     context 'with sort' do
-      let(:sorter) { Ai::Core::Sorters::Sorter.new }
+      let(:sorter) { Araignee::Ai::Core::Sorters::Sorter.new }
 
       before { allow(sorter).to receive(:sort).with(nodes, sort_reverse) { nodes } }
 

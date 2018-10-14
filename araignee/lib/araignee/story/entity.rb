@@ -1,15 +1,17 @@
 require 'ostruct'
 
-module Story
-  class Entity < OpenStruct
-    def initialize(params)
-      super(defaults.merge(params))
-    end
+module Araignee
+  module Story
+    class Entity < OpenStruct
+      def initialize(params)
+        super(defaults.merge(params))
+      end
 
-    private
+      private
 
-    def defaults
-      {}
+      def defaults
+        {}
+      end
     end
   end
 end

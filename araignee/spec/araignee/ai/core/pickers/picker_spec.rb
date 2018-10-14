@@ -1,10 +1,8 @@
 require 'araignee/ai/core/node'
 require 'araignee/ai/core/pickers/picker'
 
-RSpec.describe Ai::Core::Pickers::Picker do
-  let(:node1) { Ai::Core::Node.new }
-  let(:node2) { Ai::Core::Node.new }
-  let(:nodes) { [node1, node2] }
+RSpec.describe Araignee::Ai::Core::Pickers::Picker do
+  let(:nodes) { (1..3).map { Araignee::Ai::Core::Node.new } }
   let(:picker) { described_class.new }
 
   subject { picker }

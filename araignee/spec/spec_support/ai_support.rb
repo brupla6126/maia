@@ -1,44 +1,46 @@
 require 'araignee/ai/core/node'
 
-module Ai
-  module Core
-    class NodeBusy < Node
-      def execute(_entity, _world)
-        update_response(:busy)
+module Araignee
+  module Ai
+    module Core
+      class NodeBusy < Node
+        def execute(_entity, _world)
+          update_response(:busy)
 
-        self
+          self
+        end
       end
-    end
 
-    class NodeFailed < Node
-      def execute(_entity, _world)
-        update_response(:failed)
+      class NodeFailed < Node
+        def execute(_entity, _world)
+          update_response(:failed)
 
-        self
+          self
+        end
       end
-    end
 
-    class NodeSucceeded < Node
-      def execute(_entity, _world)
-        update_response(:succeeded)
+      class NodeSucceeded < Node
+        def execute(_entity, _world)
+          update_response(:succeeded)
 
-        self
+          self
+        end
       end
-    end
 
-    class InterrogatorFailed < Node
-      def execute(_entity, _world)
-        update_response(:failed)
+      class InterrogatorFailed < Node
+        def execute(_entity, _world)
+          update_response(:failed)
 
-        self
+          self
+        end
       end
-    end
 
-    class InterrogatorSucceeded < Node
-      def execute(_entity, _world)
-        update_response(:succeeded)
+      class InterrogatorSucceeded < Node
+        def execute(_entity, _world)
+          update_response(:succeeded)
 
-        self
+          self
+        end
       end
     end
   end

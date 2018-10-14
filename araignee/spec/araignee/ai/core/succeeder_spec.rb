@@ -1,11 +1,11 @@
 require 'araignee/ai/core/succeeder'
 
-RSpec.describe Ai::Core::Succeeder do
+RSpec.describe Araignee::Ai::Core::Succeeder do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:node_failed) { Ai::Core::Node.new }
-  let(:node_succeeded) { Ai::Core::Node.new }
+  let(:node_failed) { Araignee::Ai::Core::Node.new }
+  let(:node_succeeded) { Araignee::Ai::Core::Node.new }
 
   let(:child) { node_succeeded }
 

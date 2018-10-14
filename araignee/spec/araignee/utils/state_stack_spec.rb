@@ -1,6 +1,6 @@
 require 'araignee/utils/state_stack'
 
-RSpec.describe StateStack do
+RSpec.describe Araignee::Utils::StateStack do
   subject { state_stack }
 
   let(:state_stack) { described_class.new }

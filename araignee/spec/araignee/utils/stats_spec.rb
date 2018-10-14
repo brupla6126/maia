@@ -1,8 +1,8 @@
 require 'araignee/utils/stats'
 
-RSpec.describe Stats do
+RSpec.describe Araignee::Utils::Stats do
   class TestStats
-    include Stats
+    include Araignee::Utils::Stats
 
     attr_reader :stats
   end

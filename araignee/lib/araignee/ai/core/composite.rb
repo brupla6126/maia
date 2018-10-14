@@ -2,85 +2,87 @@ require 'araignee/ai/core/node'
 require 'araignee/ai/core/pickers/picker'
 require 'araignee/ai/core/sorters/sorter'
 
-module Ai
-  module Core
-    # A Composite Node Class, based on the Composite Design Pattern
-    class Composite < Node
-      def child(identifier)
-        children.detect { |child| child.identifier.equal?(identifier) }
-      end
-
-      def add_child(child, index)
-        index ||= :last
-
-        raise ArgumentError, "invalid index: #{index}" unless index.equal?(:last) || index.instance_of?(Integer)
-
-        if index.equal?(:last)
-          children << child
-        else
-          children.insert(index, child)
+module Araignee
+  module Ai
+    module Core
+      # A Composite Node Class, based on the Composite Design Pattern
+      class Composite < Node
+        def child(identifier)
+          children.detect { |child| child.identifier.equal?(identifier) }
         end
 
-        self
-      end
+        def add_child(child, index)
+          index ||= :last
 
-      def remove_child(child)
-        children.delete(child)
+          raise ArgumentError, "invalid index: #{index}" unless index.equal?(:last) || index.instance_of?(Integer)
 
-        self
-      end
+          if index.equal?(:last)
+            children << child
+          else
+            children.insert(index, child)
+          end
 
-      def reset_node
-        super()
+          self
+        end
 
-        # reset children children
-        children.each(&:reset_node)
+        def remove_child(child)
+          children.delete(child)
 
-        picker&.reset
-        sorter&.reset
+          self
+        end
 
-        nil
-      end
+        def reset_node
+          super()
 
-      protected
+          # reset children children
+          children.each(&:reset_node)
 
-      def default_attributes
-        super().merge(
-          children: [], # Ai::Core::Node
-          filters: [],
-          picker: nil, # Ai::Core::Pickers::Picker
-          sorter: nil, # Ai::Core::Sorters::Sorter
-          sort_reverse: false
-        )
-      end
+          picker&.reset
+          sorter&.reset
 
-      def filter(nodes)
-        return nodes if filters.empty? || nodes.empty?
+          nil
+        end
 
-        accepted_nodes = filters.map { |filter| filter.accept(nodes) }.flatten.compact
-        rejected_nodes = filters.map { |filter| filter.reject(nodes) }.flatten.compact
+        protected
 
-        accepted_nodes.uniq - rejected_nodes.uniq
-      end
+        def default_attributes
+          super().merge(
+            children: [], # Ai::Core::Node
+            filters: [],
+            picker: nil, # Ai::Core::Pickers::Picker
+            sorter: nil, # Ai::Core::Sorters::Sorter
+            sort_reverse: false
+          )
+        end
 
-      def pick_one(nodes)
-        return nil unless picker
+        def filter(nodes)
+          return nodes if filters.empty? || nodes.empty?
 
-        picker.pick_one(nodes)
-      end
+          accepted_nodes = filters.map { |filter| filter.accept(nodes) }.flatten.compact
+          rejected_nodes = filters.map { |filter| filter.reject(nodes) }.flatten.compact
 
-      def pick_many(nodes)
-        return nodes unless picker
+          accepted_nodes.uniq - rejected_nodes.uniq
+        end
 
-        picker.pick_many(nodes)
-      end
+        def pick_one(nodes)
+          return nil unless picker
 
-      def sort(nodes, reverse)
-        return nodes unless sorter
+          picker.pick_one(nodes)
+        end
 
-        sorter.sort(nodes, reverse) unless nodes.empty?
+        def pick_many(nodes)
+          return nodes unless picker
 
-        nodes
+          picker.pick_many(nodes)
+        end
+
+        def sort(nodes, reverse)
+          return nodes unless sorter
+
+          sorter.sort(nodes, reverse) unless nodes.empty?
+
+          nodes
+        end
       end
     end
   end

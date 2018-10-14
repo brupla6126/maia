@@ -1,6 +1,6 @@
 require 'araignee/ai/core/pickers/picker_round_robin'
 
-RSpec.describe Ai::Core::Pickers::PickerRoundRobin do
+RSpec.describe Araignee::Ai::Core::Pickers::PickerRoundRobin do
   let(:picker) { described_class.new }
 
   subject { picker }

@@ -1,14 +1,15 @@
 require 'ostruct'
 require 'araignee/architecture/activation'
+require 'araignee/story/entity'
 
-RSpec.describe Architecture::Activation do
-  class Entity < OpenStruct
-    include Architecture::Activation
+RSpec.describe Araignee::Architecture::Activation do
+  class MyEntity < Araignee::Story::Entity
+    include Araignee::Architecture::Activation
   end
 
   subject { entity }
 
-  let(:entity) { Entity.new }
+  let(:entity) { MyEntity.new({}) }
 
   describe '#initialize' do
     context 'with no parameters' do

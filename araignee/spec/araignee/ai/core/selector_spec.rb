@@ -1,6 +1,6 @@
 require 'araignee/ai/core/selector'
 
-RSpec.describe Ai::Core::Selector do
+RSpec.describe Araignee::Ai::Core::Selector do
   let(:world) { {} }
   let(:entity) { {} }
 
@@ -34,7 +34,7 @@ RSpec.describe Ai::Core::Selector do
     end
 
     context 'when :succeeded' do
-      let(:children) { [Ai::Core::NodeSucceeded.new] }
+      let(:children) { [Araignee::Ai::Core::NodeSucceeded.new] }
 
       it 'has succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -42,7 +42,7 @@ RSpec.describe Ai::Core::Selector do
     end
 
     context 'when :failed, :failed, :succeeded' do
-      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new, Ai::Core::NodeSucceeded.new] }
+      let(:children) { [Araignee::Ai::Core::NodeFailed.new, Araignee::Ai::Core::NodeFailed.new, Araignee::Ai::Core::NodeSucceeded.new] }
 
       it 'has succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -50,7 +50,7 @@ RSpec.describe Ai::Core::Selector do
     end
 
     context 'when :failed, :busy' do
-      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeBusy.new] }
+      let(:children) { [Araignee::Ai::Core::NodeFailed.new, Araignee::Ai::Core::NodeBusy.new] }
 
       it 'is busy' do
         expect(subject.busy?).to eq(true)
@@ -58,7 +58,7 @@ RSpec.describe Ai::Core::Selector do
     end
 
     context 'when :failed, :failed' do
-      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeFailed.new] }
+      let(:children) { [Araignee::Ai::Core::NodeFailed.new, Araignee::Ai::Core::NodeFailed.new] }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)

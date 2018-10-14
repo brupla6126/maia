@@ -1,8 +1,8 @@
 require 'araignee/story/validator'
 
-RSpec.describe Story::Validator do
+RSpec.describe Araignee::Story::Validator do
   class MyValidator < described_class
-    def validate_object(_object, context, response)
+    def validate_object(_object, _context, response)
       response.errors = []
     end
   end

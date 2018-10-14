@@ -1,6 +1,6 @@
 require 'araignee/story/request'
 
-RSpec.describe Story::Request do
+RSpec.describe Araignee::Story::Request do
   class MyRequest < described_class
     def allowed
       %i[a b]

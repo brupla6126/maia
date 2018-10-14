@@ -1,6 +1,6 @@
 require 'araignee/ai/core/xor'
 
-RSpec.describe Ai::Core::Xor do
+RSpec.describe Araignee::Ai::Core::Xor do
   let(:world) { {} }
   let(:entity) { {} }
 
@@ -23,7 +23,7 @@ RSpec.describe Ai::Core::Xor do
     subject { super().process(entity, world) }
 
     context 'when responses = [:succeeded]' do
-      let(:children) { [Ai::Core::NodeSucceeded.new] }
+      let(:children) { [Araignee::Ai::Core::NodeSucceeded.new] }
 
       it 'has succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -31,7 +31,7 @@ RSpec.describe Ai::Core::Xor do
     end
 
     context 'when responses = [:succeeded, :succeeded]' do
-      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeSucceeded.new] }
+      let(:children) { [Araignee::Ai::Core::NodeSucceeded.new, Araignee::Ai::Core::NodeSucceeded.new] }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)
@@ -39,7 +39,7 @@ RSpec.describe Ai::Core::Xor do
     end
 
     context 'when responses = [:failed]' do
-      let(:children) { [Ai::Core::NodeFailed.new] }
+      let(:children) { [Araignee::Ai::Core::NodeFailed.new] }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)
@@ -47,7 +47,7 @@ RSpec.describe Ai::Core::Xor do
     end
 
     context 'when responses = [:failed, :succeeded, :busy]' do
-      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeSucceeded.new, Ai::Core::NodeBusy.new] }
+      let(:children) { [Araignee::Ai::Core::NodeFailed.new, Araignee::Ai::Core::NodeSucceeded.new, Araignee::Ai::Core::NodeBusy.new] }
 
       it 'is busy' do
         expect(subject.busy?).to eq(true)

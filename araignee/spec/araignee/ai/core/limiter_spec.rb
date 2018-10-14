@@ -1,15 +1,15 @@
 require 'araignee/ai/core/limiter'
 
-RSpec.describe Ai::Core::Limiter do
+RSpec.describe Araignee::Ai::Core::Limiter do
   let(:world) { {} }
   let(:entity) { {} }
 
   let(:limit) { nil }
   let(:limiter) { described_class.new(child: child, limit: limit) }
 
-  let(:node_busy) { Ai::Core::NodeBusy.new }
-  let(:node_failed) { Ai::Core::NodeFailed.new }
-  let(:node_succeeded) { Ai::Core::NodeSucceeded.new }
+  let(:node_busy) { Araignee::Ai::Core::NodeBusy.new }
+  let(:node_failed) { Araignee::Ai::Core::NodeFailed.new }
+  let(:node_succeeded) { Araignee::Ai::Core::NodeSucceeded.new }
 
   let(:child) { node_succeeded }
 
@@ -33,7 +33,7 @@ RSpec.describe Ai::Core::Limiter do
     end
 
     context 'with attributes' do
-      let(:node) { Ai::Core::Wait.new(limit: limit) }
+      let(:node) { Araignee::Ai::Core::Wait.new(limit: limit) }
 
       it 'sets limit' do
         expect(subject.limit).to eq(limit)

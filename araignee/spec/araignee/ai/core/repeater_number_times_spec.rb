@@ -1,12 +1,12 @@
 require 'araignee/ai/core/wait'
 require 'araignee/ai/core/repeater_number_times'
 
-RSpec.describe Ai::Core::RepeaterNumberTimes do
+RSpec.describe Araignee::Ai::Core::RepeaterNumberTimes do
   let(:world) { {} }
   let(:entity) { {} }
 
   let(:times) { 5 }
-  let(:child) { Ai::Core::Wait.new(delay: 200) }
+  let(:child) { Araignee::Ai::Core::Wait.new(delay: 200) }
   let(:repeater) { described_class.new(child: child, times: times) }
 
   subject { repeater }

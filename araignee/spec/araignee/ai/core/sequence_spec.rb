@@ -1,6 +1,6 @@
 require 'araignee/ai/core/sequence'
 
-RSpec.describe Ai::Core::Sequence do
+RSpec.describe Araignee::Ai::Core::Sequence do
   let(:world) { {} }
   let(:entity) { {} }
 
@@ -22,7 +22,7 @@ RSpec.describe Ai::Core::Sequence do
   describe '#process' do
     subject { super().process(entity, world) }
 
-    let(:children) { [Ai::Core::NodeSucceeded.new] }
+    let(:children) { [Araignee::Ai::Core::NodeSucceeded.new] }
 
     context 'calling #prepare_nodes' do
       before { allow(sequence).to receive(:prepare_nodes).with(children, sort_reversed) { children } }
@@ -36,7 +36,7 @@ RSpec.describe Ai::Core::Sequence do
     end
 
     context 'when children = [:succeeded, :succeeded]' do
-      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeSucceeded.new] }
+      let(:children) { [Araignee::Ai::Core::NodeSucceeded.new, Araignee::Ai::Core::NodeSucceeded.new] }
 
       it 'should have succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -44,7 +44,7 @@ RSpec.describe Ai::Core::Sequence do
     end
 
     context 'when children = [:succeeded, :busy, :succeeded]' do
-      let(:children) { [Ai::Core::NodeSucceeded.new, Ai::Core::NodeBusy.new, Ai::Core::NodeSucceeded.new] }
+      let(:children) { [Araignee::Ai::Core::NodeSucceeded.new, Araignee::Ai::Core::NodeBusy.new, Araignee::Ai::Core::NodeSucceeded.new] }
 
       it 'should be busy' do
         expect(subject.busy?).to eq(true)
@@ -52,7 +52,7 @@ RSpec.describe Ai::Core::Sequence do
     end
 
     context 'when children = [:failed, :succeeded]' do
-      let(:children) { [Ai::Core::NodeFailed.new, Ai::Core::NodeSucceeded.new] }
+      let(:children) { [Araignee::Ai::Core::NodeFailed.new, Araignee::Ai::Core::NodeSucceeded.new] }
 
       it 'should have failed' do
         expect(subject.failed?).to eq(true)

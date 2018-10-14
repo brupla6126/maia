@@ -1,40 +1,44 @@
 require 'araignee/utils/state'
 
-# To represent a stack of states
-class StateStack
-  attr_reader :states
+module Araignee
+  module Utils
+    # To represent a stack of states
+    class StateStack
+      attr_reader :states
 
-  def initialize
-    @states = []
-  end
+      def initialize
+        @states = []
+      end
 
-  def current
-    states.last
-  end
+      def current
+        states.last
+      end
 
-  def push(state)
-    current&.pause
+      def push(state)
+        current&.pause
 
-    states.push(state)
+        states.push(state)
 
-    state.enter
-  end
+        state.enter
+      end
 
-  def pop
-    current&.leave
+      def pop
+        current&.leave
 
-    states.pop
+        states.pop
 
-    current&.resume
-  end
+        current&.resume
+      end
 
-  def pop_until(state)
-    return unless states.include?(state)
+      def pop_until(state)
+        return unless states.include?(state)
 
-    loop do
-      break if current.equal?(state)
+        loop do
+          break if current.equal?(state)
 
-      pop
+          pop
+        end
+      end
     end
   end
 end
