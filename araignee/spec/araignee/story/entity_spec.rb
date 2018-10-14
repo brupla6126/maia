@@ -1,6 +1,6 @@
-require 'araignee/architecture/entity'
+require 'araignee/story/entity'
 
-RSpec.describe Architecture::Entity do
+RSpec.describe Story::Entity do
   subject { entity }
 
   let!(:entity) { described_class.new(attributes) }
