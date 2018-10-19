@@ -20,7 +20,7 @@ module Araignee
         def execute(entity, world)
           responses = { busy: 0, succeeded: 0, failed: 0 }
 
-          nodes = sort(filter(children), sort_reverse)
+          nodes = sort(filter(children), sort_reversed)
 
           nodes.each do |child|
             responded = child.process(entity, world).response

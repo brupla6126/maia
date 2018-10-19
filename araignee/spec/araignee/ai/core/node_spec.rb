@@ -100,35 +100,15 @@ RSpec.describe Araignee::Ai::Core::Node do
     end
   end
 
-  describe '#reset_node' do
-    subject { node.reset_node }
+  describe '#reset' do
+    subject { node.reset }
 
-    before { node.start! }
+    before { node.response = :busy }
 
     it 'resets response to default value' do
       subject
 
       expect(node.response).to eq(:unknown)
-    end
-  end
-
-  describe 'update_response' do
-    context 'invalid response' do
-      it 'raises ArgumentError' do
-        expect { subject.send(:update_response, nil) }.to raise_error(ArgumentError, 'invalid response: ')
-        expect { subject.send(:update_response, :done) }.to raise_error(ArgumentError, 'invalid response: done')
-      end
-    end
-
-    context 'valid response' do
-      let(:responses) { %i[busy failed succeeded] }
-
-      it 'updates response' do
-        responses.each do |response|
-          expect { subject.send(:update_response, response) }.not_to raise_error
-          expect(subject.response).to eq(response)
-        end
-      end
     end
   end
 end

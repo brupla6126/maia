@@ -33,8 +33,10 @@ module Araignee
           response.equal?(:succeeded)
         end
 
-        def reset_node
+        def reset
           reset_attribute(:response)
+
+          self
         end
 
         def validate_attributes

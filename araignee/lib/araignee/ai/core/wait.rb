@@ -7,10 +7,12 @@ module Araignee
       # The Wait node response is set to :succeeded after a certain
       # amount of time has passed. Meanwhile it is set to :busy
       class Wait < Node
-        def reset_node
+        def reset
           super()
 
           reset_attribute(:start_time)
+
+          self
         end
 
         protected

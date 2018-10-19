@@ -52,8 +52,8 @@ RSpec.describe Araignee::Ai::Core::Wait do
     end
   end
 
-  describe 'reset_node' do
-    subject { wait.reset_node }
+  describe 'reset' do
+    subject { super().reset }
 
     context 'reset_attribute' do
       it 'calls reset_attribute' do

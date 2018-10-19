@@ -22,6 +22,14 @@ module Araignee
           update_response(handle_response(responded))
         end
 
+        def reset
+          super()
+
+          reset_attribute(:times)
+
+          self
+        end
+
         protected
 
         def default_attributes
@@ -35,12 +43,6 @@ module Araignee
           return responded if %i[busy failed].include?(responded)
 
           :succeeded
-        end
-
-        def reset_node
-          super()
-
-          reset_attribute(:times)
         end
 
         def validate_attributes

@@ -7,16 +7,8 @@ RSpec.describe Araignee::Ai::Core::Pickers::Picker do
 
   subject { picker }
 
-  describe 'pick_one' do
-    subject { super().pick_one(nodes) }
-
-    it 'returns nil' do
-      expect(subject).to eq(nil)
-    end
-  end
-
-  describe 'pick_many' do
-    subject { super().pick_many(nodes) }
+  describe 'pick' do
+    subject { super().pick(nodes) }
 
     it 'returns all nodes' do
       expect(subject).to eq(nodes)

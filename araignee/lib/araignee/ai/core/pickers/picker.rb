@@ -13,11 +13,8 @@ module Araignee
             super(default_attributes.merge(state))
           end
 
-          # default behavior is to return nil
-          def pick_one(_nodes); end
-
           # default behavior is to return all nodes
-          def pick_many(nodes)
+          def pick(nodes)
             nodes
           end
 

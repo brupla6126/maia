@@ -11,8 +11,6 @@ module Araignee
         def execute(entity, world)
           responses = initialize_responses
 
-          nodes = prepare_nodes(children)
-
           nodes.each do |child|
             respond(responses, child.process(entity, world).response)
 
@@ -24,10 +22,6 @@ module Araignee
 
         def initialize_responses
           { busy: 0, failed: 0, succeeded: 0 }
-        end
-
-        def prepare_nodes(nodes)
-          filter(nodes)
         end
 
         def respond(responses, responded)

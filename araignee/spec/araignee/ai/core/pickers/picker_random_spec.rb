@@ -6,37 +6,8 @@ RSpec.describe Araignee::Ai::Core::Pickers::PickerRandom do
 
   let(:nodes) { (1..3).map { Araignee::Ai::Core::Node.new } }
 
-  describe '#pick_one' do
-    subject { picker.pick_one(nodes) }
-
-    it 'does not return nil' do
-      expect(subject).not_to eq(nil)
-    end
-
-    it 'does not return nodes' do
-      expect(subject).not_to eq(nodes)
-    end
-
-    context 'with nodes empty' do
-      let(:nodes) { [] }
-
-      it 'return nil' do
-        expect(subject).to eq(nil)
-      end
-    end
-
-    context 'calling nodes#sample' do
-      before { allow(nodes).to receive(:sample) }
-
-      it 'calls nodes#sample' do
-        expect(nodes).to receive(:sample)
-        subject
-      end
-    end
-  end
-
-  describe '#pick_many' do
-    subject { picker.pick_many(nodes) }
+  describe '#pick' do
+    subject { picker.pick(nodes) }
 
     context 'with nodes empty' do
       let(:nodes) { [] }

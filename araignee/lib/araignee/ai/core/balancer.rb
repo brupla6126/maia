@@ -13,9 +13,9 @@ module Araignee
         def execute(entity, world)
           responded = :failed
 
-          node = pick_one(filter(children))
-
-          responded = node.process(entity, world).response if node
+          nodes.each do |node|
+            responded = node.process(entity, world).response
+          end
 
           update_response(handle_response(responded))
         end

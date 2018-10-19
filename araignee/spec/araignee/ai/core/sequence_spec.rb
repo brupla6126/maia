@@ -24,17 +24,6 @@ RSpec.describe Araignee::Ai::Core::Sequence do
 
     let(:children) { [Araignee::Ai::Core::NodeSucceeded.new] }
 
-    context 'calling #prepare_nodes' do
-      before { allow(sequence).to receive(:prepare_nodes).with(children, sort_reversed) { children } }
-
-      let(:sort_reversed) { false }
-
-      it 'calls #prepare_nodes' do
-        expect(sequence).to receive(:prepare_nodes).with(children, sort_reversed)
-        subject
-      end
-    end
-
     context 'when children = [:succeeded, :succeeded]' do
       let(:children) { [Araignee::Ai::Core::NodeSucceeded.new, Araignee::Ai::Core::NodeSucceeded.new] }
 
@@ -57,30 +46,6 @@ RSpec.describe Araignee::Ai::Core::Sequence do
       it 'should have failed' do
         expect(subject.failed?).to eq(true)
       end
-    end
-  end
-
-  describe 'prepare_nodes' do
-    subject { super().send(:prepare_nodes, nodes, sort_reversed) }
-
-    let(:nodes) { [] }
-    let(:sort_reversed) { false }
-
-    context 'calling #filter and #sort' do
-      before { allow(sequence).to receive(:filter).with(children) { children } }
-      before { allow(sequence).to receive(:sort).with(children, sort_reversed) { children } }
-
-      let(:sort_reversed) { false }
-
-      it 'calls #filter and #sort' do
-        expect(sequence).to receive(:filter).with(children)
-        expect(sequence).to receive(:sort).with(children, sort_reversed)
-        subject
-      end
-    end
-
-    it '' do
-      expect(subject).to eq(nodes)
     end
   end
 end

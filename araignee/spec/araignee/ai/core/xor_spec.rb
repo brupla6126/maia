@@ -54,26 +54,4 @@ RSpec.describe Araignee::Ai::Core::Xor do
       end
     end
   end
-
-  describe 'prepare_nodes' do
-    subject { super().send(:prepare_nodes, nodes) }
-
-    let(:nodes) { [] }
-    let(:sort_reversed) { false }
-
-    context 'calling #filter' do
-      before { allow(xor).to receive(:filter).with(children) { children } }
-
-      let(:sort_reversed) { false }
-
-      it 'calls #filter' do
-        expect(xor).to receive(:filter).with(children)
-        subject
-      end
-    end
-
-    it '' do
-      expect(subject).to eq(nodes)
-    end
-  end
 end

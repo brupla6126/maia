@@ -9,13 +9,8 @@ module Araignee
       module Pickers
         # Picks node(s) randomly
         class PickerRandom < Picker
-          # pick a node at random
-          def pick_one(nodes)
-            nodes.sample
-          end
-
           # pick many nodes at random
-          def pick_many(nodes)
+          def pick(nodes)
             return nodes if nodes.empty?
 
             nodes.shuffle[0...Random.rand(nodes.count)]

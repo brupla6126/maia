@@ -31,27 +31,31 @@ module Araignee
           self
         end
 
-        def reset_node
+        def reset
           super()
 
           # reset children children
-          children.each(&:reset_node)
+          children.each(&:reset)
 
           picker&.reset
           sorter&.reset
 
-          nil
+          self
+        end
+
+        def nodes
+          sort(pick(filter(children)), sort_reversed)
         end
 
         protected
 
         def default_attributes
           super().merge(
-            children: [], # Ai::Core::Node
+            children: [], # Ai::Core::Node derived
             filters: [],
-            picker: nil, # Ai::Core::Pickers::Picker
-            sorter: nil, # Ai::Core::Sorters::Sorter
-            sort_reverse: false
+            picker: nil, # Ai::Core::Pickers::Picker derived
+            sorter: nil, # Ai::Core::Sorters::Sorter derived
+            sort_reversed: false
           )
         end
 
@@ -61,27 +65,23 @@ module Araignee
           accepted_nodes = filters.map { |filter| filter.accept(nodes) }.flatten.compact
           rejected_nodes = filters.map { |filter| filter.reject(nodes) }.flatten.compact
 
-          accepted_nodes.uniq - rejected_nodes.uniq
+          (accepted_nodes - rejected_nodes).uniq
         end
 
-        def pick_one(nodes)
-          return nil unless picker
-
-          picker.pick_one(nodes)
-        end
-
-        def pick_many(nodes)
+        def pick(nodes)
           return nodes unless picker
 
-          picker.pick_many(nodes)
+          picker.pick(nodes)
         end
 
-        def sort(nodes, reverse)
+        def sort(nodes, reversed)
           return nodes unless sorter
 
-          sorter.sort(nodes, reverse) unless nodes.empty?
-
-          nodes
+          if nodes.empty?
+            nodes
+          else
+            sorter.sort(nodes, reversed)
+          end
         end
       end
     end

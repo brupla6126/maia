@@ -11,8 +11,12 @@ module Araignee
           update_response(handle_response)
         end
 
-        def reset_node
+        def reset
+          super()
+
           reset_attribute(:start_time)
+
+          self
         end
 
         protected

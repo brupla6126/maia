@@ -17,8 +17,6 @@ module Araignee
         def execute(entity, world)
           responses = initialize_responses
 
-          nodes = prepare_nodes(children, sort_reverse)
-
           nodes.each do |node|
             respond(responses, node.process(entity, world).response)
           end
@@ -28,10 +26,6 @@ module Araignee
 
         def initialize_responses
           { busy: 0, failed: 0, succeeded: 0 }
-        end
-
-        def prepare_nodes(nodes, sort_reversed)
-          sort(filter(nodes), sort_reversed)
         end
 
         def respond(responses, responded)

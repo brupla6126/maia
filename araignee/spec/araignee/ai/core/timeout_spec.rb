@@ -48,8 +48,8 @@ RSpec.describe Araignee::Ai::Core::Timeout do
     end
   end
 
-  describe '#reset_node' do
-    subject { super().reset_node }
+  describe '#reset' do
+    subject { super().reset }
 
     context '' do
       let(:now) { Time.local(2017, 5, 12) }

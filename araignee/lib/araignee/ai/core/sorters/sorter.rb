@@ -7,7 +7,9 @@ module Araignee
         # A Sorter derived class will sort node(s) its own way.
         class Sorter
           # default behavior is to return nodes as received
-          def sort(nodes, _reverse = false)
+          def sort(nodes, reverse = false)
+            return nodes.reverse if reverse
+
             nodes
           end
 

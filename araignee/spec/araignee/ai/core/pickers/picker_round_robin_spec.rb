@@ -13,20 +13,20 @@ RSpec.describe Araignee::Ai::Core::Pickers::PickerRoundRobin do
     end
   end
 
-  describe '#pick_one' do
+  describe '#pick' do
     it 'returns appropriate node' do
-      expect(subject.pick_one(nodes)).to eq(nodes[0])
-      expect(subject.pick_one(nodes)).to eq(nodes[1])
-      expect(subject.pick_one(nodes)).to eq(nodes[2])
-      expect(subject.pick_one(nodes)).to eq(nodes[3])
-      expect(subject.pick_one(nodes)).to eq(nodes[0])
+      expect(subject.pick(nodes)).to eq([nodes[0]])
+      expect(subject.pick(nodes)).to eq([nodes[1]])
+      expect(subject.pick(nodes)).to eq([nodes[2]])
+      expect(subject.pick(nodes)).to eq([nodes[3]])
+      expect(subject.pick(nodes)).to eq([nodes[0]])
     end
   end
 
   describe 'reset' do
     subject { super().reset }
 
-    before { picker.pick_one(nodes) }
+    before { picker.pick(nodes) }
 
     it 'resets current to 0' do
       subject

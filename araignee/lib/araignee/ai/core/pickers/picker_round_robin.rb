@@ -10,16 +10,18 @@ module Araignee
         # Picks node(s) in round robin fashion
         class PickerRoundRobin < Picker
           # pick a node round robin fashion
-          def pick_one(nodes)
+          def pick(nodes)
             node = nodes[current]
 
             self.current = current == nodes.count - 1 ? 0 : current + 1
 
-            node
+            [node]
           end
 
           def reset
             reset_attribute(:current)
+
+            self
           end
 
           protected

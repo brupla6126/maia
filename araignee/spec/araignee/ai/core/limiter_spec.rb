@@ -4,7 +4,7 @@ RSpec.describe Araignee::Ai::Core::Limiter do
   let(:world) { {} }
   let(:entity) { {} }
 
-  let(:limit) { nil }
+  let(:limit) { 5 }
   let(:limiter) { described_class.new(child: child, limit: limit) }
 
   let(:node_busy) { Araignee::Ai::Core::NodeBusy.new }
@@ -81,83 +81,77 @@ RSpec.describe Araignee::Ai::Core::Limiter do
         expect(subject.succeeded?).to eq(true)
       end
     end
-  end
 
-  describe 'reset_node' do
-    subject { limiter.send(:reset_node) }
+    context 'child response handling' do
+      let(:response) { nil }
 
-    context 'calling reset_attribute' do
-      before { allow(limiter).to receive(:reset_attribute) }
+      before { allow(child).to receive(:response) { response } }
 
-      it 'calls reset_attribute' do
-        expect(limiter).to receive(:reset_attribute).with(:times)
-        expect(limiter).to receive(:reset_attribute).with(:response)
-        subject
+      context 'busy' do
+        let(:response) { :busy }
+
+        it 'returns :busy' do
+          expect(subject.response).to eq(:busy)
+        end
       end
-    end
 
-    context '' do
-      it 'resets times' do
-        expect(limiter.limit).to eq(limit)
-        expect(limiter.response).to eq(:unknown)
+      context 'failed' do
+        let(:response) { :failed }
+
+        it 'returns :failed' do
+          expect(subject.response).to eq(:failed)
+        end
       end
-    end
-  end
 
-  describe 'validates attributes' do
-    subject { limiter.send(:validate_attributes) }
+      context 'unknown' do
+        let(:response) { :unknown }
 
-    context 'invalid child' do
-      let(:child) { nil }
-
-      it 'raises ArgumentError, invalid decorated child' do
-        expect { subject }.to raise_error(ArgumentError, 'invalid decorated child')
-      end
-    end
-
-    context 'invalid limit' do
-      let(:limit) { 0 }
-      let(:limiter) { described_class.new(child: child, limit: limit) }
-
-      it 'raises ArgumentError, limit must be > 0' do
-        expect { subject }.to raise_error(ArgumentError, 'limit must be > 0')
-      end
-    end
-
-    context 'valid limit' do
-      let(:limit) { 3 }
-
-      it 'does not raise ArgumentError' do
-        expect { subject }.not_to raise_error
+        it 'returns :succeeded' do
+          expect(subject.response).to eq(:succeeded)
+        end
       end
     end
   end
 
-  describe 'handle_response' do
-    subject { limiter.send(:handle_response, response) }
+  describe 'reset' do
+    subject { super().reset }
 
-    context 'busy' do
-      let(:response) { :busy }
-
-      it 'returns :busy' do
-        expect(subject).to eq(:busy)
-      end
+    before do
+      limiter.times = 1000
+      limiter.response = :busy
     end
 
-    context 'failed' do
-      let(:response) { :failed }
-
-      it 'returns :failed' do
-        expect(subject).to eq(:failed)
-      end
-    end
-
-    context 'unknown' do
-      let(:response) { :unknown }
-
-      it 'returns :succeeded' do
-        expect(subject).to eq(:succeeded)
-      end
+    it 'resets attributes' do
+      expect(subject.times).to eq(0)
+      expect(subject.response).to eq(:unknown)
     end
   end
+  #   describe 'validates attributes' do
+  #     subject { limiter.send(:validate_attributes) }
+  #
+  #     context 'invalid child' do
+  #       let(:child) { nil }
+  #
+  #       it 'raises ArgumentError, invalid decorated child' do
+  #         expect { subject }.to raise_error(ArgumentError, 'invalid decorated child')
+  #       end
+  #     end
+  #
+  #     context 'invalid limit' do
+  #       let(:limit) { 0 }
+  #       let(:limiter) { described_class.new(child: child, limit: limit) }
+  #
+  #       it 'raises ArgumentError, limit must be > 0' do
+  #         expect { subject }.to raise_error(ArgumentError, 'limit must be > 0')
+  #       end
+  #     end
+  #
+  #     context 'valid limit' do
+  #       let(:limit) { 3 }
+  #
+  #       it 'does not raise ArgumentError' do
+  #         expect { subject }.not_to raise_error
+  #       end
+  #     end
+  #   end
 end
