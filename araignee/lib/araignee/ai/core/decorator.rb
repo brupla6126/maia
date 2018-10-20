@@ -13,10 +13,6 @@ module Araignee
             child: nil
           )
         end
-
-        def validate_attributes
-          raise ArgumentError, 'invalid decorated child' unless child
-        end
       end
     end
   end

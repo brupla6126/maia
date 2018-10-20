@@ -46,6 +46,22 @@ RSpec.describe Araignee::Ai::Core::Timeout do
         end
       end
     end
+
+    context 'invalid delay' do
+      let(:delay) { 0 }
+
+      it 'raises ArgumentError delay must be > 0' do
+        expect { subject }.to raise_error(ArgumentError, 'delay must be > 0')
+      end
+    end
+
+    context 'valid delay' do
+      let(:delay) { 3 }
+
+      it 'does not raise ArgumentError' do
+        expect { subject }.not_to raise_error
+      end
+    end
   end
 
   describe '#reset' do
@@ -61,35 +77,6 @@ RSpec.describe Araignee::Ai::Core::Timeout do
         subject
         expect(timeout.start_time).to eq(now)
         expect(timeout.response).to eq(:unknown)
-      end
-    end
-  end
-
-  context 'validates attributes' do
-    subject { timeout.send(:validate_attributes) }
-
-    context 'invalid identifier' do
-      let(:identifier) { Araignee::Ai::Core::Node.new }
-      let(:timeout) { described_class.new(identifier: identifier, delay: delay) }
-
-      it 'raises ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, 'invalid identifier')
-      end
-    end
-
-    context 'invalid delay' do
-      let(:delay) { 0 }
-
-      it 'raises ArgumentError delay must be > 0' do
-        expect { subject }.to raise_error(ArgumentError, 'delay must be > 0')
-      end
-    end
-
-    context 'valid delay' do
-      let(:delay) { 3 }
-
-      it 'does not raise ArgumentError' do
-        expect { subject }.not_to raise_error
       end
     end
   end

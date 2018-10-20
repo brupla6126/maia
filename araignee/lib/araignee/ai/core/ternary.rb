@@ -9,14 +9,6 @@ module Araignee
       # the no node. It will return the response from the yes or
       # no node.
       class Ternary < Node
-        def execute(entity, world)
-          executing_node = execute_node(interrogator.process(entity, world).response)
-
-          responded = executing_node.process(entity, world).response
-
-          update_response(handle_response(responded))
-        end
-
         protected
 
         def default_attributes
@@ -25,6 +17,14 @@ module Araignee
             yes: nil, # Ai::Core::Node
             no: nil # Ai::Core::Node
           )
+        end
+
+        def execute(entity, world)
+          executing_node = execute_node(interrogator.process(entity, world).response)
+
+          responded = executing_node.process(entity, world).response
+
+          update_response(handle_response(responded))
         end
 
         def execute_node(interrogator_response)

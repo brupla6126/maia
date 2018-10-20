@@ -8,6 +8,8 @@ module Araignee
       # That is until the child finally returns a success, at which point the
       # repeater will return success to its parent.
       class RepeaterUntilSuccess < Repeater
+        protected
+
         def repeat(child, entity, world)
           loop do
             break if child.process(entity, world).succeeded?

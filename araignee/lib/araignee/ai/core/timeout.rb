@@ -7,10 +7,6 @@ module Araignee
       # The Timeout node return a response :failed after a certain
       # amount of time has passed.
       class Timeout < Node
-        def execute(_entity, _world)
-          update_response(handle_response)
-        end
-
         def reset
           super()
 
@@ -28,18 +24,18 @@ module Araignee
           )
         end
 
+        def execute(_entity, _world)
+          raise ArgumentError, 'delay must be > 0' unless delay.positive?
+
+          update_response(handle_response)
+        end
+
         def handle_response
           if Time.now - start_time > delay
             :failed
           else
             :busy
           end
-        end
-
-        def validate_attributes
-          super()
-
-          raise ArgumentError, 'delay must be > 0' unless delay.positive?
         end
       end
     end

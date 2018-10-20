@@ -5,57 +5,22 @@ RSpec.describe Araignee::Ai::Core::Node do
   let(:world) { {}  }
   let(:entity) { {} }
 
-  let(:node) { described_class.new }
+  let(:attributes) { {} }
+
+  let(:node) { described_class.new(attributes) }
 
   subject { node }
 
   describe '#initialize' do
-    let(:secure_random_hex) { 'abcdef' }
+    let(:identifier) { 'abcdef' }
+    let(:attributes) { { identifier: identifier } }
 
-    before { allow(SecureRandom).to receive(:hex) { secure_random_hex } }
+    it 'sets identifier' do
+      expect(subject.identifier).to eq(identifier)
+    end
 
     it 'sets response to :unknown' do
-      expect(node.response).to eq(:unknown)
-    end
-
-    it 'sets identifier from SecureRandom.hex' do
-      expect(SecureRandom).to receive(:hex)
-      expect(node.identifier).to eq(secure_random_hex)
-    end
-
-    context 'with attributes' do
-      let(:identifier) { 'abcdef' }
-      let(:node) { Araignee::Ai::Core::Node.new(identifier: identifier) }
-
-      before { subject }
-
-      it 'sets identifier' do
-        expect(node.identifier).to eq(identifier)
-      end
-    end
-
-    context 'with attributes' do
-      let(:identifier) { 'abcdefg' }
-      let(:node) { Araignee::Ai::Core::Node.new(identifier: identifier) }
-
-      before { subject }
-
-      it 'sets identifier' do
-        expect(node.identifier).to eq(identifier)
-      end
-    end
-  end
-
-  describe 'validate_attributes' do
-    subject { super().validate_attributes }
-
-    context 'invalid identifier' do
-      let(:identifier) { Araignee::Ai::Core::Node.new }
-      let(:node) { Araignee::Ai::Core::Node.new(identifier: identifier) }
-
-      it 'raises ArgumentError' do
-        expect { subject }.to raise_error(ArgumentError, 'invalid identifier')
-      end
+      expect(subject.response).to eq(:unknown)
     end
   end
 
@@ -68,8 +33,10 @@ RSpec.describe Araignee::Ai::Core::Node do
       expect(subject).to eq(node)
     end
 
-    it 'calls execute with entity and world' do
+    it 'calls execute with entity, world and emits processing events' do
+      expect(node).to receive(:emit).with(:ai_node_processing, node)
       expect(node).to receive(:execute).with(entity, world)
+      expect(node).to receive(:emit).with(:ai_node_processed, node)
       subject
     end
   end

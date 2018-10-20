@@ -9,19 +9,6 @@ module Araignee
       # i.e., after a certain number of calls, its child will never
       # be called again unless the Limiter is restarted.
       class Limiter < Decorator
-        def execute(entity, world)
-          self.times += 1
-
-          responded =
-            if times <= limit
-              child.process(entity, world).response
-            else
-              :failed
-            end
-
-          update_response(handle_response(responded))
-        end
-
         def reset
           super()
 
@@ -39,16 +26,25 @@ module Araignee
           )
         end
 
+        def execute(entity, world)
+          raise ArgumentError, 'limit must be > 0' unless limit.positive?
+
+          self.times += 1
+
+          responded =
+            if times <= limit
+              child.process(entity, world).response
+            else
+              :failed
+            end
+
+          update_response(handle_response(responded))
+        end
+
         def handle_response(responded)
           return responded if %i[busy failed].include?(responded)
 
           :succeeded
-        end
-
-        def validate_attributes
-          super()
-
-          raise ArgumentError, 'limit must be > 0' unless limit.positive?
         end
       end
     end

@@ -7,13 +7,13 @@ module Araignee
       # Inverter will invert or negate the result of their child node.
       # Response :succeeded becomes :failed, and :failed becomes :succeeded.
       class Inverter < Decorator
+        protected
+
         def execute(entity, world)
           responded = child.process(entity, world).response
 
           update_response(handle_response(responded))
         end
-
-        protected
 
         def handle_response(responded)
           case responded
