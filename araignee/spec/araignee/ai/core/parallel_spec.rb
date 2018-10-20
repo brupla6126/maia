@@ -134,10 +134,6 @@ RSpec.describe Araignee::Ai::Core::Parallel do
         expect(subject.failed?).to eq(true)
       end
     end
-  end
-
-  describe 'validates attributes' do
-    subject { super().send(:validate_attributes) }
 
     context 'when completions is invalid' do
       let(:completions) { -2 }

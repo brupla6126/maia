@@ -15,8 +15,6 @@ module Araignee
           update_response(handle_response(responded))
         end
 
-        private
-
         # return :succeeded or :failed
         def handle_response(responded)
           return :failed unless responded.equal?(:succeeded)

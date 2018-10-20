@@ -1,5 +1,4 @@
 require 'ostruct'
-require 'securerandom'
 require 'araignee/utils/emitter'
 
 module Araignee
@@ -11,12 +10,14 @@ module Araignee
 
         def initialize(state = {})
           super(default_attributes.merge(state))
-
-          self.identifier ||= SecureRandom.hex
         end
 
         def process(entity, world)
+          emit(:ai_node_processing, self)
+
           execute(entity, world)
+
+          emit(:ai_node_processed, self)
 
           self
         end
@@ -39,10 +40,6 @@ module Araignee
           self
         end
 
-        def validate_attributes
-          raise ArgumentError, 'invalid identifier' unless identifier.instance_of?(String)
-        end
-
         protected
 
         def default_attributes
@@ -53,14 +50,14 @@ module Araignee
           self[attribute] = default_attributes[attribute]
         end
 
+        # Implement this method in derived classes to do the node's behavior.
+        def execute(_entity, _world) end
+
         def update_response(response)
           raise ArgumentError, "invalid response: #{response}" unless %i[busy failed succeeded].include?(response)
 
           self.response = response
         end
-
-        # Implement this method in derived classes to do the node's behavior.
-        def execute(_entity, _world) end
       end
     end
   end

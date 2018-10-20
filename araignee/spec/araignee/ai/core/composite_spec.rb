@@ -22,7 +22,7 @@ RSpec.describe Araignee::Ai::Core::Composite do
   let(:picker) { nil }
   let(:sorter) { nil }
   let(:sort_reversed) { false }
-  let(:composite_params) do
+  let(:composite_attributes) do
     {
       children: children,
       filters: filters,
@@ -32,7 +32,7 @@ RSpec.describe Araignee::Ai::Core::Composite do
     }
   end
 
-  let(:composite) { MyComposite.new(composite_params) }
+  let(:composite) { MyComposite.new(composite_attributes) }
 
   subject { composite }
 
@@ -89,92 +89,6 @@ RSpec.describe Araignee::Ai::Core::Composite do
 
       it 'does not find child' do
         expect(subject).to eq(nil)
-      end
-    end
-  end
-
-  describe '#add_child' do
-    subject { super().add_child(added_child, index) }
-
-    let(:added_child) { Araignee::Ai::Core::Node.new }
-    let(:index) { :last }
-
-    it 'should have all children' do
-      expect(subject.children.count).to eq(4)
-    end
-
-    context 'invalid index' do
-      context 'with wrong symbol' do
-        let(:index) { :last_index }
-
-        it 'raises ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError, "invalid index: #{index}")
-        end
-      end
-
-      context 'with String' do
-        let(:index) { '1' }
-
-        it 'raises ArgumentError' do
-          expect { subject }.to raise_error(ArgumentError, "invalid index: #{index}")
-        end
-      end
-
-      context 'with nil' do
-        let(:index) { nil }
-
-        it 'inserts at last position' do
-          expect(subject.children[subject.children.count - 1]).to eq(added_child)
-        end
-      end
-    end
-
-    context 'valid index' do
-      it 'does not raise ArgumentError' do
-        expect { subject }.not_to raise_error
-      end
-
-      context 'when insert at last position' do
-        it 'inserts at last position' do
-          expect(subject.children[subject.children.count - 1]).to eq(added_child)
-          expect(subject.children.count).to eq(4)
-        end
-      end
-
-      context 'when insert at specified position' do
-        let(:index) { 1 }
-
-        it 'inserts at specified position' do
-          expect(subject.children[index]).to eq(added_child)
-          expect(subject.children.count).to eq(4)
-        end
-      end
-    end
-  end
-
-  describe '#remove_child' do
-    subject { super().remove_child(removed_child) }
-
-    context 'known child' do
-      let(:child) { Araignee::Ai::Core::Node.new }
-      let(:children) { [child] }
-
-      let(:removed_child) { child }
-
-      it 'removes child' do
-        expect(subject.children.include?(child)).to eq(false)
-      end
-    end
-
-    context 'unknown child' do
-      let(:child) { Araignee::Ai::Core::Node.new }
-      let(:unknown) { Araignee::Ai::Core::Node.new }
-      let(:children) { [child] }
-
-      let(:removed_child) { unknown }
-
-      it 'does not remove' do
-        expect(subject.children.count).to eq(1)
       end
     end
   end
@@ -261,7 +175,6 @@ RSpec.describe Araignee::Ai::Core::Composite do
       let(:child) { double('[child]') }
       let(:children) { [child] }
 
-      before { allow(child).to receive(:validate_attributes) }
       before { allow(child).to receive(:reset) }
 
       it 'calls reset on each child' do

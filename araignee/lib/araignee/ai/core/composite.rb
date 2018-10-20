@@ -11,26 +11,6 @@ module Araignee
           children.detect { |child| child.identifier.equal?(identifier) }
         end
 
-        def add_child(child, index)
-          index ||= :last
-
-          raise ArgumentError, "invalid index: #{index}" unless index.equal?(:last) || index.instance_of?(Integer)
-
-          if index.equal?(:last)
-            children << child
-          else
-            children.insert(index, child)
-          end
-
-          self
-        end
-
-        def remove_child(child)
-          children.delete(child)
-
-          self
-        end
-
         def reset
           super()
 
@@ -75,13 +55,9 @@ module Araignee
         end
 
         def sort(nodes, reversed)
-          return nodes unless sorter
+          return nodes unless sorter && nodes.any?
 
-          if nodes.empty?
-            nodes
-          else
-            sorter.sort(nodes, reversed)
-          end
+          sorter.sort(nodes, reversed)
         end
       end
     end

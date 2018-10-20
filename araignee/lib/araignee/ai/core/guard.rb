@@ -32,12 +32,6 @@ module Araignee
 
           :succeeded
         end
-
-        def validate_attributes
-          super()
-
-          raise ArgumentError, 'interrogator node nil' unless interrogator
-        end
       end
     end
   end

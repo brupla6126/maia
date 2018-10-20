@@ -111,6 +111,23 @@ RSpec.describe Araignee::Ai::Core::Limiter do
         end
       end
     end
+
+    context 'invalid limit' do
+      let(:limit) { 0 }
+      let(:limiter) { described_class.new(child: child, limit: limit) }
+
+      it 'raises ArgumentError, limit must be > 0' do
+        expect { subject }.to raise_error(ArgumentError, 'limit must be > 0')
+      end
+    end
+
+    context 'valid limit' do
+      let(:limit) { 3 }
+
+      it 'does not raise ArgumentError' do
+        expect { subject }.not_to raise_error
+      end
+    end
   end
 
   describe 'reset' do
@@ -126,32 +143,4 @@ RSpec.describe Araignee::Ai::Core::Limiter do
       expect(subject.response).to eq(:unknown)
     end
   end
-  #   describe 'validates attributes' do
-  #     subject { limiter.send(:validate_attributes) }
-  #
-  #     context 'invalid child' do
-  #       let(:child) { nil }
-  #
-  #       it 'raises ArgumentError, invalid decorated child' do
-  #         expect { subject }.to raise_error(ArgumentError, 'invalid decorated child')
-  #       end
-  #     end
-  #
-  #     context 'invalid limit' do
-  #       let(:limit) { 0 }
-  #       let(:limiter) { described_class.new(child: child, limit: limit) }
-  #
-  #       it 'raises ArgumentError, limit must be > 0' do
-  #         expect { subject }.to raise_error(ArgumentError, 'limit must be > 0')
-  #       end
-  #     end
-  #
-  #     context 'valid limit' do
-  #       let(:limit) { 3 }
-  #
-  #       it 'does not raise ArgumentError' do
-  #         expect { subject }.not_to raise_error
-  #       end
-  #     end
-  #   end
 end

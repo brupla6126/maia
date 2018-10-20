@@ -10,7 +10,8 @@ module Araignee
       # but you do not want to abandon executing of a sequence that branch
       # sits on.
       class Failer < Decorator
-        # see Ai::Core::Node#execute
+        protected
+
         def execute(entity, world)
           child.process(entity, world)
 

@@ -25,6 +25,8 @@ module Araignee
         end
 
         def execute(_entity, _world)
+          raise ArgumentError, 'delay must be > 0' unless delay.positive?
+
           update_response(handle_response)
         end
 
@@ -34,12 +36,6 @@ module Araignee
           else
             :busy
           end
-        end
-
-        def validate_attributes
-          super()
-
-          raise ArgumentError, 'delay must be > 0' unless delay.positive?
         end
       end
     end

@@ -18,6 +18,11 @@ module Araignee
         end
 
         def execute(entity, world)
+          raise ArgumentError, 'completions must be >= 0' unless completions >= 0
+          raise ArgumentError, 'failures must be >= 0' unless failures >= 0
+
+          raise ArgumentError, 'completions and failures must not equal' if completions.positive? && completions.equal?(failures)
+
           responses = { busy: 0, succeeded: 0, failed: 0 }
 
           nodes = sort(filter(children), sort_reversed)
@@ -54,15 +59,6 @@ module Araignee
             end
 
           update_response(responded)
-        end
-
-        def validate_attributes
-          super()
-
-          raise ArgumentError, 'completions must be >= 0' unless completions >= 0
-          raise ArgumentError, 'failures must be >= 0' unless failures >= 0
-
-          raise ArgumentError, 'completions and failures must not equal' if completions.positive? && completions.equal?(failures)
         end
       end
     end

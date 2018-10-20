@@ -10,6 +10,8 @@ module Araignee
       # anticipated, but you do not want to abandon executing a sequence
       # that branch sits on
       class Succeeder < Decorator
+        protected
+
         def execute(entity, world)
           child.process(entity, world)
 
