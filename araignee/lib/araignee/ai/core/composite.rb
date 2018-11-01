@@ -29,16 +29,6 @@ module Araignee
 
         protected
 
-        def default_attributes
-          super().merge(
-            children: [], # Ai::Core::Node derived
-            filters: [],
-            picker: nil, # Ai::Core::Pickers::Picker derived
-            sorter: nil, # Ai::Core::Sorters::Sorter derived
-            sort_reversed: false
-          )
-        end
-
         def filter(nodes)
           return nodes if filters.empty? || nodes.empty?
 

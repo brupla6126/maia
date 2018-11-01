@@ -2,54 +2,34 @@ require 'timecop'
 require 'araignee/ai/core/wait'
 
 RSpec.describe Araignee::Ai::Core::Wait do
-  let(:world) { {} }
-  let(:entity) { {} }
-
+  let(:wait) { described_class.new }
   let(:delay) { 3 }
-  let(:wait) { described_class.new(delay: delay) }
+  let(:start_time) { Time.parse('2018-11-11 11:11:11') }
+
+  before do
+    wait.state = initial_state(start_time: start_time, delay: delay)
+  end
 
   subject { wait }
 
-  describe '#initialize' do
-    it 'response is :unknown' do
-      expect(subject.response).to eq(:unknown)
-    end
+  describe '#reset' do
+    subject { super().reset }
 
-    context 'with attributes' do
-      let(:node) { described_class(delay: delay) }
+    let(:now) { Time.parse('2018-12-12 12:12:12') }
 
-      it 'sets delay' do
-        expect(subject.delay).to eq(delay)
+    it 'resets start_time' do
+      Timecop.freeze(now) do
+        subject
+        expect(wait.state.start_time).to eq(now)
       end
     end
   end
 
   describe '#process' do
+    let(:world) { {} }
+    let(:entity) { {} }
+
     subject { super().process(entity, world) }
-
-    context 'when wait of 3 seconds' do
-      after { Timecop.return }
-
-      context 'before wait expires' do
-        it 'is busy' do
-          wait
-
-          Timecop.travel(Time.now + 1)
-
-          expect(subject.busy?).to eq(true)
-        end
-      end
-
-      context 'after wait expires' do
-        it 'has succeeded' do
-          wait
-
-          Timecop.travel(Time.now + 5)
-
-          expect(subject.succeeded?).to eq(true)
-        end
-      end
-    end
 
     context 'invalid delay' do
       let(:delay) { 0 }
@@ -66,27 +46,26 @@ RSpec.describe Araignee::Ai::Core::Wait do
         expect { subject }.not_to raise_error
       end
     end
-  end
 
-  describe 'reset' do
-    subject { super().reset }
+    context 'when wait of 3 seconds' do
+      let(:start_time) { Time.now }
 
-    context 'reset_attribute' do
-      it 'calls reset_attribute' do
-        expect(wait.response).to eq(:unknown)
-        subject
-      end
-    end
-
-    context '' do
-      let(:now) { Time.local(2017, 5, 12) }
-
-      before { Timecop.freeze(now) }
       after { Timecop.return }
 
-      it 'start_time is set to Time.now' do
-        expect(wait.start_time).to eq(now)
-        subject
+      context 'before wait expires' do
+        it 'is busy' do
+          Timecop.travel(Time.now + 1)
+
+          expect(subject.busy?).to eq(true)
+        end
+      end
+
+      context 'after wait expires' do
+        it 'has succeeded' do
+          Timecop.travel(Time.now + 5)
+
+          expect(subject.succeeded?).to eq(true)
+        end
       end
     end
   end

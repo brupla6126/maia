@@ -8,8 +8,8 @@ module Araignee
       class Node < OpenStruct
         include Araignee::Utils::Emitter
 
-        def initialize(state = {})
-          super(default_attributes.merge(state))
+        def initialize(attributes = {})
+          super(attributes)
         end
 
         def process(entity, world)
@@ -20,6 +20,14 @@ module Araignee
           emit(:ai_node_processed, self)
 
           self
+        end
+
+        def reset
+          emit(:ai_node_resetting, self)
+        end
+
+        def response
+          state.response
         end
 
         def busy?
@@ -34,21 +42,7 @@ module Araignee
           response.equal?(:succeeded)
         end
 
-        def reset
-          reset_attribute(:response)
-
-          self
-        end
-
         protected
-
-        def default_attributes
-          { response: :unknown }
-        end
-
-        def reset_attribute(attribute)
-          self[attribute] = default_attributes[attribute]
-        end
 
         # Implement this method in derived classes to do the node's behavior.
         def execute(_entity, _world) end
@@ -56,7 +50,7 @@ module Araignee
         def update_response(response)
           raise ArgumentError, "invalid response: #{response}" unless %i[busy failed succeeded].include?(response)
 
-          self.response = response
+          state.response = response
         end
       end
     end

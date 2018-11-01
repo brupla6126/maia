@@ -5,8 +5,20 @@ RSpec.describe Araignee::Ai::Core::Balancer do
   let(:picker) { double('[picker]', pick: [picked]) }
   let(:filters) { [] }
 
-  let(:children) { [Araignee::Ai::Core::NodeSucceeded.new, Araignee::Ai::Core::NodeFailed.new, Araignee::Ai::Core::NodeBusy.new] }
+  let(:child_succeeded) { Araignee::Ai::Core::NodeSucceeded.new }
+  let(:child_failed) { Araignee::Ai::Core::NodeFailed.new }
+  let(:child_busy) { Araignee::Ai::Core::NodeBusy.new }
+  let(:children) { [1, 2, 3] }
+
+  let(:children) { [child_succeeded, child_failed, child_busy] }
   let(:balancer) { described_class.new(children: children, picker: picker, filters: filters) }
+
+  before do
+    child_succeeded.state = initial_state
+    child_failed.state = initial_state
+    child_busy.state = initial_state
+    balancer.state = initial_state
+  end
 
   subject { balancer }
 

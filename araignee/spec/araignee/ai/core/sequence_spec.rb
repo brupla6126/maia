@@ -1,31 +1,35 @@
 require 'araignee/ai/core/sequence'
 
 RSpec.describe Araignee::Ai::Core::Sequence do
-  let(:world) { {} }
-  let(:entity) { {} }
-
-  let(:children) { [] }
+  let(:child_succeeded) { Araignee::Ai::Core::NodeSucceeded.new }
+  let(:child_failed) { Araignee::Ai::Core::NodeFailed.new }
+  let(:child_busy) { Araignee::Ai::Core::NodeBusy.new }
+  let(:children) { [1, 2, 3] }
   let(:sequence) { described_class.new(children: children, filters: []) }
+
+  before do
+    child_succeeded.state = initial_state
+    child_failed.state = initial_state
+    child_busy.state = initial_state
+    sequence.state = initial_state
+  end
 
   subject { sequence }
 
   describe '#initialize' do
-    context 'when children is not set' do
-      let(:sequence) { described_class.new }
-
-      it 'children set to default value' do
-        expect(subject.children).to eq([])
-      end
+    it 'sets children' do
+      expect(subject.children).to eq(children)
     end
   end
 
   describe '#process' do
+    let(:world) { {} }
+    let(:entity) { {} }
+
     subject { super().process(entity, world) }
 
-    let(:children) { [Araignee::Ai::Core::NodeSucceeded.new] }
-
     context 'when children = [:succeeded, :succeeded]' do
-      let(:children) { [Araignee::Ai::Core::NodeSucceeded.new, Araignee::Ai::Core::NodeSucceeded.new] }
+      let(:children) { [child_succeeded, child_succeeded] }
 
       it 'should have succeeded' do
         expect(subject.succeeded?).to eq(true)
@@ -33,15 +37,15 @@ RSpec.describe Araignee::Ai::Core::Sequence do
     end
 
     context 'when children = [:succeeded, :busy, :succeeded]' do
-      let(:children) { [Araignee::Ai::Core::NodeSucceeded.new, Araignee::Ai::Core::NodeBusy.new, Araignee::Ai::Core::NodeSucceeded.new] }
+      let(:children) { [child_succeeded, child_busy, child_succeeded] }
 
       it 'should be busy' do
         expect(subject.busy?).to eq(true)
       end
     end
 
-    context 'when children = [:failed, :succeeded]' do
-      let(:children) { [Araignee::Ai::Core::NodeFailed.new, Araignee::Ai::Core::NodeSucceeded.new] }
+    context 'when children = [:succeeded, :failed]' do
+      let(:children) { [child_succeeded, child_failed] }
 
       it 'should have failed' do
         expect(subject.failed?).to eq(true)

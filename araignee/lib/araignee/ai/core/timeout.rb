@@ -10,28 +10,21 @@ module Araignee
         def reset
           super()
 
-          reset_attribute(:start_time)
+          state.start_time = Time.now
 
           self
         end
 
         protected
 
-        def default_attributes
-          super().merge(
-            delay: 0,
-            start_time: Time.now
-          )
-        end
-
         def execute(_entity, _world)
-          raise ArgumentError, 'delay must be > 0' unless delay.positive?
+          raise ArgumentError, 'delay must be > 0' unless state.delay.positive?
 
           update_response(handle_response)
         end
 
         def handle_response
-          if Time.now - start_time > delay
+          if Time.now - state.start_time > state.delay
             :failed
           else
             :busy

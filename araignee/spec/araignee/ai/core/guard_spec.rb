@@ -1,84 +1,61 @@
 require 'araignee/ai/core/guard'
-require 'araignee/ai/core/failer'
 require 'araignee/ai/core/interrogator'
-require 'araignee/ai/core/succeeder'
 
 RSpec.describe Araignee::Ai::Core::Guard do
-  include Araignee
-
-  let(:world) { {} }
-  let(:entity) { {} }
-
+  let(:interrogator_busy) { Araignee::Ai::Core::InterrogatorBusy.new }
+  let(:interrogator_failed) { Araignee::Ai::Core::InterrogatorFailed.new }
   let(:interrogator_succeeded) { Araignee::Ai::Core::InterrogatorSucceeded.new }
-  let(:interrogator_failed) { Araignee::Ai::Core::InterrogatorFAiled.new }
-  let(:interrogator) { interrogator_succeeded }
-  let(:guarded) { Araignee::Ai::Core::Node.new }
+  let(:child_interrogator) { nil }
+  let(:interrogator) { Araignee::Ai::Core::Interrogator.new(child: child_interrogator) }
+  let(:guarded) { Araignee::Ai::Core::NodeSucceeded.new }
 
   let(:guard) { described_class.new(interrogator: interrogator, child: guarded) }
+
+  before do
+    interrogator_busy.state = initial_state
+    interrogator_failed.state = initial_state
+    interrogator_succeeded.state = initial_state
+    interrogator.state = initial_state
+    guarded.state = initial_state
+    guard.state = initial_state
+  end
 
   subject { guard }
 
   describe '#initialize' do
-    it 'sets interrogator' do
-      expect(subject.interrogator).to eq(interrogator_succeeded)
+    it 'sets interrogator node' do
+      expect(subject.interrogator).to eq(interrogator)
     end
 
-    it 'sets guarded' do
+    it 'sets guarded node' do
       expect(subject.child).to eq(guarded)
     end
   end
+
   describe '#process' do
-    subject { guard.process(entity, world) }
+    let(:world) { {} }
+    let(:entity) { {} }
 
-    context 'calling guard#handle_response' do
-      before { allow(guard).to receive(:handle_response) { :succeeded } }
-
-      it 'has called guard#process' do
-        expect(guard).to receive(:handle_response)
-        subject
-      end
-    end
-
-    context 'when processing guard' do
-      before { allow(guard.child).to receive(:process) { guard.child } }
-
-      it 'has called child#process' do
-        expect(guard.child).to receive(:process).with(entity, world)
-        subject
-      end
-    end
+    subject { super().process(entity, world) }
 
     context 'when interrogator returns :succeeded' do
-      let(:interrogator) { Araignee::Ai::Core::Interrogator.new(child: Araignee::Ai::Core::NodeSucceeded.new) }
+      let(:child_interrogator) { interrogator_succeeded }
 
-      context 'calling interrogator#process' do
-        before { allow(guard.interrogator).to receive(:process) { guard.child } }
-
-        it 'has called interrogator#process' do
-          expect(guard.interrogator).to receive(:process).with(entity, world)
-          subject
-        end
-      end
-
-      context 'when guarded returns :succeeded' do
-        let(:guarded) { Araignee::Ai::Core::NodeSucceeded.new }
-
-        it 'has succeeded' do
-          expect(subject.succeeded?).to eq(true)
-        end
-      end
-
-      context 'when guarded returns :failed' do
-        let(:guarded) { Araignee::Ai::Core::NodeFailed.new }
-
-        it 'has failed' do
-          expect(subject.failed?).to eq(true)
-        end
+      it 'has called child#process' do
+        expect(subject.succeeded?).to eq(true)
       end
     end
 
-    context 'when child interrogator returns :busy' do
-      let(:interrogator) { Araignee::Ai::Core::Interrogator.new(child: Araignee::Ai::Core::NodeBusy.new) }
+    context 'when interrogator returns :failed' do
+      let(:child_interrogator) { interrogator_failed }
+
+      it 'has failed' do
+        expect(subject.failed?).to eq(true)
+      end
+    end
+
+    context 'when interrogator returns :busy' do
+      let(:child_interrogator) { interrogator_busy }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)

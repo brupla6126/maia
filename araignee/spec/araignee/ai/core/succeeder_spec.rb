@@ -1,37 +1,36 @@
 require 'araignee/ai/core/succeeder'
 
 RSpec.describe Araignee::Ai::Core::Succeeder do
-  let(:world) { {} }
-  let(:entity) { {} }
-
-  let(:node_failed) { Araignee::Ai::Core::Node.new }
-  let(:node_succeeded) { Araignee::Ai::Core::Node.new }
+  let(:node_failed) { Araignee::Ai::Core::NodeFailed.new }
+  let(:node_succeeded) { Araignee::Ai::Core::NodeSucceeded.new }
 
   let(:child) { node_succeeded }
 
   let(:succeeder) { described_class.new(child: child) }
 
+  before do
+    initialize_state(succeeder)
+    initialize_state(child)
+  end
+
   subject { succeeder }
 
-  before { allow(node_failed).to receive(:response) { :failed } }
-  before { allow(node_succeeded).to receive(:response) { :succeeded } }
-
   describe '#initialize' do
-    it 'response is :unknown' do
-      expect(subject.response).to eq(:unknown)
+    it 'has its child set' do
+      expect(subject.child).to eq(child)
     end
   end
 
   describe '#process' do
+    let(:world) { {} }
+    let(:entity) { {} }
+
     subject { super().process(entity, world) }
 
-    before { allow(child).to receive(:execute).with(entity, world) { child } }
-
-    after { subject }
-
-    context 'when action :succeeded' do
+    context 'when child response :succeeded' do
       it 'child is processed' do
         expect(child).to receive(:execute).with(entity, world)
+        subject
       end
 
       it 'has succeeded' do
@@ -39,11 +38,12 @@ RSpec.describe Araignee::Ai::Core::Succeeder do
       end
     end
 
-    context 'when action :failed' do
+    context 'when child response :failed' do
       let(:child) { node_failed }
 
       it 'child is processed' do
         expect(child).to receive(:execute).with(entity, world)
+        subject
       end
 
       it 'has succeeded' do

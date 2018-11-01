@@ -10,13 +10,6 @@ module Araignee
       class Parallel < Composite
         protected
 
-        def default_attributes
-          super().merge(
-            completions: 0, # Integer::MAX means all
-            failures: 0 # Integer::MAX means all
-          )
-        end
-
         def execute(entity, world)
           raise ArgumentError, 'completions must be >= 0' unless completions >= 0
           raise ArgumentError, 'failures must be >= 0' unless failures >= 0

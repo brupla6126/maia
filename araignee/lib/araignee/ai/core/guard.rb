@@ -9,13 +9,6 @@ module Araignee
       class Guard < Decorator
         protected
 
-        def default_attributes
-          super().merge(
-            interrogator: nil # the interrogator node, see Ai::Core::Interrogator
-            # child is the guarded node
-          )
-        end
-
         # If the interrogator node evaluates to :succeeded, the guard
         # will return the processed guarded node state, otherwise
         # returns :failed.

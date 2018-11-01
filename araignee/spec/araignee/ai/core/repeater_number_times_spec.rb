@@ -2,12 +2,14 @@ require 'araignee/ai/core/wait'
 require 'araignee/ai/core/repeater_number_times'
 
 RSpec.describe Araignee::Ai::Core::RepeaterNumberTimes do
-  let(:world) { {} }
-  let(:entity) { {} }
-
   let(:times) { 5 }
-  let(:child) { Araignee::Ai::Core::Wait.new(delay: 200) }
-  let(:repeater) { described_class.new(child: child, times: times) }
+  let(:child) { Araignee::Ai::Core::Wait.new }
+  let(:repeater) { described_class.new(child: child) }
+
+  before do
+    child.state = initial_state(delay: 200)
+    repeater.state = initial_state(times: times)
+  end
 
   subject { repeater }
 
@@ -18,6 +20,9 @@ RSpec.describe Araignee::Ai::Core::RepeaterNumberTimes do
   end
 
   describe '#process' do
+    let(:world) { {} }
+    let(:entity) { {} }
+
     subject { super().process(entity, world) }
 
     context 'number of times negative' do

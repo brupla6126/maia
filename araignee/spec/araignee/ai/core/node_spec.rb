@@ -9,6 +9,23 @@ RSpec.describe Araignee::Ai::Core::Node do
 
   let(:node) { described_class.new(attributes) }
 
+  before do
+    node.on(:ai_node_processing) do |params|
+      emitter = params[0]
+      emitter.state = initial_state
+    end
+
+    node.on(:ai_node_processed) do |params|
+      emitter = params[0]
+      emitter.state = busy_state
+    end
+
+    node.on(:ai_node_resetting) do |params|
+      emitter = params[0]
+      emitter.state = initial_state
+    end
+  end
+
   subject { node }
 
   describe '#initialize' do
@@ -18,33 +35,30 @@ RSpec.describe Araignee::Ai::Core::Node do
     it 'sets identifier' do
       expect(subject.identifier).to eq(identifier)
     end
-
-    it 'sets response to :unknown' do
-      expect(subject.response).to eq(:unknown)
-    end
   end
 
   describe '#process' do
     subject { super().process(entity, world) }
-
-    before { node.start! }
 
     it 'returns self' do
       expect(subject).to eq(node)
     end
 
     it 'calls execute with entity, world and emits processing events' do
-      expect(node).to receive(:emit).with(:ai_node_processing, node)
       expect(node).to receive(:execute).with(entity, world)
-      expect(node).to receive(:emit).with(:ai_node_processed, node)
       subject
+      expect(node.state).to eq(busy_state)
     end
+    # TODO: process twice to check for current state
   end
 
   describe 'busy?' do
     subject { super().busy? }
 
-    before { node.response = :busy }
+    before do
+      node.process(entity, world)
+      node.state = busy_state
+    end
 
     it 'returns true' do
       expect(subject).to be_truthy
@@ -52,30 +66,43 @@ RSpec.describe Araignee::Ai::Core::Node do
   end
 
   describe 'failed?' do
-    before { subject.response = :failed }
+    subject { super().failed? }
+
+    before do
+      node.process(entity, world)
+      node.state = failed_state
+    end
 
     it 'returns true' do
-      expect(subject.failed?).to be_truthy
+      expect(subject).to be_truthy
     end
   end
 
   describe 'succeeded?' do
-    before { subject.response = :succeeded }
+    subject { super().succeeded? }
+
+    before do
+      node.process(entity, world)
+      node.state = succeeded_state
+    end
 
     it 'returns true' do
-      expect(subject.succeeded?).to be_truthy
+      expect(subject).to be_truthy
     end
   end
 
   describe '#reset' do
-    subject { node.reset }
+    subject { super().reset }
 
-    before { node.response = :busy }
+    before do
+      node.process(entity, world)
+      node.state = busy_state
+    end
 
     it 'resets response to default value' do
       subject
 
-      expect(node.response).to eq(:unknown)
+      expect(node.state.response).to eq(:unknown)
     end
   end
 end

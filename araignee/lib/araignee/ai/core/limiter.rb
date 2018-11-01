@@ -12,27 +12,20 @@ module Araignee
         def reset
           super()
 
-          reset_attribute(:times)
+          state.times = 0
 
           self
         end
 
         protected
 
-        def default_attributes
-          super().merge(
-            times: 0,
-            limit: 1
-          )
-        end
-
         def execute(entity, world)
-          raise ArgumentError, 'limit must be > 0' unless limit.positive?
+          raise ArgumentError, 'limit must be > 0' unless state.limit.positive?
 
-          self.times += 1
+          state.times += 1
 
           responded =
-            if times <= limit
+            if state.times <= state.limit
               child.process(entity, world).response
             else
               :failed

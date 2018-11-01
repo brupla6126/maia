@@ -1,12 +1,13 @@
-require 'araignee/ai/core/node'
 require 'araignee/ai/core/repeater'
 
 RSpec.describe Araignee::Ai::Core::Repeater do
-  let(:world) { {} }
-  let(:entity) { {} }
-
-  let(:child) { Araignee::Ai::Core::Node.new }
+  let(:child) { Araignee::Ai::Core::NodeFailed.new }
   let(:repeater) { described_class.new(child: child) }
+
+  before do
+    child.state = initial_state
+    repeater.state = initial_state
+  end
 
   subject { repeater }
 
@@ -17,11 +18,12 @@ RSpec.describe Araignee::Ai::Core::Repeater do
   end
 
   describe '#process' do
+    let(:world) { {} }
+    let(:entity) { {} }
+
     subject { repeater.process(entity, world) }
 
     context 'calling repeater#repeat' do
-      before { allow(repeater).to receive(:repeat).with(child, entity, world) { nil } }
-
       it 'repeater#repeat is called' do
         expect(repeater).to receive(:repeat).with(child, entity, world)
         subject

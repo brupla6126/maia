@@ -16,7 +16,11 @@ RSpec.describe Araignee::Ai::Core::Composite do
     end
   end
 
-  let(:children) { [Araignee::Ai::Core::NodeSucceeded.new, Araignee::Ai::Core::NodeFailed.new, Araignee::Ai::Core::NodeBusy.new] }
+  let(:child_succeeded) { Araignee::Ai::Core::NodeSucceeded.new }
+  let(:child_failed) { Araignee::Ai::Core::NodeFailed.new }
+  let(:child_busy) { Araignee::Ai::Core::NodeBusy.new }
+
+  let(:children) { [child_succeeded, child_failed, child_busy] }
   let(:filters) { [] }
   let(:picked) { nil }
   let(:picker) { nil }
@@ -34,6 +38,13 @@ RSpec.describe Araignee::Ai::Core::Composite do
 
   let(:composite) { MyComposite.new(composite_attributes) }
 
+  before do
+    child_succeeded.state = initial_state
+    child_failed.state = initial_state
+    child_busy.state = initial_state
+    composite.state = initial_state
+  end
+
   subject { composite }
 
   describe '#initialize' do
@@ -43,10 +54,6 @@ RSpec.describe Araignee::Ai::Core::Composite do
 
     it 'children are set' do
       expect(subject.children).to eq(children)
-    end
-
-    it 'children response are :unknown' do
-      children.each { |child| expect(child.response).to eq(:unknown) }
     end
 
     it 'picker is nil' do
@@ -161,14 +168,8 @@ RSpec.describe Araignee::Ai::Core::Composite do
 
     after { subject }
 
-    context 'returned value' do
-      it 'returns self' do
-        expect(subject).to eq(composite)
-      end
-    end
-
-    it 'reset response attribute' do
-      expect(composite).to receive(:reset_attribute).with(:response)
+    it 'returns self' do
+      expect(subject).to eq(composite)
     end
 
     context 'children' do

@@ -1,38 +1,38 @@
 require 'araignee/ai/core/interrogator'
 
 RSpec.describe Araignee::Ai::Core::Interrogator do
-  let(:world) { {} }
-  let(:entity) { {} }
-
-  let(:child) { Araignee::Ai::Core::Node.new }
+  let(:child) { Araignee::Ai::Core::NodeSucceeded.new }
   let(:interrogator) { described_class.new(child: child) }
+
+  before do
+    child.state = initial_state
+    interrogator.state = initial_state
+  end
 
   subject { interrogator }
 
   describe '#process' do
+    let(:world) { {} }
+    let(:entity) { {} }
+
     subject { super().process(entity, world) }
 
-    before { allow(child).to receive(:process) { child } }
-
-    before { interrogator.start! }
-
     context 'when child interrogator returns :succeeded' do
-      before { allow(child).to receive(:response) { :succeeded } }
-
       it 'has succeeded' do
         expect(subject.succeeded?).to eq(true)
       end
     end
 
     context 'when child interrogator returns :failed' do
-      before { allow(child).to receive(:response) { :failed } }
+      let(:child) { Araignee::Ai::Core::NodeFailed.new }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)
       end
     end
+
     context 'when child interrogator returns neither :failed nor :succeeded' do
-      before { allow(child).to receive(:response) { :running } }
+      let(:child) { Araignee::Ai::Core::NodeBusy.new }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)

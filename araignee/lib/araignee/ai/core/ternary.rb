@@ -11,14 +11,6 @@ module Araignee
       class Ternary < Node
         protected
 
-        def default_attributes
-          super().merge(
-            interrogator: nil, # Ai::Core::Node
-            yes: nil, # Ai::Core::Node
-            no: nil # Ai::Core::Node
-          )
-        end
-
         def execute(entity, world)
           executing_node = execute_node(interrogator.process(entity, world).response)
 
