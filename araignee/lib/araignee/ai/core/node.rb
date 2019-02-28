@@ -12,10 +12,10 @@ module Araignee
           super(attributes)
         end
 
-        def process(entity, world)
+        def process(request)
           emit(:ai_node_processing, self)
 
-          execute(entity, world)
+          execute(request)
 
           emit(:ai_node_processed, self)
 
@@ -45,10 +45,14 @@ module Araignee
         protected
 
         # Implement this method in derived classes to do the node's behavior.
-        def execute(_entity, _world) end
+        def execute(_request) end
+
+        def valid_response?(response)
+          %i[busy failed succeeded].include?(response)
+        end
 
         def update_response(response)
-          raise ArgumentError, "invalid response: #{response}" unless %i[busy failed succeeded].include?(response)
+          raise ArgumentError, "invalid response: #{response}" unless valid_response?(response)
 
           state.response = response
         end

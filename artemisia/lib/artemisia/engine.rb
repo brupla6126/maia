@@ -4,19 +4,16 @@ module Artemisia
   class Engine
     include Araignee::Utils::Emitter
 
-    attr_reader :context, :worlds
+    attr_reader :config, :context, :worlds
 
-    def initialize(context)
+    def initialize(config:, context:)
+      @config = config
       @context = context
       @worlds = []
     end
 
     def boot
-      load_initializers(@context.config.initializers_path)
-
-      load_factories(@context.config.factories_paths)
-
-      load_templates(@context.config.templates_paths)
+      load_files((@config.initializer_paths + @config.factory_paths + @config.template_paths).uniq)
 
       # load worlds
       # subscribe
@@ -34,17 +31,7 @@ module Artemisia
 
     private
 
-    def load_initializers(path)
-      require_files(File.join(path, '**', '*.rb'))
-    end
-
-    def load_factories(paths)
-      paths.each do |path|
-        require_files(File.join(path, '**', '*.rb'))
-      end
-    end
-
-    def load_templates(paths)
+    def load_files(paths)
       paths.each do |path|
         require_files(File.join(path, '**', '*.rb'))
       end

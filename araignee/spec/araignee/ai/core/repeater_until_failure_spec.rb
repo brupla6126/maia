@@ -1,8 +1,11 @@
 require 'araignee/ai/core/node'
 require 'araignee/ai/core/repeater_until_failure'
+require 'spec_helpers/ai_helpers'
 
 RSpec.describe Araignee::Ai::Core::RepeaterUntilFailure do
-  let(:child) { Araignee::Ai::Core::NodeFailed.new }
+  include Araignee::Ai::Helpers
+
+  let(:child) { Araignee::Ai::Helpers::NodeFailed.new }
   let(:repeater) { described_class.new(child: child) }
 
   before do
@@ -19,10 +22,9 @@ RSpec.describe Araignee::Ai::Core::RepeaterUntilFailure do
   end
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     it 'has succeeded' do
       expect(subject.succeeded?).to eq(true)

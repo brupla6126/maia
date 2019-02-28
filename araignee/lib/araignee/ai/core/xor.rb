@@ -8,11 +8,11 @@ module Araignee
       class Xor < Composite
         protected
 
-        def execute(entity, world)
+        def execute(request)
           responses = initialize_responses
 
           nodes.each do |child|
-            respond(responses, child.process(entity, world).response)
+            respond(responses, child.process(request).response)
 
             break if responses[:busy].positive?
           end

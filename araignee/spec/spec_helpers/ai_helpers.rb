@@ -26,49 +26,49 @@ end
 
 module Araignee
   module Ai
-    module Core
-      class NodeBusy < Node
-        def execute(_entity, _world)
+    module Helpers
+      class NodeBusy < Araignee::Ai::Core::Node
+        def execute(_request)
           update_response(:busy)
 
           self
         end
       end
 
-      class NodeFailed < Node
-        def execute(_entity, _world)
+      class NodeFailed < Araignee::Ai::Core::Node
+        def execute(_request)
           update_response(:failed)
 
           self
         end
       end
 
-      class NodeSucceeded < Node
-        def execute(_entity, _world)
+      class NodeSucceeded < Araignee::Ai::Core::Node
+        def execute(_request)
           update_response(:succeeded)
 
           self
         end
       end
 
-      class InterrogatorFailed < Node
-        def execute(_entity, _world)
+      class InterrogatorFailed < Araignee::Ai::Core::Node
+        def execute(_request)
           update_response(:failed)
 
           self
         end
       end
 
-      class InterrogatorSucceeded < Node
-        def execute(_entity, _world)
+      class InterrogatorSucceeded < Araignee::Ai::Core::Node
+        def execute(_request)
           update_response(:succeeded)
 
           self
         end
       end
 
-      class InterrogatorBusy < Node
-        def execute(_entity, _world)
+      class InterrogatorBusy < Araignee::Ai::Core::Node
+        def execute(_request)
           update_response(:busy)
 
           self

@@ -1,12 +1,14 @@
 require 'araignee/ai/core/limiter'
 
 RSpec.describe Araignee::Ai::Core::Limiter do
+  include Araignee::Ai::Helpers
+
   let(:limit) { 5 }
   let(:limiter) { described_class.new(child: child) }
 
-  let(:node_busy) { Araignee::Ai::Core::NodeBusy.new }
-  let(:node_failed) { Araignee::Ai::Core::NodeFailed.new }
-  let(:node_succeeded) { Araignee::Ai::Core::NodeSucceeded.new }
+  let(:node_busy) { Araignee::Ai::Helpers::NodeBusy.new }
+  let(:node_failed) { Araignee::Ai::Helpers::NodeFailed.new }
+  let(:node_succeeded) { Araignee::Ai::Helpers::NodeSucceeded.new }
 
   let(:child) { node_succeeded }
 
@@ -20,16 +22,15 @@ RSpec.describe Araignee::Ai::Core::Limiter do
   subject { limiter }
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
     let(:limit) { 3 }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     context 'when doing 5 loops of :busy and :limit equals to 3' do
       it 'calls child#process 5 times' do
         1.upto(5) do
-          limiter.process(entity, world)
+          limiter.process(request)
         end
 
         expect(limiter.failed?).to eq(true)

@@ -1,7 +1,10 @@
 require 'araignee/ai/core/interrogator'
+require 'spec_helpers/ai_helpers'
 
 RSpec.describe Araignee::Ai::Core::Interrogator do
-  let(:child) { Araignee::Ai::Core::NodeSucceeded.new }
+  include Araignee::Ai::Helpers
+
+  let(:child) { Araignee::Ai::Helpers::NodeSucceeded.new }
   let(:interrogator) { described_class.new(child: child) }
 
   before do
@@ -12,10 +15,9 @@ RSpec.describe Araignee::Ai::Core::Interrogator do
   subject { interrogator }
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     context 'when child interrogator returns :succeeded' do
       it 'has succeeded' do
@@ -24,7 +26,7 @@ RSpec.describe Araignee::Ai::Core::Interrogator do
     end
 
     context 'when child interrogator returns :failed' do
-      let(:child) { Araignee::Ai::Core::NodeFailed.new }
+      let(:child) { Araignee::Ai::Helpers::NodeFailed.new }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)
@@ -32,7 +34,7 @@ RSpec.describe Araignee::Ai::Core::Interrogator do
     end
 
     context 'when child interrogator returns neither :failed nor :succeeded' do
-      let(:child) { Araignee::Ai::Core::NodeBusy.new }
+      let(:child) { Araignee::Ai::Helpers::NodeBusy.new }
 
       it 'has failed' do
         expect(subject.failed?).to eq(true)

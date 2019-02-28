@@ -1,15 +1,15 @@
-require 'ostruct'
 require 'araignee/architecture/activation'
-require 'araignee/story/entity'
+require 'araignee/stories/entity'
 
 RSpec.describe Araignee::Architecture::Activation do
-  class MyEntity < Araignee::Story::Entity
+  class MyEntity < Araignee::Stories::Entity
     include Araignee::Architecture::Activation
   end
 
   subject { entity }
 
-  let(:entity) { MyEntity.new({}) }
+  let(:attributes) { {} }
+  let(:entity) { MyEntity.new(attributes: attributes) }
 
   describe '#initialize' do
     context 'with no parameters' do
@@ -92,15 +92,15 @@ RSpec.describe Araignee::Architecture::Activation do
   end
 
   describe '#activated?' do
-    before { subject.activate(time) }
+    subject { super().activated? }
 
-    before  { subject }
+    before { entity.activate(time) }
 
     context 'activated in the past' do
       let(:time) { Time.now - 60 }
 
       it 'returns true' do
-        expect(entity.activated?).to eq(true)
+        expect(subject).to eq(true)
       end
     end
 
@@ -108,7 +108,7 @@ RSpec.describe Araignee::Architecture::Activation do
       let(:time) { Time.now + 60 }
 
       it 'returns false' do
-        expect(entity.activated?).to eq(false)
+        expect(subject).to eq(false)
       end
     end
   end

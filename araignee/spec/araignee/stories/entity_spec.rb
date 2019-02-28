@@ -1,9 +1,9 @@
-require 'araignee/story/entity'
+require 'araignee/stories/entity'
 
-RSpec.describe Araignee::Story::Entity do
+RSpec.describe Araignee::Stories::Entity do
   subject { entity }
 
-  let!(:entity) { described_class.new(attributes) }
+  let(:entity) { described_class.new(attributes: attributes) }
 
   describe '#initialize' do
     let(:attributes) { { a: 1, b: 2 } }

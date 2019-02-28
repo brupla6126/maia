@@ -3,16 +3,9 @@ require 'araignee/utils/state'
 RSpec.describe Araignee::Utils::State do
   subject { state }
 
-  before { allow(Araignee::Utils::Log).to receive(log_level) }
-  before { allow(state).to receive(:inspect) { 'abc' } }
-
-  after { subject }
-
-  let(:state) { described_class.new(context) }
-
   let(:context) { double('[context]') }
 
-  let(:log_level) { :info }
+  let(:state) { described_class.new(context) }
 
   describe '#initialize' do
     it 'context is set' do
@@ -23,48 +16,36 @@ RSpec.describe Araignee::Utils::State do
   describe '#enter' do
     subject { super().enter }
 
-    it 'calls Log::info' do
-      expect(state).to receive(:inspect)
-
-      expect(Araignee::Utils::Log).to receive(log_level) do |&block|
-        expect(block.call).to eq("Entering state #{state.inspect}")
-      end
+    it 'emits :state_entering event' do
+      expect(state).to receive(:emit).with(:state_entering, state)
+      subject
     end
   end
 
   describe '#leave' do
     subject { super().leave }
 
-    it 'calls Log::info' do
-      expect(state).to receive(:inspect)
-
-      expect(Araignee::Utils::Log).to receive(log_level) do |&block|
-        expect(block.call).to eq("Leaving state #{state.inspect}")
-      end
+    it 'emits :state_leaving event' do
+      expect(state).to receive(:emit).with(:state_leaving, state)
+      subject
     end
   end
 
   describe '#pause' do
     subject { super().pause }
 
-    it 'calls Log::info' do
-      expect(state).to receive(:inspect)
-
-      expect(Araignee::Utils::Log).to receive(log_level) do |&block|
-        expect(block.call).to eq("Pausing state #{state.inspect}")
-      end
+    it 'emits :state_pausing event' do
+      expect(state).to receive(:emit).with(:state_pausing, state)
+      subject
     end
   end
 
   describe '#resume' do
     subject { super().resume }
 
-    it 'calls Log::info' do
-      expect(state).to receive(:inspect)
-
-      expect(Araignee::Utils::Log).to receive(log_level) do |&block|
-        expect(block.call).to eq("Resuming state #{state.inspect}")
-      end
+    it 'emits :state_resuming event' do
+      expect(state).to receive(:emit).with(:state_resuming, state)
+      subject
     end
   end
 end

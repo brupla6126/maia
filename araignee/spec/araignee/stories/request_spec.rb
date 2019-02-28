@@ -1,18 +1,11 @@
-require 'araignee/story/request'
+require 'araignee/stories/request'
 
-RSpec.describe Araignee::Story::Request do
-  class MyRequest < described_class
-    def allowed
-      %i[a b]
-    end
-
-    def defaults
-      { b: 22 }
-    end
-  end
-
+RSpec.describe Araignee::Stories::Request do
   let(:params) { { a: 1, b: 2 } }
-  let(:request) { described_class.new(params) }
+  let(:defaults) { { b: 22 } }
+  let(:allowed) { %i[a b] }
+
+  let(:request) { described_class.new(params: params, defaults: defaults, allowed: allowed) }
 
   subject { request }
 
@@ -26,30 +19,18 @@ RSpec.describe Araignee::Story::Request do
 
     context 'with default params' do
       let(:params) { { a: 1 } }
-      let(:request) { MyRequest.new(params) }
 
       it 'missing params are set with default values' do
         expect(subject.a).to eq(1)
         expect(subject.b).to eq(22)
       end
     end
-  end
-
-  describe '#valid?' do
-    subject { super().valid? }
 
     context 'with unallowed params' do
+      let(:allowed) { %i[] }
+
       it 'raises ArgumentError' do
         expect { subject }.to raise_error(ArgumentError, 'unallowed params: a, b')
-      end
-    end
-
-    context 'with allowed params' do
-      let(:params) { { a: 1, b: 2 } }
-      let(:request) { MyRequest.new(params) }
-
-      it 'is valid' do
-        expect(subject).to be_truthy
       end
     end
   end

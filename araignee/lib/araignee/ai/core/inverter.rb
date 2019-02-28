@@ -9,8 +9,8 @@ module Araignee
       class Inverter < Decorator
         protected
 
-        def execute(entity, world)
-          responded = child.process(entity, world).response
+        def execute(request)
+          responded = child.process(request).response
 
           update_response(handle_response(responded))
         end

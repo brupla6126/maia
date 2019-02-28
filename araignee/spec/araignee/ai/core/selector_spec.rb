@@ -1,9 +1,12 @@
 require 'araignee/ai/core/selector'
+require 'spec_helpers/ai_helpers'
 
 RSpec.describe Araignee::Ai::Core::Selector do
-  let(:child_succeeded) { Araignee::Ai::Core::NodeSucceeded.new }
-  let(:child_failed) { Araignee::Ai::Core::NodeFailed.new }
-  let(:child_busy) { Araignee::Ai::Core::NodeBusy.new }
+  include Araignee::Ai::Helpers
+
+  let(:child_succeeded) { Araignee::Ai::Helpers::NodeSucceeded.new }
+  let(:child_failed) { Araignee::Ai::Helpers::NodeFailed.new }
+  let(:child_busy) { Araignee::Ai::Helpers::NodeBusy.new }
   let(:children) { [1, 2, 3] }
   let(:selector) { described_class.new(children: children, filters: []) }
 
@@ -23,10 +26,9 @@ RSpec.describe Araignee::Ai::Core::Selector do
   end
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     context 'when :succeeded' do
       let(:children) { [child_succeeded] }

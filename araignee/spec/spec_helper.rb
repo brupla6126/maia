@@ -30,7 +30,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 SimpleCov.start do
   add_group 'AI', 'araignee/ai'
   add_group 'Architecture', 'araignee/architecture'
-  add_group 'Stories', 'araignee/story'
+  add_group 'Stories', 'araignee/stories'
   add_group 'Utilities', 'araignee/utils'
   add_filter '/spec/'
 end

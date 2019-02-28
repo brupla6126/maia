@@ -1,17 +1,12 @@
 require 'ostruct'
 
 module Araignee
-  module Story
+  module Stories
     # It is returned by a User Story Interactor.
     # It contains response properties.
     class Response < OpenStruct
-      def initialize(params = {})
+      def initialize(params: {}, defaults: {})
         super(defaults.merge(params))
-      end
-
-      # hash of handled parameters with their default values
-      def defaults
-        {}
       end
     end
   end

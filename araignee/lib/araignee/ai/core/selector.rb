@@ -14,11 +14,11 @@ module Araignee
       class Selector < Composite
         protected
 
-        def execute(entity, world)
+        def execute(request)
           responses = initialize_responses
 
           nodes.each do |node|
-            respond(responses, node.process(entity, world).response)
+            respond(responses, node.process(request).response)
           end
 
           update_response(handle_response(responses))
@@ -33,7 +33,7 @@ module Araignee
         end
 
         def handle_response(responses)
-          # succeed if all children have succeeded
+          # succeed if at least on child has succeeded
           if responses.fetch(:busy).positive?
             :busy
           elsif responses.fetch(:succeeded).positive?

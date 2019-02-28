@@ -1,20 +1,18 @@
-require 'araignee/story/response'
+require 'araignee/stories/response'
 
-RSpec.describe Araignee::Story::Response do
-  class MyResponse < described_class
-    def defaults
-      { errors: [] }
-    end
-  end
-
+RSpec.describe Araignee::Stories::Response do
   let(:errors) { ['error1'] }
   let(:params) { { result: 1, errors: errors } }
-  let(:response) { described_class.new(params) }
+  let(:defaults) { { errors: [] } }
+
+  let(:response) { described_class.new(params: params, defaults: defaults) }
 
   subject { response }
 
   describe '#initialize' do
     context 'without default params' do
+      let(:defaults) { {} }
+
       it 'params are set as passed in' do
         expect(subject.result).to eq(1)
         expect(subject.errors).to eq(errors)
@@ -23,11 +21,9 @@ RSpec.describe Araignee::Story::Response do
 
     context 'with default params' do
       let(:params) { { result: 1 } }
-      let(:response) { MyResponse.new(params) }
 
       it 'missing params are set with default values' do
-        expect(subject.result).to eq(1)
-        expect(subject.errors).to eq([])
+        expect(subject.errors).to eq(defaults[:errors])
       end
     end
   end

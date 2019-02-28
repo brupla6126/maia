@@ -27,10 +27,9 @@ RSpec.describe Araignee::Ai::Core::Timeout do
   end
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     context 'when delay of 3 seconds' do
       let(:start_time) { Time.now }

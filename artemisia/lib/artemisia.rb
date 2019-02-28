@@ -1,7 +1,6 @@
 require 'ostruct'
 
 require 'artemisia/version'
-require 'artemisia/context'
 require 'artemisia/engine'
 
 module Artemisia
@@ -13,13 +12,13 @@ module Artemisia
 
   def self.boot
     config_params = {
-      initializers_path: File.join(Artemisia.root, 'config', 'initializers'),
-      factories_paths: [File.join(Artemisia.root, 'app', 'factories')],
-      templates_paths: [File.join(Artemisia.root, 'app', 'templates')]
+      initializer_paths: [File.join(Artemisia.root, 'config', 'initializers')],
+      factory_paths: [File.join(Artemisia.root, 'app', 'factories')],
+      template_paths: [File.join(Artemisia.root, 'app', 'templates')]
     }
     @config = OpenStruct.new(config_params)
-    @context = Context.new(@config)
-    @engine = Engine.new(@context)
+    @context = OpenStruct.new
+    @engine = Engine.new(config: @config, context: @context)
 
     @engine.boot
     @engine.run
@@ -27,6 +26,6 @@ module Artemisia
   end
 
   def self.setup(&block)
-    yield @context.config if block
+    yield @config, @context if block
   end
 end

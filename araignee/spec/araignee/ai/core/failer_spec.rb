@@ -1,7 +1,10 @@
 require 'araignee/ai/core/failer'
+require 'spec_helpers/ai_helpers'
 
 RSpec.describe Araignee::Ai::Core::Failer do
-  let(:child) { Araignee::Ai::Core::NodeSucceeded.new }
+  include Araignee::Ai::Helpers
+
+  let(:child) { Araignee::Ai::Helpers::NodeSucceeded.new }
   let(:failer) { described_class.new(child: child) }
 
   before do
@@ -18,14 +21,13 @@ RSpec.describe Araignee::Ai::Core::Failer do
   end
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     context 'when child response :succeeded' do
       it 'child is processed' do
-        expect(child).to receive(:execute).with(entity, world)
+        expect(child).to receive(:execute).with(request)
         subject
       end
 
@@ -35,10 +37,10 @@ RSpec.describe Araignee::Ai::Core::Failer do
     end
 
     context 'when child response :failed' do
-      let(:child) { Araignee::Ai::Core::NodeFailed.new }
+      let(:child) { Araignee::Ai::Helpers::NodeFailed.new }
 
       it 'child is processed' do
-        expect(child).to receive(:execute).with(entity, world)
+        expect(child).to receive(:execute).with(request)
         subject
       end
 

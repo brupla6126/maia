@@ -12,8 +12,12 @@ module Araignee
       class Failer < Decorator
         protected
 
-        def execute(entity, world)
-          child.process(entity, world)
+        def valid_response?(response)
+          %i[failed].include?(response)
+        end
+
+        def execute(request)
+          child.process(request)
 
           update_response(:failed)
         end

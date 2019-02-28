@@ -1,7 +1,10 @@
 require 'araignee/ai/core/repeater'
+require 'spec_helpers/ai_helpers'
 
 RSpec.describe Araignee::Ai::Core::Repeater do
-  let(:child) { Araignee::Ai::Core::NodeFailed.new }
+  include Araignee::Ai::Helpers
+
+  let(:child) { Araignee::Ai::Helpers::NodeFailed.new }
   let(:repeater) { described_class.new(child: child) }
 
   before do
@@ -18,14 +21,13 @@ RSpec.describe Araignee::Ai::Core::Repeater do
   end
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { repeater.process(entity, world) }
+    subject { repeater.process(request) }
 
     context 'calling repeater#repeat' do
       it 'repeater#repeat is called' do
-        expect(repeater).to receive(:repeat).with(child, entity, world)
+        expect(repeater).to receive(:repeat).with(child, request)
         subject
       end
     end

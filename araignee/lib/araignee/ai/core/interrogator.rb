@@ -9,10 +9,14 @@ module Araignee
       class Interrogator < Decorator
         protected
 
-        def execute(entity, world)
-          responded = child.process(entity, world).response
+        def execute(request)
+          responded = child.process(request).response
 
           update_response(handle_response(responded))
+        end
+
+        def valid_response?(response)
+          %i[failed succeeded].include?(response)
         end
 
         # return :succeeded or :failed

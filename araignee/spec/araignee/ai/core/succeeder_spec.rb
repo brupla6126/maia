@@ -1,8 +1,11 @@
 require 'araignee/ai/core/succeeder'
+require 'spec_helpers/ai_helpers'
 
 RSpec.describe Araignee::Ai::Core::Succeeder do
-  let(:node_failed) { Araignee::Ai::Core::NodeFailed.new }
-  let(:node_succeeded) { Araignee::Ai::Core::NodeSucceeded.new }
+  include Araignee::Ai::Helpers
+
+  let(:node_failed) { Araignee::Ai::Helpers::NodeFailed.new }
+  let(:node_succeeded) { Araignee::Ai::Helpers::NodeSucceeded.new }
 
   let(:child) { node_succeeded }
 
@@ -22,14 +25,13 @@ RSpec.describe Araignee::Ai::Core::Succeeder do
   end
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     context 'when child response :succeeded' do
       it 'child is processed' do
-        expect(child).to receive(:execute).with(entity, world)
+        expect(child).to receive(:execute).with(request)
         subject
       end
 
@@ -42,7 +44,7 @@ RSpec.describe Araignee::Ai::Core::Succeeder do
       let(:child) { node_failed }
 
       it 'child is processed' do
-        expect(child).to receive(:execute).with(entity, world)
+        expect(child).to receive(:execute).with(request)
         subject
       end
 

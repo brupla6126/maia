@@ -12,10 +12,10 @@ module Araignee
         # If the interrogator node evaluates to :succeeded, the guard
         # will return the processed guarded node state, otherwise
         # returns :failed.
-        def execute(entity, world)
+        def execute(request)
           responded = :failed
 
-          responded = child.process(entity, world).response if interrogator.process(entity, world).succeeded?
+          responded = child.process(request).response if interrogator.process(request).succeeded?
 
           update_response(handle_response(responded))
         end

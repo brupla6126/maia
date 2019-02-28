@@ -1,13 +1,16 @@
 require 'araignee/ai/core/guard'
 require 'araignee/ai/core/interrogator'
+require 'spec_helpers/ai_helpers'
 
 RSpec.describe Araignee::Ai::Core::Guard do
-  let(:interrogator_busy) { Araignee::Ai::Core::InterrogatorBusy.new }
-  let(:interrogator_failed) { Araignee::Ai::Core::InterrogatorFailed.new }
-  let(:interrogator_succeeded) { Araignee::Ai::Core::InterrogatorSucceeded.new }
+  include Araignee::Ai::Helpers
+
+  let(:interrogator_busy) { Araignee::Ai::Helpers::InterrogatorBusy.new }
+  let(:interrogator_failed) { Araignee::Ai::Helpers::InterrogatorFailed.new }
+  let(:interrogator_succeeded) { Araignee::Ai::Helpers::InterrogatorSucceeded.new }
   let(:child_interrogator) { nil }
   let(:interrogator) { Araignee::Ai::Core::Interrogator.new(child: child_interrogator) }
-  let(:guarded) { Araignee::Ai::Core::NodeSucceeded.new }
+  let(:guarded) { Araignee::Ai::Helpers::NodeSucceeded.new }
 
   let(:guard) { described_class.new(interrogator: interrogator, child: guarded) }
 
@@ -33,10 +36,9 @@ RSpec.describe Araignee::Ai::Core::Guard do
   end
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     context 'when interrogator returns :succeeded' do
       let(:child_interrogator) { interrogator_succeeded }

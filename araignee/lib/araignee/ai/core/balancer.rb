@@ -10,11 +10,11 @@ module Araignee
       class Balancer < Composite
         protected
 
-        def execute(entity, world)
+        def execute(request)
           responded = :failed
 
           nodes.each do |node|
-            responded = node.process(entity, world).response
+            responded = node.process(request).response
           end
 
           update_response(handle_response(responded))

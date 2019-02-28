@@ -9,13 +9,13 @@ module Araignee
       class RepeaterNumberTimes < Repeater
         protected
 
-        def repeat(child, entity, world)
+        def repeat(child, request)
           raise ArgumentError, 'times must be > 0' unless state.times.positive?
 
           child.start! unless child.running?
 
           (1..state.times).each do
-            child.process(entity, world)
+            child.process(request)
           end
         end
       end

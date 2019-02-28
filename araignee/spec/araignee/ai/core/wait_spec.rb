@@ -26,10 +26,9 @@ RSpec.describe Araignee::Ai::Core::Wait do
   end
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     context 'invalid delay' do
       let(:delay) { 0 }

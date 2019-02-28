@@ -5,7 +5,7 @@ module Artemisia
     def initialize(attributes)
       super(attributes)
 
-      raise ArgumentError, 'missing type attribute' unless attributes[:type]
+      raise ArgumentError, 'missing type attribute' unless attributes.key?(:type)
     end
   end
 end

@@ -2,12 +2,11 @@ require 'timecop'
 require 'araignee/ai/core/node'
 
 RSpec.describe Araignee::Ai::Core::Node do
-  let(:world) { {}  }
-  let(:entity) { {} }
-
   let(:attributes) { {} }
 
   let(:node) { described_class.new(attributes) }
+
+  let(:request) { OpenStruct.new(world: {}, entity: {}) }
 
   before do
     node.on(:ai_node_processing) do |params|
@@ -38,14 +37,14 @@ RSpec.describe Araignee::Ai::Core::Node do
   end
 
   describe '#process' do
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     it 'returns self' do
       expect(subject).to eq(node)
     end
 
-    it 'calls execute with entity, world and emits processing events' do
-      expect(node).to receive(:execute).with(entity, world)
+    it 'calls execute with request and emits processing events' do
+      expect(node).to receive(:execute).with(request)
       subject
       expect(node.state).to eq(busy_state)
     end
@@ -56,7 +55,7 @@ RSpec.describe Araignee::Ai::Core::Node do
     subject { super().busy? }
 
     before do
-      node.process(entity, world)
+      node.process(request)
       node.state = busy_state
     end
 
@@ -69,7 +68,7 @@ RSpec.describe Araignee::Ai::Core::Node do
     subject { super().failed? }
 
     before do
-      node.process(entity, world)
+      node.process(request)
       node.state = failed_state
     end
 
@@ -82,7 +81,7 @@ RSpec.describe Araignee::Ai::Core::Node do
     subject { super().succeeded? }
 
     before do
-      node.process(entity, world)
+      node.process(request)
       node.state = succeeded_state
     end
 
@@ -95,7 +94,7 @@ RSpec.describe Araignee::Ai::Core::Node do
     subject { super().reset }
 
     before do
-      node.process(entity, world)
+      node.process(request)
       node.state = busy_state
     end
 

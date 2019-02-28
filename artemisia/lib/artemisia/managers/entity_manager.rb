@@ -16,11 +16,11 @@ module Artemisia
 
       # entity_id String
       def add(entity_id)
-        already = @entities.include?(entity_id)
+        return self if @entities.include?(entity_id)
 
-        @entities << entity_id unless already
+        @entities << entity_id
 
-        emit(:entity_added, entity_id) unless already
+        emit(:entity_added, entity_id)
 
         self
       end
@@ -55,11 +55,11 @@ module Artemisia
 
       # entity_id String
       def disable(entity_id)
-        already_disabled = @disabled.include?(entity_id)
+        return self if @disabled.include?(entity_id)
 
-        @disabled << entity_id unless already_disabled
+        @disabled << entity_id
 
-        emit(:entity_disabled, entity_id) unless already_disabled
+        emit(:entity_disabled, entity_id)
 
         self
       end

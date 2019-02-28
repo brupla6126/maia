@@ -17,10 +17,14 @@ module Araignee
 
         protected
 
-        def execute(_entity, _world)
+        def execute(_request)
           raise ArgumentError, 'delay must be > 0' unless state.delay.positive?
 
           update_response(handle_response)
+        end
+
+        def valid_response?(response)
+          %i[busy failed].include?(response)
         end
 
         def handle_response

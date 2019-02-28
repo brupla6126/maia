@@ -1,8 +1,10 @@
-require 'araignee/utils/log'
+require 'araignee/utils/emitter'
 
 module Araignee
   module Utils
     class State
+      include Araignee::Utils::Emitter
+
       attr_reader :context
 
       def initialize(context)
@@ -11,22 +13,22 @@ module Araignee
 
       # called when entering the state
       def enter
-        Log.info { "Entering state #{inspect}" }
+        emit(:state_entering, self)
       end
 
       # called when pausing the state
       def pause
-        Log.info { "Pausing state #{inspect}" }
+        emit(:state_pausing, self)
       end
 
       # called when resuming the state
       def resume
-        Log.info { "Resuming state #{inspect}" }
+        emit(:state_resuming, self)
       end
 
       # called when leaving the state
       def leave
-        Log.info { "Leaving state #{inspect}" }
+        emit(:state_leaving, self)
       end
     end
   end

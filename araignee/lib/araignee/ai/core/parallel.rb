@@ -10,7 +10,7 @@ module Araignee
       class Parallel < Composite
         protected
 
-        def execute(entity, world)
+        def execute(request)
           raise ArgumentError, 'completions must be >= 0' unless completions >= 0
           raise ArgumentError, 'failures must be >= 0' unless failures >= 0
 
@@ -21,7 +21,7 @@ module Araignee
           nodes = sort(filter(children), sort_reversed)
 
           nodes.each do |child|
-            responded = child.process(entity, world).response
+            responded = child.process(request).response
 
             # count responses
             responses[responded] ||= 0

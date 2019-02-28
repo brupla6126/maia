@@ -19,14 +19,14 @@ module Araignee
 
         protected
 
-        def execute(entity, world)
+        def execute(request)
           raise ArgumentError, 'limit must be > 0' unless state.limit.positive?
 
           state.times += 1
 
           responded =
             if state.times <= state.limit
-              child.process(entity, world).response
+              child.process(request).response
             else
               :failed
             end

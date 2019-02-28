@@ -11,10 +11,10 @@ module Araignee
       class Ternary < Node
         protected
 
-        def execute(entity, world)
-          executing_node = execute_node(interrogator.process(entity, world).response)
+        def execute(request)
+          executing_node = execute_node(interrogator.process(request).response)
 
-          responded = executing_node.process(entity, world).response
+          responded = executing_node.process(request).response
 
           update_response(handle_response(responded))
         end

@@ -1,7 +1,7 @@
-require 'araignee/story/response'
+require 'ostruct'
 
 module Araignee
-  module Story
+  module Stories
     # Validator helper part of Clean Architecture.
     # It validates an object and returns a response.
     class Validator
@@ -16,7 +16,7 @@ module Araignee
       protected
 
       def new_response
-        Response.new
+        OpenStruct.new
       end
 
       private

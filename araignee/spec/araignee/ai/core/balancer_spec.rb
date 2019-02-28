@@ -1,13 +1,16 @@
 require 'araignee/ai/core/balancer'
+require 'spec_helpers/ai_helpers'
 
 RSpec.describe Araignee::Ai::Core::Balancer do
+  include Araignee::Ai::Helpers
+
   let(:picked) { nil }
   let(:picker) { double('[picker]', pick: [picked]) }
   let(:filters) { [] }
 
-  let(:child_succeeded) { Araignee::Ai::Core::NodeSucceeded.new }
-  let(:child_failed) { Araignee::Ai::Core::NodeFailed.new }
-  let(:child_busy) { Araignee::Ai::Core::NodeBusy.new }
+  let(:child_succeeded) { Araignee::Ai::Helpers::NodeSucceeded.new }
+  let(:child_failed) { Araignee::Ai::Helpers::NodeFailed.new }
+  let(:child_busy) { Araignee::Ai::Helpers::NodeBusy.new }
   let(:children) { [1, 2, 3] }
 
   let(:children) { [child_succeeded, child_failed, child_busy] }
@@ -37,10 +40,9 @@ RSpec.describe Araignee::Ai::Core::Balancer do
   end
 
   describe '#process' do
-    let(:world) { {} }
-    let(:entity) { {} }
+    let(:request) { OpenStruct.new }
 
-    subject { super().process(entity, world) }
+    subject { super().process(request) }
 
     context 'when picker picks one child' do
       let(:picked) { children.first }

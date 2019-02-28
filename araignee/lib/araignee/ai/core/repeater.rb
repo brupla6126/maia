@@ -11,13 +11,13 @@ module Araignee
       class Repeater < Decorator
         protected
 
-        def execute(entity, world)
-          repeat(child, entity, world)
+        def execute(request)
+          repeat(child, request)
 
           update_response(:succeeded)
         end
 
-        def repeat(_child, _entity, _world) end
+        def repeat(_child, request) end
       end
     end
   end

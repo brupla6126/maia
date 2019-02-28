@@ -12,10 +12,14 @@ module Araignee
       class Succeeder < Decorator
         protected
 
-        def execute(entity, world)
-          child.process(entity, world)
+        def execute(request)
+          child.process(request)
 
           update_response(:succeeded)
+        end
+
+        def valid_response?(response)
+          %i[succeeded].include?(response)
         end
       end
     end

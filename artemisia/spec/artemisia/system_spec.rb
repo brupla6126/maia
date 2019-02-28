@@ -4,7 +4,7 @@ RSpec.describe Artemisia::System do
   let(:system) { described_class.new(attributes) }
 
   let(:attributes) { OpenStruct.new(type: type, aspect: aspect, active: active) }
-  let(:type) { nil }
+  let(:type) { :entity_system }
   let(:aspect) { nil }
   let(:active) { true }
 
@@ -13,6 +13,7 @@ RSpec.describe Artemisia::System do
   describe '#initialize' do
     context 'without a type' do
       let(:aspect) { Artemisia::Aspect.new }
+      let(:type) { nil }
 
       it 'raise ArgumentError' do
         expect { subject }.to raise_error(ArgumentError, 'missing type')
@@ -20,7 +21,6 @@ RSpec.describe Artemisia::System do
     end
 
     context 'without an aspect' do
-      let(:type) { :entity_system }
 
       it 'raise ArgumentError' do
         expect { subject }.to raise_error(ArgumentError, 'missing aspect')
@@ -28,7 +28,6 @@ RSpec.describe Artemisia::System do
     end
 
     context 'with type and aspect' do
-      let(:type) { :entity_system }
       let(:aspect) { Artemisia::Aspect.new }
 
       it 'has a type' do
@@ -44,7 +43,6 @@ RSpec.describe Artemisia::System do
   describe '#activate' do
     subject { super().activate }
 
-    let(:type) { :entity_system }
     let(:aspect) { double('[aspect]') }
 
     context 'was deactivated' do
@@ -60,7 +58,6 @@ RSpec.describe Artemisia::System do
   describe '#deactivate' do
     subject { super().deactivate }
 
-    let(:type) { :entity_system }
     let(:aspect) { double('[aspect]') }
 
     context 'was activated' do
@@ -75,8 +72,6 @@ RSpec.describe Artemisia::System do
 
   describe '#dummy?' do
     subject { super().dummy? }
-
-    let(:type) { :entity_system }
 
     context 'without empty aspect' do
       let(:aspect) { double('[aspect]', empty?: false) }

@@ -10,9 +10,9 @@ module Araignee
       class RepeaterUntilFailure < Repeater
         protected
 
-        def repeat(child, entity, world)
+        def repeat(child, request)
           loop do
-            break if child.process(entity, world).failed?
+            break if child.process(request).failed?
           end
         end
       end

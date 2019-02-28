@@ -10,9 +10,9 @@ module Araignee
       class RepeaterUntilSuccess < Repeater
         protected
 
-        def repeat(child, entity, world)
+        def repeat(child, request)
           loop do
-            break if child.process(entity, world).succeeded?
+            break if child.process(request).succeeded?
           end
         end
       end

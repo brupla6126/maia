@@ -9,11 +9,11 @@ module Araignee
       class Sequence < Composite
         protected
 
-        def execute(entity, world)
+        def execute(request)
           responses = initialize_responses
 
           nodes.each do |node|
-            respond(responses, node.process(entity, world).response)
+            respond(responses, node.process(request).response)
             # no need to execute further if this node is busy or has failed
             break if node.busy? || node.failed?
           end

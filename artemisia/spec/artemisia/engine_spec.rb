@@ -5,9 +5,9 @@ RSpec.describe Artemisia::Engine do
   let(:config_params) { {} }
 
   let(:config) { OpenStruct.new(config_params) }
-  let(:context) { OpenStruct.new(config: config) }
+  let(:context) { OpenStruct.new }
 
-  let(:engine) { described_class.new(context) }
+  let(:engine) { described_class.new(config: config, context: context) }
 
   subject { engine }
 
@@ -15,6 +15,7 @@ RSpec.describe Artemisia::Engine do
     subject { super() }
 
     it 'sets context' do
+      expect(subject.config).to eq(config)
       expect(subject.context).to eq(context)
       expect(subject.worlds).to eq([])
     end
@@ -23,28 +24,22 @@ RSpec.describe Artemisia::Engine do
   describe '#boot' do
     subject { super().boot }
 
-    let(:initializers_path) { 'abc' }
-    let(:factories_paths) { ['def'] }
-    let(:templates_paths) { ['ghi'] }
+    let(:initializer_paths) { ['abc', 'abc'] }
+    let(:factory_paths) { ['def'] }
+    let(:template_paths) { ['ghi'] }
 
     let(:config_params) do
-      { initializers_path: initializers_path,
-        factories_paths: factories_paths,
-        templates_paths: templates_paths }
+      { initializer_paths: initializer_paths,
+        factory_paths: factory_paths,
+        template_paths: template_paths }
     end
 
-    it 'load initializers' do
-      expect(engine).to receive(:load_initializers).with(config.initializers_path)
+    it 'load initializers, factories and templates' do
       subject
     end
 
-    it 'load factories' do
-      expect(engine).to receive(:load_factories).with(config.factories_paths)
-      subject
-    end
-
-    it 'load factories' do
-      expect(engine).to receive(:load_templates).with(config.templates_paths)
+    it 'does not load files more than once' do
+      expect(engine).to receive(:load_files).with((config.initializer_paths + config.factory_paths + config.template_paths).uniq)
       subject
     end
   end
@@ -53,6 +48,13 @@ RSpec.describe Artemisia::Engine do
   end
 
   describe '#shutdown' do
+    subject { super().shutdown }
+
+    it 'sends :before_shutdown event' do
+      expect(engine).to receive(:emit).with(:before_shutdown)
+      expect(engine).to receive(:emit).with(:after_shutdown)
+      subject
+    end
   end
   #   describe '#worlds' do
   #     subject { super().worlds }

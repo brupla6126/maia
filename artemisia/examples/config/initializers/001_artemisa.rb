@@ -1,6 +1,6 @@
 require 'artemisia'
 
 Artemisia.setup do |config|
-  puts "initializers path: #{config.initializers_path}"
-  puts "factories paths: #{config.factories_paths}"
+  puts "initializers paths #{config.initializer_paths}"
+  puts "factory paths: #{config.factory_paths}"
 end
